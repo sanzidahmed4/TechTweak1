@@ -6,6 +6,7 @@ import ActivityLog from "@/lib/models/ActivityLog";
 import AnalyticsEvent from "@/lib/models/AnalyticsEvent";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import { Smartphone, Tags, FileText, ArrowRight, TrendingUp, Users, Activity, Battery, Cpu } from "lucide-react";
 import * as Icons from "lucide-react";
 
 export default async function AdminDashboardPage() {
