@@ -1,0 +1,481 @@
+"use server";
+
+import connectToDatabase from "@/lib/mongodb/mongoose";
+import Phone from "@/lib/models/Phone";
+import { revalidatePath } from "next/cache";
+import slugify from "slugify";
+import { redirect } from "next/navigation";
+
+function parseSafeInt(value: any): number | null {
+  if (!value) return null;
+  if (typeof value === "number") return value;
+  // Extract numbers and negative sign
+  const cleanVal = (value as string).replace(/[^\d-]/g, '');
+  const parsed = parseInt(cleanVal, 10);
+  return isNaN(parsed) ? null : parsed;
+}
+
+export async function addPhone(formData: FormData) {
+  await connectToDatabase();
+
+  const name = formData.get("name") as string;
+  const brand_id = formData.get("brand_id") as string;
+  
+  // Automatic slug generation if not provided
+  let slug = formData.get("slug") as string;
+  if (!slug) {
+    slug = slugify(name, { lower: true, strict: true });
+  }
+
+  // Parse images from external folder paths or Cloudinary urls
+  const imagesRaw = formData.get("images") as string;
+  const images = imagesRaw 
+    ? (imagesRaw.includes("|") 
+        ? imagesRaw.split("|") 
+        : imagesRaw.split(","))
+        .map(img => img.trim()).filter(Boolean) 
+    : [];
+
+  // Parse arrays
+  const colorsRaw = formData.get("colors") as string;
+  const colors = colorsRaw ? colorsRaw.split(",").map(c => c.trim()).filter(Boolean) : [];
+
+  const aiFeaturesRaw = formData.get("ai_features") as string;
+  const ai_features = aiFeaturesRaw ? aiFeaturesRaw.split(",").map(f => f.trim()).filter(Boolean) : [];
+
+  // Auto-generate helper will run before saving
+
+  // Old fields backward compatibility mapping
+  const cpu = formData.get("cpu") as string;
+  const ram_variants = formData.get("ram_variants") as string;
+  const storage_variants = formData.get("storage_variants") as string;
+  const display_type = formData.get("display_type") as string;
+  const screen_size = formData.get("screen_size") as string;
+  const cam_main_sensor = formData.get("cam_main_sensor") as string;
+  const cam_front_resolution = formData.get("cam_front_resolution") as string;
+  const battery_capacity = formData.get("battery_capacity") as string;
+  const charging_wired = formData.get("charging_wired") as string;
+  const has_5g = formData.get("has_5g") === "on";
+  const has_audio_jack = formData.get("has_audio_jack") === "on";
+
+  const processor = cpu || (formData.get("chipset_highlight") as string);
+  const ram = ram_variants;
+  const storage = storage_variants;
+  const display = `${screen_size || ""} ${display_type || ""}`.trim() || (formData.get("display_highlight") as string);
+  const camera_main = cam_main_sensor || (formData.get("camera_highlight") as string);
+  const camera_front = cam_front_resolution || (formData.get("camera_front") as string);
+  const battery = battery_capacity || (formData.get("battery_highlight") as string);
+  const charging = charging_wired || (formData.get("charging") as string);
+  const network = has_5g ? "5G Network" : "4G LTE";
+
+  const phoneData = {
+    name,
+    slug,
+    brand_id,
+    is_published: formData.get("is_published") === "on",
+    is_featured: formData.get("is_featured") === "on",
+    upcoming: formData.get("upcoming") === "on",
+    is_official: formData.get("is_official") === "on",
+    release_date: formData.get("release_date") || null,
+    colors,
+    pros: [] as string[],
+    cons: [] as string[],
+    faqs: [] as any[],
+    model_number: formData.get("model_number") as string,
+    phone_variants: formData.get("phone_variants") as string,
+    made_in: formData.get("made_in") as string,
+    images,
+    
+    // Quick Highlights
+    chipset_highlight: formData.get("chipset_highlight") as string,
+    camera_highlight: formData.get("camera_highlight") as string,
+    display_highlight: formData.get("display_highlight") as string,
+    battery_highlight: formData.get("battery_highlight") as string,
+    benchmark_highlight: formData.get("benchmark_highlight") as string,
+
+    // Old fallbacks
+    processor,
+    ram,
+    storage,
+    display,
+    camera_main,
+    camera_front,
+    battery,
+    charging,
+    network,
+    antutu_score: parseSafeInt(formData.get("antutu_score")),
+    price_bdt: parseSafeInt(formData.get("price_official")),
+    price_official: parseSafeInt(formData.get("price_official")),
+    price_unofficial: parseSafeInt(formData.get("price_unofficial")),
+
+    // General Info
+    weight: formData.get("weight") as string,
+    dimensions: formData.get("dimensions") as string,
+    build_material: formData.get("build_material") as string,
+    sim_type: formData.get("sim_type") as string,
+    water_resistance: formData.get("water_resistance") as string,
+
+    // Display
+    display_type,
+    screen_size,
+    resolution: formData.get("resolution") as string,
+    refresh_rate: formData.get("refresh_rate") as string,
+    brightness: formData.get("brightness") as string,
+    hdr: formData.get("hdr") as string,
+    protection: formData.get("protection") as string,
+    pixel_density: formData.get("pixel_density") as string,
+
+    // Performance
+    cpu,
+    gpu: formData.get("gpu") as string,
+    fabrication: formData.get("fabrication") as string,
+    ram_variants,
+    storage_variants,
+    storage_type: formData.get("storage_type") as string,
+    geekbench_score: formData.get("geekbench_score") as string,
+    cooling_system: formData.get("cooling_system") as string,
+
+    // Primary Camera
+    cam_count: formData.get("cam_count") as string,
+    cam_main_sensor,
+    cam_ultrawide: formData.get("cam_ultrawide") as string,
+    cam_telephoto: formData.get("cam_telephoto") as string,
+    cam_macro: formData.get("cam_macro") as string,
+    cam_ois: formData.get("cam_ois") as string,
+    cam_flash: formData.get("cam_flash") as string,
+    cam_video: formData.get("cam_video") as string,
+
+    // Front Camera
+    cam_front_resolution,
+    cam_front_hdr: formData.get("cam_front_hdr") as string,
+    cam_front_portrait: formData.get("cam_front_portrait") as string,
+    cam_front_video: formData.get("cam_front_video") as string,
+
+    // Battery & Charging
+    battery_capacity,
+    charging_wired,
+    charging_wireless: formData.get("charging_wireless") as string,
+    charging_reverse: formData.get("charging_reverse") as string,
+    charger_included: formData.get("charger_included") === "on",
+    usb_type: formData.get("usb_type") as string,
+
+    // Network & Connectivity
+    has_5g,
+    wifi_version: formData.get("wifi_version") as string,
+    bluetooth_version: formData.get("bluetooth_version") as string,
+    has_nfc: formData.get("has_nfc") === "on",
+    gps_specs: formData.get("gps_specs") as string,
+    has_ir_blaster: formData.get("has_ir_blaster") === "on",
+    has_audio_jack,
+    usb_version: formData.get("usb_version") as string,
+
+    // Sensors
+    sensor_fingerprint: formData.get("sensor_fingerprint") as string,
+    has_gyroscope: formData.get("has_gyroscope") === "on",
+    has_compass: formData.get("has_compass") === "on",
+    has_accelerometer: formData.get("has_accelerometer") === "on",
+    has_face_unlock: formData.get("has_face_unlock") === "on",
+
+    // Software & AI
+    android_version: formData.get("android_version") as string,
+    ui_version: formData.get("ui_version") as string,
+    update_policy: formData.get("update_policy") as string,
+    ai_features,
+    has_circle_to_search: formData.get("has_circle_to_search") === "on",
+    has_ai_editing: formData.get("has_ai_editing") === "on",
+    has_live_translation: formData.get("has_live_translation") === "on",
+    has_ai_assistant: formData.get("has_ai_assistant") === "on",
+
+    // Removed manual related IDs reading, left empty to let frontend auto-suggest
+    related_similar_ids: [],
+    related_compare_ids: [],
+    related_better_ids: [],
+  };
+
+  // Auto-generate Pros, Cons, FAQs based on specs
+  const autoPros = [];
+  const autoCons = [];
+  const autoFaqs = [];
+
+  if (has_5g) autoPros.push("Supports Latest 5G Network");
+  
+  const parsedBattery = battery_capacity ? parseSafeInt(battery_capacity) : null;
+  if (parsedBattery && parsedBattery >= 5000) autoPros.push(`Large ${battery_capacity} Battery for all-day use`);
+  
+  if (display_type && (display_type.toLowerCase().includes('amoled') || display_type.toLowerCase().includes('oled'))) autoPros.push("Vibrant and crisp AMOLED/OLED display");
+  
+  const refreshRateRaw = formData.get("refresh_rate") as string;
+  const parsedRefresh = refreshRateRaw ? parseSafeInt(refreshRateRaw) : null;
+  if (parsedRefresh && parsedRefresh >= 120) autoPros.push("Smooth 120Hz+ High Refresh Rate Screen");
+  
+  const parsedCam = cam_main_sensor ? parseSafeInt(cam_main_sensor) : null;
+  if (parsedCam && parsedCam >= 50) autoPros.push(`High resolution ${parsedCam}MP Main Camera`);
+  
+  if (formData.get("water_resistance") && (formData.get("water_resistance") as string).includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
+  
+  if (!formData.get("charger_included") || formData.get("charger_included") !== "on") autoCons.push("Charging adapter is not included in the box");
+  if (!has_audio_jack) autoCons.push("Lacks a 3.5mm headphone jack");
+  
+  const weightRaw = formData.get("weight") as string;
+  const parsedWeight = weightRaw ? parseSafeInt(weightRaw) : null;
+  if (parsedWeight && parsedWeight >= 210) autoCons.push("Device is relatively heavy");
+
+  if (charging_wired) autoFaqs.push({ question: "Does it support fast charging?", answer: `Yes, it supports ${charging_wired}.` });
+  if (has_5g) autoFaqs.push({ question: "Does this smartphone support 5G?", answer: "Yes, it is fully compatible with 5G networks for high-speed internet." });
+  autoFaqs.push({ question: "Is the charger included in the box?", answer: (formData.get("charger_included") === "on") ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
+  if (formData.get("water_resistance")) autoFaqs.push({ question: "Is this phone water-resistant?", answer: formData.get("water_resistance") as string });
+  if (formData.get("made_in")) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${formData.get("made_in") as string}.` });
+
+  phoneData.pros = autoPros;
+  phoneData.cons = autoCons;
+  phoneData.faqs = autoFaqs;
+
+  try {
+    await Phone.create(phoneData);
+  } catch (error: any) {
+    console.error("Error inserting phone:", error);
+    throw new Error(error.message);
+  }
+
+  // Automatic Brand Routing & SEO revalidation
+  revalidatePath("/");
+  revalidatePath("/phones");
+  revalidatePath("/compare");
+  revalidatePath("/phones/[brand]", "page");
+
+  redirect("/admin/phones");
+}
+
+export async function editPhone(id: string, formData: FormData) {
+  await connectToDatabase();
+
+  const name = formData.get("name") as string;
+  const brand_id = formData.get("brand_id") as string;
+  
+  let slug = formData.get("slug") as string;
+  if (!slug) {
+    slug = slugify(name, { lower: true, strict: true });
+  }
+
+  const imagesRaw = formData.get("images") as string;
+  const images = imagesRaw 
+    ? (imagesRaw.includes("|") 
+        ? imagesRaw.split("|") 
+        : imagesRaw.split(","))
+        .map(img => img.trim()).filter(Boolean) 
+    : [];
+
+  const colorsRaw = formData.get("colors") as string;
+  const colors = colorsRaw ? colorsRaw.split(",").map(c => c.trim()).filter(Boolean) : [];
+
+  const aiFeaturesRaw = formData.get("ai_features") as string;
+  const ai_features = aiFeaturesRaw ? aiFeaturesRaw.split(",").map(f => f.trim()).filter(Boolean) : [];
+
+  // Auto-generate helper will run before saving
+
+  const cpu = formData.get("cpu") as string;
+  const ram_variants = formData.get("ram_variants") as string;
+  const storage_variants = formData.get("storage_variants") as string;
+  const display_type = formData.get("display_type") as string;
+  const screen_size = formData.get("screen_size") as string;
+  const cam_main_sensor = formData.get("cam_main_sensor") as string;
+  const cam_front_resolution = formData.get("cam_front_resolution") as string;
+  const battery_capacity = formData.get("battery_capacity") as string;
+  const charging_wired = formData.get("charging_wired") as string;
+  const has_5g = formData.get("has_5g") === "on";
+  const has_audio_jack = formData.get("has_audio_jack") === "on";
+
+  const processor = cpu || (formData.get("chipset_highlight") as string);
+  const ram = ram_variants;
+  const storage = storage_variants;
+  const display = `${screen_size || ""} ${display_type || ""}`.trim() || (formData.get("display_highlight") as string);
+  const camera_main = cam_main_sensor || (formData.get("camera_highlight") as string);
+  const camera_front = cam_front_resolution || (formData.get("camera_front") as string);
+  const battery = battery_capacity || (formData.get("battery_highlight") as string);
+  const charging = charging_wired || (formData.get("charging") as string);
+  const network = has_5g ? "5G Network" : "4G LTE";
+
+  const phoneData = {
+    name,
+    slug,
+    brand_id,
+    is_published: formData.get("is_published") === "on",
+    is_featured: formData.get("is_featured") === "on",
+    upcoming: formData.get("upcoming") === "on",
+    is_official: formData.get("is_official") === "on",
+    release_date: formData.get("release_date") || null,
+    colors,
+    pros: [] as string[],
+    cons: [] as string[],
+    faqs: [] as any[],
+    model_number: formData.get("model_number") as string,
+    phone_variants: formData.get("phone_variants") as string,
+    made_in: formData.get("made_in") as string,
+    images,
+    
+    // Quick Highlights
+    chipset_highlight: formData.get("chipset_highlight") as string,
+    camera_highlight: formData.get("camera_highlight") as string,
+    display_highlight: formData.get("display_highlight") as string,
+    battery_highlight: formData.get("battery_highlight") as string,
+    benchmark_highlight: formData.get("benchmark_highlight") as string,
+
+    // Old fallbacks
+    processor,
+    ram,
+    storage,
+    display,
+    camera_main,
+    camera_front,
+    battery,
+    charging,
+    network,
+    antutu_score: parseSafeInt(formData.get("antutu_score")),
+    price_bdt: parseSafeInt(formData.get("price_official")),
+    price_official: parseSafeInt(formData.get("price_official")),
+    price_unofficial: parseSafeInt(formData.get("price_unofficial")),
+
+    // General Info
+    weight: formData.get("weight") as string,
+    dimensions: formData.get("dimensions") as string,
+    build_material: formData.get("build_material") as string,
+    sim_type: formData.get("sim_type") as string,
+    water_resistance: formData.get("water_resistance") as string,
+
+    // Display
+    display_type,
+    screen_size,
+    resolution: formData.get("resolution") as string,
+    refresh_rate: formData.get("refresh_rate") as string,
+    brightness: formData.get("brightness") as string,
+    hdr: formData.get("hdr") as string,
+    protection: formData.get("protection") as string,
+    pixel_density: formData.get("pixel_density") as string,
+
+    // Performance
+    cpu,
+    gpu: formData.get("gpu") as string,
+    fabrication: formData.get("fabrication") as string,
+    ram_variants,
+    storage_variants,
+    storage_type: formData.get("storage_type") as string,
+    geekbench_score: formData.get("geekbench_score") as string,
+    cooling_system: formData.get("cooling_system") as string,
+
+    // Primary Camera
+    cam_count: formData.get("cam_count") as string,
+    cam_main_sensor,
+    cam_ultrawide: formData.get("cam_ultrawide") as string,
+    cam_telephoto: formData.get("cam_telephoto") as string,
+    cam_macro: formData.get("cam_macro") as string,
+    cam_ois: formData.get("cam_ois") as string,
+    cam_flash: formData.get("cam_flash") as string,
+    cam_video: formData.get("cam_video") as string,
+
+    // Front Camera
+    cam_front_resolution,
+    cam_front_hdr: formData.get("cam_front_hdr") as string,
+    cam_front_portrait: formData.get("cam_front_portrait") as string,
+    cam_front_video: formData.get("cam_front_video") as string,
+
+    // Battery & Charging
+    battery_capacity,
+    charging_wired,
+    charging_wireless: formData.get("charging_wireless") as string,
+    charging_reverse: formData.get("charging_reverse") as string,
+    charger_included: formData.get("charger_included") === "on",
+    usb_type: formData.get("usb_type") as string,
+
+    // Network & Connectivity
+    has_5g,
+    wifi_version: formData.get("wifi_version") as string,
+    bluetooth_version: formData.get("bluetooth_version") as string,
+    has_nfc: formData.get("has_nfc") === "on",
+    gps_specs: formData.get("gps_specs") as string,
+    has_ir_blaster: formData.get("has_ir_blaster") === "on",
+    has_audio_jack,
+    usb_version: formData.get("usb_version") as string,
+
+    // Sensors
+    sensor_fingerprint: formData.get("sensor_fingerprint") as string,
+    has_gyroscope: formData.get("has_gyroscope") === "on",
+    has_compass: formData.get("has_compass") === "on",
+    has_accelerometer: formData.get("has_accelerometer") === "on",
+    has_face_unlock: formData.get("has_face_unlock") === "on",
+
+    // Software & AI
+    android_version: formData.get("android_version") as string,
+    ui_version: formData.get("ui_version") as string,
+    update_policy: formData.get("update_policy") as string,
+    ai_features,
+    has_circle_to_search: formData.get("has_circle_to_search") === "on",
+    has_ai_editing: formData.get("has_ai_editing") === "on",
+    has_live_translation: formData.get("has_live_translation") === "on",
+    has_ai_assistant: formData.get("has_ai_assistant") === "on",
+
+    // Removed manual related IDs reading, left empty to let frontend auto-suggest
+    related_similar_ids: [],
+    related_compare_ids: [],
+    related_better_ids: [],
+    
+    updated_at: new Date(),
+  };
+
+  // Auto-generate Pros, Cons, FAQs based on specs
+  const autoPros = [];
+  const autoCons = [];
+  const autoFaqs = [];
+
+  if (has_5g) autoPros.push("Supports Latest 5G Network");
+  
+  const parsedBattery = battery_capacity ? parseSafeInt(battery_capacity) : null;
+  if (parsedBattery && parsedBattery >= 5000) autoPros.push(`Large ${battery_capacity} Battery for all-day use`);
+  
+  if (display_type && (display_type.toLowerCase().includes('amoled') || display_type.toLowerCase().includes('oled'))) autoPros.push("Vibrant and crisp AMOLED/OLED display");
+  
+  const refreshRateRaw = formData.get("refresh_rate") as string;
+  const parsedRefresh = refreshRateRaw ? parseSafeInt(refreshRateRaw) : null;
+  if (parsedRefresh && parsedRefresh >= 120) autoPros.push("Smooth 120Hz+ High Refresh Rate Screen");
+  
+  const parsedCam = cam_main_sensor ? parseSafeInt(cam_main_sensor) : null;
+  if (parsedCam && parsedCam >= 50) autoPros.push(`High resolution ${parsedCam}MP Main Camera`);
+  
+  if (formData.get("water_resistance") && (formData.get("water_resistance") as string).includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
+  
+  if (!formData.get("charger_included") || formData.get("charger_included") !== "on") autoCons.push("Charging adapter is not included in the box");
+  if (!has_audio_jack) autoCons.push("Lacks a 3.5mm headphone jack");
+  
+  const weightRaw = formData.get("weight") as string;
+  const parsedWeight = weightRaw ? parseSafeInt(weightRaw) : null;
+  if (parsedWeight && parsedWeight >= 210) autoCons.push("Device is relatively heavy");
+
+  if (charging_wired) autoFaqs.push({ question: "Does it support fast charging?", answer: `Yes, it supports ${charging_wired}.` });
+  if (has_5g) autoFaqs.push({ question: "Does this smartphone support 5G?", answer: "Yes, it is fully compatible with 5G networks for high-speed internet." });
+  autoFaqs.push({ question: "Is the charger included in the box?", answer: (formData.get("charger_included") === "on") ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
+  if (formData.get("water_resistance")) autoFaqs.push({ question: "Is this phone water-resistant?", answer: formData.get("water_resistance") as string });
+  if (formData.get("made_in")) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${formData.get("made_in") as string}.` });
+
+  phoneData.pros = autoPros;
+  phoneData.cons = autoCons;
+  phoneData.faqs = autoFaqs;
+
+  try {
+    await Phone.findByIdAndUpdate(id, phoneData);
+  } catch (error: any) {
+    console.error("Error updating phone:", error);
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/phones");
+  revalidatePath("/compare");
+  revalidatePath("/phones/[brand]", "page");
+  revalidatePath("/phones/[brand]/[model]", "page");
+
+  const returnUrl = formData.get("returnUrl") as string;
+  if (returnUrl) {
+    redirect(returnUrl);
+  } else {
+    redirect("/admin/phones");
+  }
+}

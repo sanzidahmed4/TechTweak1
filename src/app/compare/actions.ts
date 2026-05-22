@@ -1,0 +1,25 @@
+"use server";
+
+import connectToDatabase from "@/lib/mongodb/mongoose";
+import Phone from "@/lib/models/Phone";
+
+export async function searchPhonesForCompare(query: string) {
+  await connectToDatabase();
+  try {
+    const rawPhones = await Phone.find({ name: { $regex: query, $options: 'i' } })
+      .populate('brand_id', 'name')
+      .limit(10)
+      .lean();
+      
+    return rawPhones.map((p: any) => ({
+      id: p._id.toString(),
+      name: p.name,
+      slug: p.slug,
+      brands: { name: p.brand_id?.name },
+      images: p.images
+    }));
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
