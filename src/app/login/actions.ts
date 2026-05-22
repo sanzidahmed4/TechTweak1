@@ -9,7 +9,7 @@ import { signToken } from "@/lib/auth/jwt";
 
 export async function login(formData: FormData) {
   try {
-    const email = formData.get("email") as string;
+    const email = (formData.get("email") as string || "").trim().toLowerCase();
     const password = formData.get("password") as string;
 
     if (!email || !password) {
