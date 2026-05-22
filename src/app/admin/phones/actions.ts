@@ -2,6 +2,7 @@
 
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
+import ActivityLog from "@/lib/models/ActivityLog";
 import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { redirect } from "next/navigation";
@@ -232,6 +233,15 @@ export async function addPhone(formData: FormData) {
 
   try {
     await Phone.create(phoneData);
+    
+    // Log activity
+    await ActivityLog.create({
+      title: `Added new phone: ${name}`,
+      type: 'Phone',
+      action: 'Create',
+      icon: 'Smartphone',
+      color: 'text-blue-500 bg-blue-50',
+    });
   } catch (error: any) {
     console.error("Error inserting phone:", error);
     throw new Error(error.message);
@@ -461,6 +471,15 @@ export async function editPhone(id: string, formData: FormData) {
 
   try {
     await Phone.findByIdAndUpdate(id, phoneData);
+    
+    // Log activity
+    await ActivityLog.create({
+      title: `Updated phone: ${name}`,
+      type: 'Phone',
+      action: 'Update',
+      icon: 'Smartphone',
+      color: 'text-purple-500 bg-purple-50',
+    });
   } catch (error: any) {
     console.error("Error updating phone:", error);
     throw new Error(error.message);

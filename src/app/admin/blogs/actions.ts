@@ -2,6 +2,7 @@
 
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Post from "@/lib/models/Post";
+import ActivityLog from "@/lib/models/ActivityLog";
 import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { redirect } from "next/navigation";
@@ -40,6 +41,15 @@ export async function addBlogPost(formData: FormData) {
 
   try {
     await Post.create(postData);
+    
+    // Log activity
+    await ActivityLog.create({
+      title: `Published article: ${title}`,
+      type: 'Post',
+      action: is_published ? 'Publish' : 'Create',
+      icon: 'FileText',
+      color: 'text-amber-500 bg-amber-50',
+    });
   } catch (error: any) {
     console.error("Error inserting post:", error);
     throw new Error(error.message);
@@ -87,6 +97,15 @@ export async function updateBlogPost(id: string, formData: FormData) {
 
   try {
     await Post.findByIdAndUpdate(id, postData);
+    
+    // Log activity
+    await ActivityLog.create({
+      title: `Updated article: ${title}`,
+      type: 'Post',
+      action: 'Update',
+      icon: 'FileText',
+      color: 'text-amber-500 bg-amber-50',
+    });
   } catch (error: any) {
     console.error("Error updating post:", error);
     throw new Error(error.message);
@@ -101,7 +120,18 @@ export async function deleteBlogPost(id: string) {
   await connectToDatabase();
   
   try {
+    const post = await Post.findById(id);
     await Post.findByIdAndDelete(id);
+    
+    if (post) {
+      await ActivityLog.create({
+        title: `Deleted article: ${post.title}`,
+        type: 'Post',
+        action: 'Delete',
+        icon: 'Trash2',
+        color: 'text-red-500 bg-red-50',
+      });
+    }
   } catch (error: any) {
     console.error("Error deleting post:", error);
     throw new Error(error.message);

@@ -2,22 +2,68 @@ import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import Brand from "@/lib/models/Brand";
 import Post from "@/lib/models/Post";
+import ActivityLog from "@/lib/models/ActivityLog";
+import AnalyticsEvent from "@/lib/models/AnalyticsEvent";
 import Link from "next/link";
-import { Smartphone, Tags, FileText, ArrowRight, TrendingUp, Users, Activity, Battery, Cpu } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import * as Icons from "lucide-react";
 
 export default async function AdminDashboardPage() {
   await connectToDatabase();
   
   // Fetch real counts
-  let phonesCount = 0, brandsCount = 0, postsCount = 0;
+  let phonesCount = 0, brandsCount = 0, postsCount = 0, monthlyVisitors = 0;
+  let recentActivities: any[] = [];
+  let chartData: number[] = [10, 10, 10, 10, 10, 10, 10]; // Fallback minimums
+
   try {
     [phonesCount, brandsCount, postsCount] = await Promise.all([
       Phone.countDocuments(),
       Brand.countDocuments(),
       Post.countDocuments(),
     ]);
+
+    // 30 days visitors count (unique sessions)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const uniqueSessions = await AnalyticsEvent.distinct('session_id', {
+      created_at: { $gte: thirtyDaysAgo }
+    });
+    monthlyVisitors = uniqueSessions.length;
+
+    // Last 7 days traffic for chart
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const events = await AnalyticsEvent.aggregate([
+      { $match: { created_at: { $gte: sevenDaysAgo } } },
+      { $group: {
+          _id: { $dayOfWeek: "$created_at" }, // 1 (Sun) to 7 (Sat)
+          count: { $sum: 1 }
+      }}
+    ]);
+    
+    // Map to array where Mon is index 0
+    const dayMap: Record<number, number> = { 2: 0, 3: 1, 4: 2, 5: 3, 6: 4, 7: 5, 1: 6 };
+    let maxCount = 1;
+    let rawChartData = [0, 0, 0, 0, 0, 0, 0];
+    
+    events.forEach(e => {
+       const idx = dayMap[e._id];
+       if (idx !== undefined) {
+         rawChartData[idx] = e.count;
+         if (e.count > maxCount) maxCount = e.count;
+       }
+    });
+    
+    // Convert to percentages
+    chartData = rawChartData.map(c => Math.max(10, Math.floor((c / maxCount) * 100)));
+
+    recentActivities = await ActivityLog.find().sort({ created_at: -1 }).limit(5).lean();
+
   } catch (err) {
-    console.error("MongoDB count failed", err);
+    console.error("Dashboard fetch failed", err);
   }
 
   return (
@@ -65,7 +111,7 @@ export default async function AdminDashboardPage() {
             </span>
           </div>
           <h3 className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Monthly Visitors</h3>
-          <p className="text-4xl font-black text-slate-900">142.5K</p>
+          <p className="text-4xl font-black text-slate-900">{monthlyVisitors}</p>
         </div>
 
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group">
@@ -94,7 +140,7 @@ export default async function AdminDashboardPage() {
             </select>
           </div>
           <div className="h-64 w-full flex items-end justify-between gap-2 px-2">
-            {[40, 60, 30, 80, 50, 90, 70].map((height, i) => (
+            {chartData.map((height, i) => (
               <div key={i} className="w-full bg-slate-100 rounded-t-xl relative group">
                 <div 
                   className="absolute bottom-0 w-full bg-primary/20 rounded-t-xl group-hover:bg-primary smooth-transition" 
@@ -114,24 +160,27 @@ export default async function AdminDashboardPage() {
             <h2 className="text-xl font-bold text-slate-900">Recent Activity</h2>
           </div>
           <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
-            {[
-              { title: "Published 'Galaxy S25 Ultra'", time: "2 hours ago", icon: Smartphone, color: "text-blue-500 bg-blue-50" },
-              { title: "Updated SEO Schema", time: "5 hours ago", icon: FileText, color: "text-purple-500 bg-purple-50" },
-              { title: "Added 'Snapdragon 8 Gen 4'", time: "1 day ago", icon: Cpu, color: "text-amber-500 bg-amber-50" },
-              { title: "System Backup Completed", time: "2 days ago", icon: Activity, color: "text-green-500 bg-green-50" },
-            ].map((log, i) => (
+            {recentActivities.length > 0 ? recentActivities.map((log, i) => {
+              const IconComponent = (Icons as any)[log.icon] || Icons.Activity;
+              return (
               <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white ${log.color} shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10`}>
-                  <log.icon size={16} />
+                  <IconComponent size={16} />
                 </div>
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl bg-slate-50 border border-slate-100 group-hover:border-slate-300 smooth-transition">
                   <div className="flex items-center justify-between mb-1">
                     <div className="font-bold text-slate-900 text-sm">{log.title}</div>
                   </div>
-                  <div className="text-xs text-slate-500 font-medium">{log.time}</div>
+                  <div className="text-xs text-slate-500 font-medium">
+                    {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
+                  </div>
                 </div>
               </div>
-            ))}
+            )}) : (
+              <div className="relative text-center text-slate-500 py-8 bg-slate-50 rounded-2xl border border-dashed border-slate-200 z-10">
+                No recent activity logged yet.
+              </div>
+            )}
           </div>
         </div>
       </div>
