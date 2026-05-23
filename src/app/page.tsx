@@ -49,18 +49,7 @@ export default async function Home() {
     console.error("MongoDB not connected or error fetching", error);
   }
 
-  // Fallbacks
-  if (featuredPhones.length === 0) {
-    featuredPhones = [1, 2, 3, 4, 5, 6].map(i => ({
-      id: i, name: `Model ${i} Pro`, slug: `model-${i}-pro`, brands: { name: `Brand ${i}`, slug: `brand-${i}` }, price_bdt: 150000, images: []
-    }));
-  }
-  
-  if (latestArticles.length === 0) {
-    latestArticles = [1, 2, 3].map(i => ({
-      id: i, title: `The Future of Smartphone Tech ${i}`, excerpt: "A deep dive into upcoming features.", slug: `future-tech-${i}`, categories: { name: "Insights" }
-    }));
-  }
+  // Remove demo content fallbacks
 
   return (
     <>
@@ -87,7 +76,15 @@ export default async function Home() {
             </Link>
           </div>
           
-          <TrendingCarousel phones={featuredPhones} />
+          {featuredPhones.length > 0 ? (
+            <TrendingCarousel phones={featuredPhones} />
+          ) : (
+            <div className="bg-white p-12 rounded-3xl text-center border border-slate-200 shadow-sm">
+              <Smartphone size={48} className="mx-auto text-slate-300 mb-4" />
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No Phones Available</h3>
+              <p className="text-slate-500">We are updating our catalog. Check back soon!</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -163,25 +160,33 @@ export default async function Home() {
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {latestArticles.map((article) => (
-              <Link href={`/news/${article.slug}`} key={article.id} className="group block">
-                <div className="w-full aspect-video bg-slate-200 rounded-3xl mb-6 overflow-hidden relative">
-                  {article.featured_image ? (
-                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={article.featured_image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 smooth-transition" />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-slate-400">Image</div>
-                  )}
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-slate-900 text-xs font-bold px-3 py-1.5 rounded-full">
-                    {article.categories?.name}
+          {latestArticles.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {latestArticles.map((article) => (
+                <Link href={`/news/${article.slug}`} key={article.id} className="group block">
+                  <div className="w-full aspect-video bg-slate-200 rounded-3xl mb-6 overflow-hidden relative">
+                    {article.featured_image ? (
+                       // eslint-disable-next-line @next/next/no-img-element
+                      <img src={article.featured_image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 smooth-transition" />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-slate-400">Image</div>
+                    )}
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-slate-900 text-xs font-bold px-3 py-1.5 rounded-full">
+                      {article.categories?.name}
+                    </div>
                   </div>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-primary smooth-transition line-clamp-2 leading-tight">{article.title}</h3>
-                <p className="text-slate-500 line-clamp-2 leading-relaxed">{article.excerpt}</p>
-              </Link>
-            ))}
-          </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-primary smooth-transition line-clamp-2 leading-tight">{article.title}</h3>
+                  <p className="text-slate-500 line-clamp-2 leading-relaxed">{article.excerpt}</p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white p-12 rounded-3xl text-center border border-slate-200 shadow-sm">
+              <FileText size={48} className="mx-auto text-slate-300 mb-4" />
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No Articles Published</h3>
+              <p className="text-slate-500">We are working on some great content. Stay tuned!</p>
+            </div>
+          )}
         </div>
       </section>
 
