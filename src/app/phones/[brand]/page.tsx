@@ -40,7 +40,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
         id: p._id.toString(),
         name: p.name,
         slug: p.slug,
-        price_bdt: p.price_bdt,
+        price_usd: p.price_usd,
         images: p.images
       }));
     }
@@ -55,7 +55,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
       id: i,
       name: `${brandData.name} Model ${i}`,
       slug: `${brand}-model-${i}`,
-      price_bdt: 150000,
+      price_usd: 1250,
       images: []
     }));
   }
@@ -98,7 +98,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
                   {phone.processor}
                 </p>
                 <div className="pt-4 flex items-center justify-between">
-                  <span className="text-lg font-bold text-slate-900">{phone.price_bdt ? `৳${phone.price_bdt.toLocaleString()}` : 'N/A'}</span>
+                  <span className="text-lg font-bold text-slate-900">{phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'N/A'}</span>
                   <button className="text-xs font-medium bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-colors">
                     Details
                   </button>

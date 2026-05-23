@@ -42,8 +42,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   let sortQuery: any = {};
   if (sort === "newest") sortQuery = { release_date: -1 };
-  if (sort === "price_high") sortQuery = { price_bdt: -1 };
-  if (sort === "price_low") sortQuery = { price_bdt: 1 };
+  if (sort === "price_high") sortQuery = { price_usd: -1 };
+  if (sort === "price_low") sortQuery = { price_usd: 1 };
 
   let phones: any[] = [];
   try {
@@ -57,7 +57,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       name: p.name,
       slug: p.slug,
       brands: { name: p.brand_id?.name, slug: p.brand_id?.slug },
-      price_bdt: p.price_bdt,
+      price_usd: p.price_usd,
       images: p.images
     }));
   } catch (error) {
@@ -156,7 +156,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   <div className="text-xs font-bold text-primary tracking-wider uppercase">{phone.brands?.name}</div>
                   <h3 className="text-lg font-bold text-slate-900 line-clamp-1">{phone.name}</h3>
                   <div className="pt-4 flex items-center justify-between">
-                    <span className="text-lg font-bold text-slate-900">{phone.price_bdt ? `৳${phone.price_bdt.toLocaleString()}` : 'N/A'}</span>
+                    <span className="text-lg font-bold text-slate-900">{phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'N/A'}</span>
                   </div>
                 </div>
               </Link>

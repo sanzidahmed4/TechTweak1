@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Smartphone } from "lucide-react";
 
 const CATEGORIES = [
   {
-    label: "Under ৳10,000",
+    label: "Under $200",
     sublabel: "Budget Picks",
     count: "120+ phones",
     href: "/phones?maxPrice=90",
@@ -15,7 +15,7 @@ const CATEGORIES = [
     icon: "💚",
   },
   {
-    label: "৳10,000 – ৳15,000",
+    label: "$200 – $400",
     sublabel: "Entry Level",
     count: "85+ phones",
     href: "/phones?minPrice=90&maxPrice=135",
@@ -24,7 +24,7 @@ const CATEGORIES = [
     icon: "📱",
   },
   {
-    label: "৳15,000 – ৳20,000",
+    label: "$400 – $600",
     sublabel: "Mid Range",
     count: "100+ phones",
     href: "/phones?minPrice=135&maxPrice=180",
@@ -33,19 +33,19 @@ const CATEGORIES = [
     icon: "🔮",
   },
   {
-    label: "৳20,000 – ৳25,000",
+    label: "$600 – $800",
     sublabel: "Upper Mid",
     count: "74+ phones",
-    href: "/phones?minPrice=180&maxPrice=225",
+    href: "/phones?minPrice=600&maxPrice=800",
     gradient: "from-orange-500 to-pink-600",
     glow: "shadow-orange-500/30",
     icon: "🚀",
   },
   {
-    label: "৳25,000 – ৳35,000",
+    label: "Above $1000",
     sublabel: "Premium Mid",
     count: "60+ phones",
-    href: "/phones?minPrice=225&maxPrice=315",
+    href: "/phones?minPrice=1000",
     gradient: "from-rose-500 to-red-600",
     glow: "shadow-rose-500/30",
     icon: "💎",

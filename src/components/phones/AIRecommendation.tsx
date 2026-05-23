@@ -46,13 +46,13 @@ const CATEGORIES = [
     key: "budget",
     label: "Budget",
     icon: Wallet,
-    description: "Best value under ৳30000",
+    description: "Best value under $300",
     color: "from-amber-500 to-orange-500",
     glow: "shadow-amber-500/20",
     hoverBg: "group-hover:bg-amber-50",
     activeBg: "bg-amber-50 border-amber-200",
     iconColor: "text-amber-500",
-    filter: (p: PhoneData) => (p.price_bdt || 9999999) < 30000,
+    filter: (p: PhoneData) => (p.price_usd || 9999999) < 300,
   },
 ];
 
@@ -95,7 +95,7 @@ export default function AIRecommendation({ phones }: Props) {
     .map((p) => ({
       name: p.name,
       tag: p.processor?.split(" ").slice(0, 3).join(" ") || cat.label,
-      price: p.price_bdt ? `৳${p.price_bdt.toLocaleString()}` : "N/A",
+      price: p.price_usd ? `$${p.price_usd.toLocaleString()}` : "N/A",
       slug: `/phones/${p.brand.slug}/${p.slug}`,
       brand: p.brand.slug,
     }));

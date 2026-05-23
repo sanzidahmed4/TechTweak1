@@ -41,7 +41,7 @@ export default function TrendingCarousel({ phones }: { phones: any[] }) {
                   <div className="pt-4 flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-lg font-bold text-slate-900">
-                        {phone.price_bdt ? `৳${phone.price_bdt.toLocaleString()}` : 'TBA'}
+                        {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'TBA'}
                       </span>
                     </div>
                     <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 group-hover:bg-primary group-hover:text-white smooth-transition">

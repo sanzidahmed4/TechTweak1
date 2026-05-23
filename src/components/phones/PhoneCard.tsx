@@ -20,8 +20,8 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
   const [imageError, setImageError] = useState(false);
 
   const is5G = phone.network?.toLowerCase().includes("5g");
-  const discount = phone.price_bdt && phone.price_bdt > 40000
-    ? Math.floor(((phone.price_bdt * 3) % 15)) + 5
+  const discount = phone.price_usd && phone.price_usd > 500
+    ? Math.floor(((phone.price_usd * 3) % 15)) + 5
     : null;
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -76,7 +76,7 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
           <div className="flex items-center justify-between mt-3">
             <div className="flex flex-col">
               <span className="text-base font-black text-slate-900">
-                {phone.price_bdt ? `৳${phone.price_bdt.toLocaleString()}` : "Price TBA"}
+                {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA"}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -182,7 +182,7 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
           <div className="flex flex-col">
             <span className="text-base font-black text-slate-900">
-              {phone.price_bdt ? `৳${phone.price_bdt.toLocaleString()}` : "Price TBA"}
+              {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA"}
             </span>
           </div>
           <Link

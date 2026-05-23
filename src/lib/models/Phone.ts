@@ -8,6 +8,7 @@ export interface IPhone extends Document {
   category_id?: mongoose.Types.ObjectId;
   
   // Basic Info (Expanded)
+  price_usd?: number;
   price_bdt?: number;
   price_official?: number;
   price_unofficial?: number;
@@ -151,6 +152,7 @@ const PhoneSchema: Schema = new Schema({
   category_id: { type: Schema.Types.ObjectId, ref: 'Category' },
   
   // Basic Info
+  price_usd: { type: Number },
   price_bdt: { type: Number },
   price_official: { type: Number },
   price_unofficial: { type: Number },

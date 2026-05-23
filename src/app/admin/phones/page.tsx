@@ -44,7 +44,7 @@ export default async function AdminPhonesPage(props: {
       slug: p.slug,
       brands: { name: p.brand_id?.name || "Unknown" },
       is_published: p.is_published,
-      price_bdt: p.price_bdt,
+      price_usd: p.price_usd,
       created_at: p.created_at?.toISOString()
     }));
   } catch (err) {
@@ -54,9 +54,9 @@ export default async function AdminPhonesPage(props: {
   // Dummy data fallback for preview
   if (phones.length === 0) {
     phones = [
-      { id: "1", name: "Galaxy S26 Ultra", slug: "galaxy-s26-ultra", brands: { name: "Samsung" }, is_published: true, price_bdt: 150000, created_at: new Date().toISOString() },
-      { id: "2", name: "iPhone 16 Pro", slug: "iphone-16-pro", brands: { name: "Apple" }, is_published: true, price_bdt: 120000, created_at: new Date().toISOString() },
-      { id: "3", name: "Pixel 9 Pro", slug: "pixel-9-pro", brands: { name: "Google" }, is_published: false, price_bdt: 100000, created_at: new Date().toISOString() },
+      { id: "1", name: "Galaxy S26 Ultra", slug: "galaxy-s26-ultra", brands: { name: "Samsung" }, is_published: true, price_usd: 1250, created_at: new Date().toISOString() },
+      { id: "2", name: "iPhone 16 Pro", slug: "iphone-16-pro", brands: { name: "Apple" }, is_published: true, price_usd: 999, created_at: new Date().toISOString() },
+      { id: "3", name: "Pixel 9 Pro", slug: "pixel-9-pro", brands: { name: "Google" }, is_published: false, price_usd: 899, created_at: new Date().toISOString() },
     ];
   }
 
@@ -154,7 +154,7 @@ export default async function AdminPhonesPage(props: {
                 </th>
                 <th className="p-4 font-bold">Device Model</th>
                 <th className="p-4 font-bold">Brand</th>
-                <th className="p-4 font-bold">Price (BDT)</th>
+                <th className="p-4 font-bold">Price (USD)</th>
                 <th className="p-4 font-bold">Status</th>
                 <th className="p-4 font-bold text-right">Actions</th>
               </tr>
@@ -173,7 +173,7 @@ export default async function AdminPhonesPage(props: {
                     <span className="bg-slate-100 px-2.5 py-1 rounded-md">{phone.brands?.name}</span>
                   </td>
                   <td className="p-4 text-sm font-bold text-slate-900">
-                    {phone.price_bdt ? `৳${phone.price_bdt.toLocaleString()}` : <span className="text-slate-400 font-normal">N/A</span>}
+                    {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : <span className="text-slate-400 font-normal">N/A</span>}
                   </td>
                   <td className="p-4">
                     <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full hover:opacity-80 transition-opacity" title="Toggle Status">

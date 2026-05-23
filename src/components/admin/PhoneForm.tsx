@@ -60,14 +60,14 @@ export default function PhoneForm({ initialData, brands, action, title, descript
             <p className="text-xs text-slate-500">Leave blank to auto-generate from name.</p>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700">Official Price (BDT) <span className="text-xs font-normal text-green-600">✅ Authorized</span></label>
-            <input type="number" name="price_official" defaultValue={initialData?.price_official ?? initialData?.price_bdt} placeholder="e.g. 150000" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
-            <p className="text-xs text-slate-500">Official / authorized dealer price in BDT.</p>
+            <label className="text-sm font-semibold text-slate-700">Official Price (USD) <span className="text-xs font-normal text-green-600">✅ Authorized</span></label>
+            <input type="number" name="price_usd" defaultValue={initialData?.price_usd ?? (initialData?.price_official ? Math.round(initialData.price_official / 120) : '')} placeholder="e.g. 1000" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+            <p className="text-xs text-slate-500">Official / authorized dealer price in USD.</p>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700">Unofficial Price (BDT) <span className="text-xs font-normal text-orange-500">⚠️ Grey Market</span></label>
-            <input type="number" name="price_unofficial" defaultValue={initialData?.price_unofficial} placeholder="e.g. 130000" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
-            <p className="text-xs text-slate-500">Unofficial / grey market price in BDT.</p>
+            <label className="text-sm font-semibold text-slate-700">Unofficial Price (USD) <span className="text-xs font-normal text-orange-500">⚠️ Grey Market</span></label>
+            <input type="number" name="price_unofficial" defaultValue={initialData?.price_unofficial ? Math.round(initialData.price_unofficial / 120) : ''} placeholder="e.g. 850" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+            <p className="text-xs text-slate-500">Unofficial / grey market price in USD.</p>
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Release Date</label>

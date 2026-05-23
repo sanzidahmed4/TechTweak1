@@ -105,8 +105,8 @@ export async function addPhone(formData: FormData) {
     charging,
     network,
     antutu_score: parseSafeInt(formData.get("antutu_score")),
-    price_bdt: parseSafeInt(formData.get("price_official")),
-    price_official: parseSafeInt(formData.get("price_official")),
+    price_usd: parseSafeInt(formData.get("price_usd")),
+    price_official: parseSafeInt(formData.get("price_usd")),
     price_unofficial: parseSafeInt(formData.get("price_unofficial")),
 
     // General Info
@@ -341,8 +341,8 @@ export async function editPhone(id: string, formData: FormData) {
     charging,
     network,
     antutu_score: parseSafeInt(formData.get("antutu_score")),
-    price_bdt: parseSafeInt(formData.get("price_official")),
-    price_official: parseSafeInt(formData.get("price_official")),
+    price_usd: parseSafeInt(formData.get("price_usd")),
+    price_official: parseSafeInt(formData.get("price_usd")),
     price_unofficial: parseSafeInt(formData.get("price_unofficial")),
 
     // General Info

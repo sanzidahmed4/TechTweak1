@@ -20,7 +20,7 @@ export interface IPhoneSummary {
   name: string;
   slug: string;
   brands: IBrandSummary;
-  price_bdt: number;
+  price_usd: number;
   images: string[];
 }
 
@@ -43,7 +43,7 @@ type RawPhone = {
   name: string;
   slug: string;
   brand_id?: IBrandSummary;
-  price_bdt: number;
+  price_usd: number;
   images: string[];
 };
 
@@ -74,7 +74,7 @@ export default async function Home() {
       name: p.name,
       slug: p.slug,
       brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
-      price_bdt: p.price_bdt || 0,
+      price_usd: p.price_usd || 0,
       images: p.images || []
     }));
 

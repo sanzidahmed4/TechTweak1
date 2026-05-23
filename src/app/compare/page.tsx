@@ -48,7 +48,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
             battery: p.battery,
             charging: p.charging,
             os: (p.android_version || p.os) ? `${p.android_version || p.os} (Upgradable)` : undefined,
-            price_bdt: p.price_bdt,
+            price_usd: p.price_usd,
             antutu_score: p.antutu_score,
             images: p.images
           };
@@ -61,7 +61,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 
   // Define specs to compare with highlighting logic
   const specs = [
-    { label: "Price (BDT)", key: "price_bdt", prefix: "৳", invertHighlight: true }, // lower is better
+    { label: "Price (USD)", key: "price_usd", prefix: "$", invertHighlight: true }, // lower is better
     { label: "Processor", key: "processor" },
     { label: "RAM", key: "ram", highlight: true }, // higher is better
     { label: "Storage", key: "storage", highlight: true },

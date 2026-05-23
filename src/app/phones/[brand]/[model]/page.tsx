@@ -63,7 +63,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       camera_main: "200MP + 50MP + 12MP + 10MP",
       camera_front: "12MP",
       os: "Android 16, One UI 8",
-      price_bdt: 150000,
+      price_usd: 1250,
       antutu_score: 2450000,
       images: ["https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=1000"],
       is_published: true,
@@ -200,9 +200,9 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       .lean();
 
     // 2. Price Match query
-    if (rawPhone.price_bdt) {
+    if (rawPhone.price_usd) {
       dbSamePricePhones = await Phone.find({
-        price_bdt: { $gte: rawPhone.price_bdt * 0.8, $lte: rawPhone.price_bdt * 1.2 },
+        price_usd: { $gte: rawPhone.price_usd * 0.8, $lte: rawPhone.price_usd * 1.2 },
         _id: { $ne: rawPhone._id },
         is_published: true
       })
@@ -242,8 +242,8 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
     },
     offers: {
       "@type": "Offer",
-      price: rawPhone.price_bdt || "0.00",
-      priceCurrency: "BDT",
+      price: rawPhone.price_usd || "0.00",
+      priceCurrency: "USD",
       availability: rawPhone.is_published ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
     }
   };
@@ -299,16 +299,11 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
 
                 {/* Price Section - Official / Unofficial */}
                 <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                  {rawPhone.price_official ? (
+                  {rawPhone.price_usd ? (
                     <div className="flex-1 bg-green-50 border border-green-200 rounded-2xl px-4 py-3">
                       <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">✅ Official Price</p>
-                      <p className="text-2xl font-black text-green-800">৳{rawPhone.price_official.toLocaleString()}</p>
+                      <p className="text-2xl font-black text-green-800">${rawPhone.price_usd.toLocaleString()}</p>
                       <p className="text-xs text-green-600 mt-0.5">Authorized Dealer</p>
-                    </div>
-                  ) : rawPhone.price_bdt ? (
-                    <div className="flex-1 bg-green-50 border border-green-200 rounded-2xl px-4 py-3">
-                      <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">✅ Official Price</p>
-                      <p className="text-2xl font-black text-green-800">৳{rawPhone.price_bdt.toLocaleString()}</p>
                     </div>
                   ) : (
                     <div className="flex-1 bg-slate-100 border border-slate-200 rounded-2xl px-4 py-3">
@@ -316,18 +311,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <p className="text-xl font-bold text-slate-400">TBA</p>
                     </div>
                   )}
-                  {rawPhone.price_unofficial ? (
-                    <div className="flex-1 bg-orange-50 border border-orange-200 rounded-2xl px-4 py-3">
-                      <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">⚠️ Unofficial Price</p>
-                      <p className="text-2xl font-black text-orange-800">৳{rawPhone.price_unofficial.toLocaleString()}</p>
-                      <p className="text-xs text-orange-600 mt-0.5">Grey Market</p>
-                    </div>
-                  ) : (
-                    <div className="flex-1 bg-slate-100 border border-slate-200 rounded-2xl px-4 py-3">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">⚠️ Unofficial Price</p>
-                      <p className="text-xl font-bold text-slate-400">N/A</p>
-                    </div>
-                  )}
+
                 </div>
 
                 {/* Quick features highlight grid */}
@@ -481,25 +465,14 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   <div className="flex flex-col sm:flex-row p-5 text-sm">
                     <div className="w-full sm:w-1/3 font-bold text-slate-800 uppercase tracking-wider text-[11px] self-center">Official Price</div>
                     <div className="w-full sm:w-2/3 mt-1.5 sm:mt-0">
-                      {rawPhone.price_official ? (
-                        <span className="font-black text-green-700 text-base">৳{rawPhone.price_official.toLocaleString()} <span className="text-xs font-semibold text-green-500">(Official)</span></span>
-                      ) : rawPhone.price_bdt ? (
-                        <span className="font-black text-green-700 text-base">৳{rawPhone.price_bdt.toLocaleString()}</span>
+                      {rawPhone.price_usd ? (
+                        <span className="font-black text-green-700 text-base">${rawPhone.price_usd.toLocaleString()} <span className="text-xs font-semibold text-green-500">(Official)</span></span>
                       ) : (
                         <span className="text-slate-400 font-semibold">Not specified</span>
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row p-5 text-sm">
-                    <div className="w-full sm:w-1/3 font-bold text-slate-800 uppercase tracking-wider text-[11px] self-center">Unofficial Price</div>
-                    <div className="w-full sm:w-2/3 mt-1.5 sm:mt-0">
-                      {rawPhone.price_unofficial ? (
-                        <span className="font-black text-orange-600 text-base">৳{rawPhone.price_unofficial.toLocaleString()} <span className="text-xs font-semibold text-orange-400">(Grey Market)</span></span>
-                      ) : (
-                        <span className="text-slate-400 font-semibold">N/A</span>
-                      )}
-                    </div>
-                  </div>
+
                   {[
                     { label: "Phone Weight", value: rawPhone.weight },
                     { label: "Physical Dimensions", value: rawPhone.dimensions },
@@ -879,7 +852,7 @@ function SidebarPhoneRow({ phone }: { phone: any }) {
           {phone.name}
         </h4>
         <span className="text-xs font-black text-slate-900 mt-1 block">
-          {phone.price_bdt ? `৳${phone.price_bdt.toLocaleString()}` : "TBA"}
+          {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "TBA"}
         </span>
       </div>
     </Link>
