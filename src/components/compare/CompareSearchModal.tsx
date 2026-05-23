@@ -15,7 +15,6 @@ export default function CompareSearchModal({ isOpen, onClose }: { isOpen: boolea
 
   useEffect(() => {
     if (!query) {
-      setResults([]);
       return;
     }
     
@@ -60,7 +59,11 @@ export default function CompareSearchModal({ isOpen, onClose }: { isOpen: boolea
             placeholder="Type a phone model to add (e.g. Galaxy S24)" 
             className="flex-1 bg-transparent text-lg outline-none text-slate-900 placeholder:text-slate-400"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setQuery(val);
+              if (!val) setResults([]);
+            }}
           />
           {isLoading && <Loader2 size={20} className="text-primary animate-spin" />}
           <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
@@ -70,7 +73,7 @@ export default function CompareSearchModal({ isOpen, onClose }: { isOpen: boolea
         
         <div className="max-h-[60vh] overflow-y-auto">
           {query.length > 0 && results.length === 0 && !isLoading && (
-            <div className="p-8 text-center text-slate-500">No phones found matching "{query}"</div>
+            <div className="p-8 text-center text-slate-500">No phones found matching &quot;{query}&quot;</div>
           )}
           
           {results.length > 0 && (

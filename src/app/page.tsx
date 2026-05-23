@@ -2,48 +2,95 @@ import Hero from "@/components/home/Hero";
 import TrendingCarousel from "@/components/home/TrendingCarousel";
 import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
-import { ArrowRight, Cpu, Battery, Camera, Zap, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Cpu, Battery, Camera, Zap, CheckCircle2, Smartphone, FileText } from "lucide-react";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import Post from "@/lib/models/Post";
 
 export const revalidate = 3600; // Cache for 1 hour
 
+// --- DTO Interfaces ---
+interface IBrandSummary {
+  name: string;
+  slug: string;
+}
+
+export interface IPhoneSummary {
+  id: string;
+  name: string;
+  slug: string;
+  brands: IBrandSummary;
+  price_bdt: number;
+  images: string[];
+}
+
+interface ICategorySummary {
+  name: string;
+}
+
+export interface IArticleSummary {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  featured_image: string;
+  categories: ICategorySummary;
+}
+
+// --- Raw DB Types ---
+type RawPhone = {
+  _id: { toString(): string };
+  name: string;
+  slug: string;
+  brand_id?: IBrandSummary;
+  price_bdt: number;
+  images: string[];
+};
+
+type RawPost = {
+  _id: { toString(): string };
+  title: string;
+  slug: string;
+  excerpt: string;
+  featured_image: string;
+  category_id?: ICategorySummary;
+};
+
 export default async function Home() {
   await connectToDatabase();
   
-  let featuredPhones: any[] = [];
-  let latestArticles: any[] = [];
+  let featuredPhones: IPhoneSummary[] = [];
+  let latestArticles: IArticleSummary[] = [];
   
   try {
-    const rawPhones = await Phone.find({ is_published: true })
+    const rawPhones = (await Phone.find({ is_published: true })
       .populate('brand_id', 'name slug')
       .sort({ created_at: -1 })
       .limit(8)
-      .lean();
+      .lean()) as unknown as RawPhone[];
       
-    featuredPhones = rawPhones.map((p: any) => ({
+    featuredPhones = rawPhones.map((p) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,
-      brands: { name: p.brand_id?.name, slug: p.brand_id?.slug },
-      price_bdt: p.price_bdt,
-      images: p.images
+      brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
+      price_bdt: p.price_bdt || 0,
+      images: p.images || []
     }));
 
-    const rawPosts = await Post.find({ is_published: true })
+    const rawPosts = (await Post.find({ is_published: true })
       .populate('category_id', 'name')
       .sort({ created_at: -1 })
       .limit(3)
-      .lean();
+      .lean()) as unknown as RawPost[];
       
-    latestArticles = rawPosts.map((p: any) => ({
+    latestArticles = rawPosts.map((p) => ({
       id: p._id.toString(),
       title: p.title,
       slug: p.slug,
-      excerpt: p.excerpt,
-      featured_image: p.featured_image,
-      categories: { name: p.category_id?.name }
+      excerpt: p.excerpt || "",
+      featured_image: p.featured_image || "",
+      categories: { name: p.category_id?.name || 'Uncategorized' }
     }));
   } catch (error) {
     console.error("MongoDB not connected or error fetching", error);
@@ -140,7 +187,7 @@ export default async function Home() {
               <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 smooth-transition">
                 <CheckCircle2 size={32} />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Editor's Verification</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Editor&apos;s Verification</h3>
               <p className="text-slate-500">Independent expert reviews scoring UI fluidity, haptics, and daily reliability.</p>
             </div>
           </div>

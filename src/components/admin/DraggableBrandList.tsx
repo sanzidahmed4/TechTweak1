@@ -91,14 +91,21 @@ function SortableBrandRow({ brand }: { brand: BrandItem }) {
 export default function DraggableBrandList({ initialBrands }: { initialBrands: BrandItem[] }) {
   const router = useRouter();
   const [brands, setBrands] = useState(initialBrands);
+  const [prevInitialBrands, setPrevInitialBrands] = useState(initialBrands);
   const [isPending, startTransition] = useTransition();
 
   const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
+  // Sync props to state during render to avoid extra commit/flicker
+  if (initialBrands !== prevInitialBrands) {
+    setPrevInitialBrands(initialBrands);
     setBrands(initialBrands);
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
-  }, [initialBrands]);
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
