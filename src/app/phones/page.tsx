@@ -10,7 +10,7 @@ export const metadata = {
     "Browse smartphones by brand, price, specs, and features. Find your perfect device with TechTweak's advanced filter system.",
 };
 
-export const revalidate = 3600;
+export const revalidate = 0; // Disable cache for real-time updates
 
 export default async function PhonesPage() {
   await connectToDatabase();

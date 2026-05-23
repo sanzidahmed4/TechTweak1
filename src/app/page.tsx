@@ -7,7 +7,7 @@ import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import Post from "@/lib/models/Post";
 
-export const revalidate = 3600; // Cache for 1 hour
+export const revalidate = 0; // Disable cache for real-time updates
 
 // --- DTO Interfaces ---
 interface IBrandSummary {
