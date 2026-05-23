@@ -40,6 +40,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         content: rawPost.content,
         featured_image: rawPost.featured_image || "https://res.cloudinary.com/dcb4ilgpy/image/upload/v1716024976/tech_placeholder.jpg",
         category: rawPost.category_id ? rawPost.category_id.name : "Uncategorized",
+        category_id: rawPost.category_id ? rawPost.category_id._id : null,
         tags: rawPost.tags || [],
         published_at: rawPost.published_at ? new Date(rawPost.published_at).toLocaleDateString('en-US', {
           month: 'long',
