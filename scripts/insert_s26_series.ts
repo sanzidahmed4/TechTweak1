@@ -311,7 +311,7 @@ const s26Base = {
 
 async function run() {
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI!);
     console.log("✅ Connected to MongoDB");
 
     // Get Brand Schema
