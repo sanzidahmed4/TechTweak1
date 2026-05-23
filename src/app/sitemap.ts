@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 import connectToDatabase from '@/lib/mongodb/mongoose'
 import Phone from '@/lib/models/Phone'
 import Brand from '@/lib/models/Brand'
+import Post from '@/lib/models/Post'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await connectToDatabase()
@@ -10,6 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch dynamic routes
   let phonesData: any[] = []
   let brandsData: any[] = []
+  let postsData: any[] = []
   
   try {
     // Phones
@@ -35,6 +37,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       brandsData = rawBrands.map((b: any) => ({
         slug: b.slug,
         updated_at: b.updated_at || new Date()
+      }))
+    }
+
+    // Posts (News/Blogs)
+    const rawPosts = await Post.find({ is_published: true })
+      .select('slug updated_at')
+      .lean()
+      
+    if (rawPosts) {
+      postsData = rawPosts.map((p: any) => ({
+        slug: p.slug,
+        updated_at: p.updated_at || new Date()
       }))
     }
   } catch (error) {
@@ -76,5 +90,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  return [...staticRoutes, ...brandRoutes, ...phoneRoutes]
+  // Generate dynamic post routes
+  const postRoutes = postsData.map((post) => ({
+    url: `${baseUrl}/news/${post.slug}`,
+    lastModified: new Date(post.updated_at),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+
+  return [...staticRoutes, ...brandRoutes, ...phoneRoutes, ...postRoutes]
 }
