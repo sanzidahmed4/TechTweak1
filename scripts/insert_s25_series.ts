@@ -520,11 +520,11 @@ async function run() {
       console.log("⚠️ Samsung brand not found in DB! Proceeding without brand_id.");
     } else {
       const brandId = samsungBrand._id;
-      s25Ultra.brand_id = brandId;
-      s25Plus.brand_id = brandId;
-      s25Base.brand_id = brandId;
-      s25Edge.brand_id = brandId;
-      s25FE.brand_id = brandId;
+      (s25Ultra as any).brand_id = brandId;
+      (s25Plus as any).brand_id = brandId;
+      (s25Base as any).brand_id = brandId;
+      (s25Edge as any).brand_id = brandId;
+      (s25FE as any).brand_id = brandId;
     }
 
     const PhoneSchema = new mongoose.Schema({}, { strict: false });
