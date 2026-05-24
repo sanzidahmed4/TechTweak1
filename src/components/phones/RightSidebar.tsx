@@ -148,21 +148,6 @@ export default function RightSidebar({ latestNews, trendingPhones }: Props) {
         </div>
       )}
 
-      {/* Ad Banner */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-5 text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: "radial-gradient(circle at 30% 20%, white, transparent 50%)" }} />
-        <div className="relative z-10">
-          <div className="text-2xl mb-2">🎯</div>
-          <p className="text-xs font-semibold text-blue-200 mb-1">Advertisement</p>
-          <p className="font-black text-sm mb-3">Find the Best Deal Today</p>
-          <p className="text-xs text-blue-200 mb-4 leading-relaxed">Compare prices from 50+ retailers instantly</p>
-          <button className="w-full py-2.5 bg-white text-blue-700 font-bold text-xs rounded-2xl hover:bg-blue-50 transition-colors">
-            Explore Deals →
-          </button>
-        </div>
-      </div>
-
     </div>
   );
 }
