@@ -7,13 +7,12 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="bg-slate-50 min-h-screen py-24">
       <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
-        <div className="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 md:p-16">
-          <div className="mb-12 border-b border-slate-100 pb-8 text-center">
-            <h1 className="text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight">Privacy Policy</h1>
-            <p className="text-slate-500 font-medium text-lg">Last Updated: May 2026</p>
-          </div>
+        <div className="mb-12 border-b border-slate-200 pb-8 text-left">
+          <h1 className="text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight">Privacy Policy</h1>
+          <p className="text-slate-500 font-medium text-lg">Last Updated: May 2026</p>
+        </div>
 
-          <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-primary hover:prose-a:text-blue-700">
+        <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-primary hover:prose-a:text-blue-700">
             <p>
               Welcome to <strong>TechTweak</strong> ("we", "our", or "us"). Your privacy is important to us. This Privacy Policy explains how TechTweak collects, uses, protects, and handles your information when you use our website.
             </p>
@@ -109,7 +108,6 @@ export default function PrivacyPolicyPage() {
             <h2>11. Consent</h2>
             <p>By using TechTweak, you consent to this Privacy Policy and agree to its terms.</p>
           </div>
-        </div>
       </div>
     </div>
   );
