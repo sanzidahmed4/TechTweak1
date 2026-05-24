@@ -83,9 +83,6 @@ export default function NavbarSearch() {
         }`}
         onClick={() => setIsOpen(true)}
       >
-        <div className="pl-3 py-2 text-slate-500">
-          <Search size={18} />
-        </div>
         <input
           type="text"
           value={query}
@@ -96,21 +93,26 @@ export default function NavbarSearch() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search phones..."
-          className={`bg-transparent border-none outline-none text-sm text-slate-900 py-2 pr-4 transition-all duration-300 w-full ${
+          className={`bg-transparent border-none outline-none text-sm text-slate-900 py-2 pl-4 pr-2 transition-all duration-300 w-full ${
             !isOpen ? "hidden md:block" : "block"
           }`}
         />
-        {query && isOpen && (
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClear();
-            }} 
-            className="pr-3 py-2 text-slate-400 hover:text-slate-600 transition-colors"
-          >
-            <X size={16} />
-          </button>
-        )}
+        <div className="flex items-center pr-3">
+          {query && isOpen && (
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClear();
+              }} 
+              className="px-2 py-2 text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <X size={16} />
+            </button>
+          )}
+          <div className="py-2 text-slate-500">
+            <Search size={18} />
+          </div>
+        </div>
       </div>
 
       {/* Dropdown Results */}
