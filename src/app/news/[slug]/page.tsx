@@ -11,7 +11,8 @@ export const revalidate = 60;
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   await connectToDatabase();
   const slug = (await params).slug;
-  const post = await Post.findOne({ slug }).lean() as any;
+  const decodedSlug = decodeURIComponent(slug);
+  const post = await Post.findOne({ slug: decodedSlug }).lean() as any;
 
   if (!post) {
     return { title: 'Post Not Found | TechTweak' };
@@ -26,10 +27,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   await connectToDatabase();
   const slug = (await params).slug;
+  const decodedSlug = decodeURIComponent(slug);
   
   let post: any = null;
   try {
-    const rawPost = await Post.findOne({ slug, is_published: true })
+    const rawPost = await Post.findOne({ slug: decodedSlug })
       .populate('category_id', 'name slug')
       .lean();
       
