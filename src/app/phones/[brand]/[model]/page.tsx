@@ -230,24 +230,54 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
   const compareSection = rawPhone.related_compare_ids?.length > 0 ? rawPhone.related_compare_ids : dbComparePhones.slice(2, 6);
 
   // Schema data
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: rawPhone.name,
-    image: rawPhone.images && rawPhone.images.length > 0 ? rawPhone.images[0] : undefined,
-    description: rawPhone.meta_description || `Full specifications, features, and price for the ${rawPhone.name}.`,
-    brand: {
-      "@type": "Brand",
-      name: brandName
-    },
-    offers: {
-      "@type": "Offer",
-      price: rawPhone.price_usd || "0.00",
-      priceCurrency: "USD",
-      availability: rawPhone.is_published ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
-    }
-  };
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.techtweak.tech";
+  const currentUrl = `${baseUrl}/phones/${brand}/${model}`;
 
+  const jsonLd: any[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: rawPhone.name,
+      image: rawPhone.images && rawPhone.images.length > 0 ? rawPhone.images[0] : undefined,
+      description: rawPhone.meta_description || `Full specifications, features, and price for the ${rawPhone.name}.`,
+      brand: {
+        "@type": "Brand",
+        name: brandName
+      },
+      offers: {
+        "@type": "Offer",
+        url: currentUrl,
+        price: rawPhone.price_usd || "0.00",
+        priceCurrency: "USD",
+        availability: rawPhone.is_published ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
+        { "@type": "ListItem", position: 2, name: "Phones", item: `${baseUrl}/phones` },
+        { "@type": "ListItem", position: 3, name: brandName, item: `${baseUrl}/phones/${brand}` },
+        { "@type": "ListItem", position: 4, name: rawPhone.name, item: currentUrl }
+      ]
+    }
+  ];
+
+  if (rawPhone.faqs && rawPhone.faqs.length > 0) {
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: rawPhone.faqs.map((faq: any) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer
+        }
+      }))
+    });
+  }
   return (
     <>
       {/* Inject SEO Schema */}

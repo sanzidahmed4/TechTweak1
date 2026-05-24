@@ -92,9 +92,39 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     console.error("Error fetching related posts:", e);
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.techtweak.tech";
+  const currentUrl = `${baseUrl}/news/${decodedSlug}`;
+
+  const jsonLd: any[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      headline: post.title,
+      image: [post.featured_image],
+      datePublished: new Date(post.published_at || new Date()).toISOString(),
+      dateModified: new Date(post.published_at || new Date()).toISOString(),
+      author: [{
+        "@type": "Organization",
+        name: "TechTweak",
+        url: baseUrl
+      }]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
+        { "@type": "ListItem", position: 2, name: "News", item: `${baseUrl}/news` },
+        { "@type": "ListItem", position: 3, name: post.title, item: currentUrl }
+      ]
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-50 py-20">
-      <div className="container mx-auto px-4 lg:px-8 mt-12 max-w-4xl">
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <div className="min-h-screen bg-slate-50 py-20">
+        <div className="container mx-auto px-4 lg:px-8 mt-12 max-w-4xl">
         
         {/* Back Button */}
         <Link href="/news" className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-primary transition-colors mb-8">
@@ -171,5 +201,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       </div>
     </div>
+    </>
   );
 }
