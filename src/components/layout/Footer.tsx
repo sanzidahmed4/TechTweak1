@@ -38,7 +38,7 @@ export default function Footer() {
                 { name: "Compare Devices", href: "/compare" },
                 { name: "Upcoming Phones", href: "/upcoming-phones" },
                 { name: "Tech News", href: "/news" },
-                { name: "Best Phones 2024", href: "/best" },
+                { name: "Best Phones 2026", href: "/best" },
               ].map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-slate-500 hover:text-primary text-sm transition-colors">
