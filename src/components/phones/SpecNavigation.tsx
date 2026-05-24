@@ -72,7 +72,6 @@ export default function SpecNavigation() {
           window.scrollTo({ top, behavior: "smooth" });
           
           // Temporary highlight effect
-          const originalBg = el.getAttribute("style");
           (el as HTMLElement).style.backgroundColor = "#fef08a"; // bg-yellow-200
           (el as HTMLElement).style.transition = "background-color 0.5s";
           (el as HTMLElement).style.borderRadius = "4px";

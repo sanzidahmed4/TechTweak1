@@ -2,7 +2,7 @@ import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import Brand from "@/lib/models/Brand";
 import Link from "next/link";
-import { Search as SearchIcon, Smartphone, SlidersHorizontal } from "lucide-react";
+import { Search as SearchIcon, Smartphone } from "lucide-react";
 
 export const metadata = {
   title: "Search Smartphones | TechTweak",
@@ -12,7 +12,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const { q = "", brand = "", sort = "newest", year = "", chipset = "" } = await searchParams;
   await connectToDatabase();
   
-  let mongoQuery: any = { is_published: true };
+  const mongoQuery: any = { is_published: true };
   
   if (q) {
     mongoQuery.name = { $regex: q, $options: 'i' };
@@ -166,7 +166,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-16 text-center max-w-2xl mx-auto mt-12">
             <SearchIcon size={48} className="text-slate-300 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-slate-900 mb-2">No results found</h3>
-            <p className="text-slate-500">We couldn't find any phones matching your search criteria. Try adjusting your filters.</p>
+            <p className="text-slate-500">We couldn&apos;t find any phones matching your search criteria. Try adjusting your filters.</p>
           </div>
         )}
 

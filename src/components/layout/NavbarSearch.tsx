@@ -181,7 +181,7 @@ export default function NavbarSearch() {
                 <Search size={24} />
               </div>
               <h4 className="text-base font-bold text-slate-900 mb-1">No exact match found</h4>
-              <p className="text-sm text-slate-500 mb-6">We couldn't find any phone matching "{query}".</p>
+              <p className="text-sm text-slate-500 mb-6">We couldn&apos;t find any phone matching &quot;{query}&quot;.</p>
               <Link 
                 href="/search"
                 onClick={() => setIsOpen(false)}

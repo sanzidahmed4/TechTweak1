@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-
+import './Category'; // Prevent MissingSchemaError during populate
 export interface IPost extends Document {
   title: string;
   slug: string;
