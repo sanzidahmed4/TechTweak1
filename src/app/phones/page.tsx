@@ -25,7 +25,6 @@ export default async function PhonesPage() {
     const rawPhones = await Phone.find({ is_published: true })
       .populate("brand_id", "name slug logo_url")
       .sort({ created_at: -1 })
-      .limit(60)
       .lean();
 
     totalCount = await Phone.countDocuments({ is_published: true });
