@@ -323,9 +323,9 @@ async function run() {
     if (!samsungBrand) {
       console.log("⚠️ Samsung brand not found in DB! Proceeding without brand_id.");
     } else {
-      s26Ultra.brand_id = samsungBrand._id;
-      s26Plus.brand_id = samsungBrand._id;
-      s26Base.brand_id = samsungBrand._id;
+      (s26Ultra as any).brand_id = samsungBrand._id;
+      (s26Plus as any).brand_id = samsungBrand._id;
+      (s26Base as any).brand_id = samsungBrand._id;
     }
 
     const PhoneSchema = new mongoose.Schema({}, { strict: false });
@@ -346,7 +346,7 @@ async function run() {
     console.log("\n🎉 All 3 Samsung Galaxy S26 Series phones updated successfully!");
 
   } catch (err) {
-    console.error("❌ Error:", err.message);
+    console.error("❌ Error:", (err as Error).message);
   } finally {
     await mongoose.disconnect();
     console.log("🔌 Disconnected from MongoDB");
