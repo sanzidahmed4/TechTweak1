@@ -1,6 +1,6 @@
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Post from "@/lib/models/Post";
-import Category from "@/lib/models/Category";
+import "@/lib/models/Category";
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, ArrowLeft, Calendar, Tag } from "lucide-react";

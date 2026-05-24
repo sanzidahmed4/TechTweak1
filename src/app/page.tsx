@@ -6,7 +6,7 @@ import { ArrowRight, Cpu, Battery, Camera, Zap, CheckCircle2, Smartphone, FileTe
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import Post from "@/lib/models/Post";
-import Category from "@/lib/models/Category";
+import "@/lib/models/Category";
 
 export const revalidate = 0; // Disable cache for real-time updates
 
