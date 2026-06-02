@@ -3,12 +3,12 @@ import Post from "@/lib/models/Post";
 import "@/lib/models/Category";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Calendar, Tag, Eye } from "lucide-react";
 import { notFound } from "next/navigation";
 import ReactMarkdown from 'react-markdown';
 import SocialShare from "@/components/news/SocialShare";
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   await connectToDatabase();
@@ -34,7 +34,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   let post: any = null;
   
   try {
-    const rawPost = await Post.findOne({ slug: decodedSlug })
+    const rawPost = await Post.findOneAndUpdate(
+      { slug: decodedSlug },
+      { $inc: { views: 1 } },
+      { new: true }
+    )
       .populate('category_id', 'name slug')
       .lean();
       
@@ -55,7 +59,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           month: 'long',
           day: 'numeric',
           year: 'numeric'
-        })
+        }),
+        views: rawPost.views || 0
       };
     }
   } catch (error) {
@@ -193,8 +198,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <ReactMarkdown>{post.content}</ReactMarkdown>
             </div>
             
-            {/* Minimal Right-Aligned Social Share */}
-            <div className="flex justify-end mt-6">
+            {/* Reads Counter & Minimal Right-Aligned Social Share */}
+            <div className="flex justify-between items-center mt-6">
+              <div className="flex items-center gap-2 text-sm text-slate-500 font-semibold bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                <Eye size={16} className="text-primary" />
+                <span>{post.views} reads</span>
+              </div>
               <SocialShare url={currentUrl} title={post.title} />
             </div>
           </div>

@@ -7,12 +7,12 @@ import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { redirect } from "next/navigation";
 
-function parseSafeInt(value: any): number | null {
+function parseSafeNumber(value: any): number | null {
   if (!value) return null;
   if (typeof value === "number") return value;
-  // Extract numbers and negative sign
-  const cleanVal = (value as string).replace(/[^\d-]/g, '');
-  const parsed = parseInt(cleanVal, 10);
+  // Extract numbers, negative sign, and decimal point
+  const cleanVal = (value as string).replace(/[^\d.-]/g, '');
+  const parsed = parseFloat(cleanVal);
   return isNaN(parsed) ? null : parsed;
 }
 
@@ -104,10 +104,10 @@ export async function addPhone(formData: FormData) {
     battery,
     charging,
     network,
-    antutu_score: parseSafeInt(formData.get("antutu_score")),
-    price_usd: parseSafeInt(formData.get("price_usd")),
-    price_official: parseSafeInt(formData.get("price_usd")),
-    price_unofficial: parseSafeInt(formData.get("price_unofficial")),
+    antutu_score: parseSafeNumber(formData.get("antutu_score")),
+    price_usd: parseSafeNumber(formData.get("price_usd")),
+    price_official: parseSafeNumber(formData.get("price_usd")),
+    price_unofficial: parseSafeNumber(formData.get("price_unofficial")),
 
     // General Info
     weight: formData.get("weight") as string,
@@ -200,16 +200,16 @@ export async function addPhone(formData: FormData) {
 
   if (has_5g) autoPros.push("Supports Latest 5G Network");
   
-  const parsedBattery = battery_capacity ? parseSafeInt(battery_capacity) : null;
+  const parsedBattery = battery_capacity ? parseSafeNumber(battery_capacity) : null;
   if (parsedBattery && parsedBattery >= 5000) autoPros.push(`Large ${battery_capacity} Battery for all-day use`);
   
   if (display_type && (display_type.toLowerCase().includes('amoled') || display_type.toLowerCase().includes('oled'))) autoPros.push("Vibrant and crisp AMOLED/OLED display");
   
   const refreshRateRaw = formData.get("refresh_rate") as string;
-  const parsedRefresh = refreshRateRaw ? parseSafeInt(refreshRateRaw) : null;
+  const parsedRefresh = refreshRateRaw ? parseSafeNumber(refreshRateRaw) : null;
   if (parsedRefresh && parsedRefresh >= 120) autoPros.push("Smooth 120Hz+ High Refresh Rate Screen");
   
-  const parsedCam = cam_main_sensor ? parseSafeInt(cam_main_sensor) : null;
+  const parsedCam = cam_main_sensor ? parseSafeNumber(cam_main_sensor) : null;
   if (parsedCam && parsedCam >= 50) autoPros.push(`High resolution ${parsedCam}MP Main Camera`);
   
   if (formData.get("water_resistance") && (formData.get("water_resistance") as string).includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
@@ -218,7 +218,7 @@ export async function addPhone(formData: FormData) {
   if (!has_audio_jack) autoCons.push("Lacks a 3.5mm headphone jack");
   
   const weightRaw = formData.get("weight") as string;
-  const parsedWeight = weightRaw ? parseSafeInt(weightRaw) : null;
+  const parsedWeight = weightRaw ? parseSafeNumber(weightRaw) : null;
   if (parsedWeight && parsedWeight >= 210) autoCons.push("Device is relatively heavy");
 
   if (charging_wired) autoFaqs.push({ question: "Does it support fast charging?", answer: `Yes, it supports ${charging_wired}.` });
@@ -340,10 +340,10 @@ export async function editPhone(id: string, formData: FormData) {
     battery,
     charging,
     network,
-    antutu_score: parseSafeInt(formData.get("antutu_score")),
-    price_usd: parseSafeInt(formData.get("price_usd")),
-    price_official: parseSafeInt(formData.get("price_usd")),
-    price_unofficial: parseSafeInt(formData.get("price_unofficial")),
+    antutu_score: parseSafeNumber(formData.get("antutu_score")),
+    price_usd: parseSafeNumber(formData.get("price_usd")),
+    price_official: parseSafeNumber(formData.get("price_usd")),
+    price_unofficial: parseSafeNumber(formData.get("price_unofficial")),
 
     // General Info
     weight: formData.get("weight") as string,
@@ -438,16 +438,16 @@ export async function editPhone(id: string, formData: FormData) {
 
   if (has_5g) autoPros.push("Supports Latest 5G Network");
   
-  const parsedBattery = battery_capacity ? parseSafeInt(battery_capacity) : null;
+  const parsedBattery = battery_capacity ? parseSafeNumber(battery_capacity) : null;
   if (parsedBattery && parsedBattery >= 5000) autoPros.push(`Large ${battery_capacity} Battery for all-day use`);
   
   if (display_type && (display_type.toLowerCase().includes('amoled') || display_type.toLowerCase().includes('oled'))) autoPros.push("Vibrant and crisp AMOLED/OLED display");
   
   const refreshRateRaw = formData.get("refresh_rate") as string;
-  const parsedRefresh = refreshRateRaw ? parseSafeInt(refreshRateRaw) : null;
+  const parsedRefresh = refreshRateRaw ? parseSafeNumber(refreshRateRaw) : null;
   if (parsedRefresh && parsedRefresh >= 120) autoPros.push("Smooth 120Hz+ High Refresh Rate Screen");
   
-  const parsedCam = cam_main_sensor ? parseSafeInt(cam_main_sensor) : null;
+  const parsedCam = cam_main_sensor ? parseSafeNumber(cam_main_sensor) : null;
   if (parsedCam && parsedCam >= 50) autoPros.push(`High resolution ${parsedCam}MP Main Camera`);
   
   if (formData.get("water_resistance") && (formData.get("water_resistance") as string).includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
@@ -456,7 +456,7 @@ export async function editPhone(id: string, formData: FormData) {
   if (!has_audio_jack) autoCons.push("Lacks a 3.5mm headphone jack");
   
   const weightRaw = formData.get("weight") as string;
-  const parsedWeight = weightRaw ? parseSafeInt(weightRaw) : null;
+  const parsedWeight = weightRaw ? parseSafeNumber(weightRaw) : null;
   if (parsedWeight && parsedWeight >= 210) autoCons.push("Device is relatively heavy");
 
   if (charging_wired) autoFaqs.push({ question: "Does it support fast charging?", answer: `Yes, it supports ${charging_wired}.` });

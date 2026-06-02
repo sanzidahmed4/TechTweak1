@@ -3,14 +3,14 @@ import Post from "@/lib/models/Post";
 import "@/lib/models/Category";
 import Link from "next/link";
 import Image from "next/image";
-import { Clock } from "lucide-react";
+import { Clock, Eye } from "lucide-react";
 
 export const metadata = {
   title: 'News & Articles | TechTweak',
   description: 'Explore the latest smartphone news, reviews, and tech guides on TechTweak.',
 };
 
-export const revalidate = 60; // Revalidate every minute
+export const dynamic = 'force-dynamic';
 
 export default async function NewsPage() {
   await connectToDatabase();
@@ -37,7 +37,8 @@ export default async function NewsPage() {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
-      })
+      }),
+      views: p.views || 0
     }));
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -77,9 +78,15 @@ export default async function NewsPage() {
                   </div>
                 </div>
                 <div className="p-6 flex flex-col flex-1">
-                  <div className="flex items-center gap-2 text-xs text-slate-500 mb-3">
-                    <Clock size={14} />
-                    <span>{post.published_at}</span>
+                  <div className="flex items-center gap-4 text-xs text-slate-500 mb-3 font-medium">
+                    <div className="flex items-center gap-1.5">
+                      <Clock size={14} />
+                      <span>{post.published_at}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Eye size={14} />
+                      <span>{post.views}</span>
+                    </div>
                   </div>
                   <h2 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 group-hover:text-primary transition-colors">
                     {post.title}

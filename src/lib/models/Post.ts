@@ -13,6 +13,7 @@ export interface IPost extends Document {
   published_at?: Date | null;
   meta_title?: string;
   meta_description?: string;
+  views: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -30,6 +31,7 @@ const PostSchema: Schema = new Schema({
   published_at: { type: Date, default: null },
   meta_title: { type: String },
   meta_description: { type: String },
+  views: { type: Number, default: 0 },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });
