@@ -7,8 +7,9 @@ import { ArrowLeft, Calendar, Tag, Eye } from "lucide-react";
 import { notFound } from "next/navigation";
 import ReactMarkdown from 'react-markdown';
 import SocialShare from "@/components/news/SocialShare";
+import ViewTracker from "@/components/news/ViewTracker";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Enable ISR (1 hour caching)
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   await connectToDatabase();
@@ -58,11 +59,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   let post: any = null;
   
   try {
-    const rawPost = await Post.findOneAndUpdate(
-      { slug: decodedSlug },
-      { $inc: { views: 1 } },
-      { new: true }
-    )
+    const rawPost = await Post.findOne({ slug: decodedSlug })
       .populate('category_id', 'name slug')
       .lean();
       
@@ -164,6 +161,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
+      <ViewTracker slug={decodedSlug} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="min-h-screen bg-slate-50 py-20">
         <div className="container mx-auto px-4 lg:px-8 mt-12 max-w-4xl">

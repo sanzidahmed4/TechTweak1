@@ -10,7 +10,7 @@ export const metadata = {
   description: 'Explore the latest smartphone news, reviews, and tech guides on TechTweak.',
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Enable ISR (1 hour caching)
 
 export default async function NewsPage() {
   await connectToDatabase();

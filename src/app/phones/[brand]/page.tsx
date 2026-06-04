@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Smartphone } from "lucide-react";
 
+export const revalidate = 3600; // Enable ISR (1 hour caching)
+
 export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }) {
   const { brand } = await params;
   await connectToDatabase();

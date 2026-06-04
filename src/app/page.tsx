@@ -8,7 +8,7 @@ import Phone from "@/lib/models/Phone";
 import Post from "@/lib/models/Post";
 import "@/lib/models/Category";
 
-export const revalidate = 0; // Disable cache for real-time updates
+export const revalidate = 3600; // Enable ISR (1 hour caching), invalidated instantly on admin actions
 
 // --- DTO Interfaces ---
 interface IBrandSummary {
