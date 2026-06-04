@@ -2,6 +2,8 @@ import connectToDatabase from '@/lib/mongodb/mongoose';
 import Phone from '@/lib/models/Phone';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   await connectToDatabase();
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
