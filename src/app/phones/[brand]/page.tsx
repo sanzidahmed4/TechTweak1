@@ -13,9 +13,32 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   
   if (!data) return { title: "Brand Not Found" };
   
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
+  const url = `${baseUrl}/phones/${brand}`;
+
   return {
     title: `${data.name} Phones | TechTweak`,
     description: data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`,
+    alternates: {
+      canonical: url,
+      languages: {
+        'en': url,
+        'x-default': url,
+      },
+    },
+    openGraph: {
+      title: `${data.name} Phones | TechTweak`,
+      description: data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`,
+      url,
+      images: data.logo_url ? [{ url: data.logo_url }] : [],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${data.name} Phones | TechTweak`,
+      description: data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`,
+      images: data.logo_url ? [data.logo_url] : [],
+    }
   };
 }
 
@@ -60,8 +83,22 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
     }));
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
+  const currentUrl = `${baseUrl}/phones/${brand}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
+      { "@type": "ListItem", position: 2, name: "Phones", item: `${baseUrl}/phones` },
+      { "@type": "ListItem", position: 3, name: brandData.name, item: currentUrl }
+    ]
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen py-12 lg:py-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="container mx-auto px-4 lg:px-8">
         
         {/* Header */}

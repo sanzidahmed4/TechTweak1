@@ -12,11 +12,35 @@ export const metadata: Metadata = {
   title: "TechTweak | Premium Smartphone Reviews & Comparisons",
   description: "Discover the ultimate tech resource for smartphone reviews, detailed specifications, and side-by-side comparisons.",
   keywords: "smartphones, tech reviews, phone comparisons, specifications, tech news",
-  manifest: "/manifest.json",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://techtweak.com"),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'en': '/',
+      'x-default': '/',
+    },
+  },
   openGraph: {
     title: "TechTweak | The Future of Tech Media",
     description: "In-depth smartphone analysis, news, and guides.",
+    url: "/",
+    siteName: "TechTweak",
+    images: [
+      {
+        url: "https://res.cloudinary.com/dcb4ilgpy/image/upload/v1716024976/tech_placeholder.jpg",
+        width: 1200,
+        height: 630,
+        alt: "TechTweak Open Graph Image",
+      }
+    ],
+    locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TechTweak | Premium Smartphone Reviews",
+    description: "Discover the ultimate tech resource for smartphone reviews and side-by-side comparisons.",
+    images: ["https://res.cloudinary.com/dcb4ilgpy/image/upload/v1716024976/tech_placeholder.jpg"],
   },
   appleWebApp: {
     capable: true,

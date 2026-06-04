@@ -103,6 +103,46 @@ export default async function Home() {
     <>
       <Hero />
       
+      {/* Global JSON-LD Schemas */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": "https://techtweak.com/#organization",
+                "name": "TechTweak",
+                "url": "https://techtweak.com",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://res.cloudinary.com/dcb4ilgpy/image/upload/v1716024976/tech_placeholder.jpg"
+                },
+                "sameAs": [
+                  "https://twitter.com/techtweak",
+                  "https://facebook.com/techtweak"
+                ]
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://techtweak.com/#website",
+                "url": "https://techtweak.com",
+                "name": "TechTweak",
+                "publisher": {
+                  "@id": "https://techtweak.com/#organization"
+                },
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": "https://techtweak.com/search?q={search_term_string}",
+                  "query-input": "required name=search_term_string"
+                }
+              }
+            ]
+          })
+        }}
+      />
+      
       {/* Global Leaderboard Ad Slot */}
       <div className="bg-white py-8 border-b border-slate-100">
         <div className="container mx-auto px-4">

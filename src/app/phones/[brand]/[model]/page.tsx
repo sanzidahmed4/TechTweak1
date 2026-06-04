@@ -12,20 +12,39 @@ import SpecNavigation from "@/components/phones/SpecNavigation";
 import Link from "next/link";
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string, model: string }> }) {
-  const { model } = await params;
+  const { brand, model } = await params;
   await connectToDatabase();
 
-  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description images").lean() as any;
+  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description images updated_at").lean() as any;
 
   if (!data) return { title: "Phone Not Found" };
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
+  const url = `${baseUrl}/phones/${brand}/${model}`;
 
   return {
     title: data.meta_title || `${data.name} Specs, Review, and Price | TechTweak`,
     description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
+    alternates: {
+      canonical: url,
+      languages: {
+        'en': url,
+        'x-default': url,
+      },
+    },
     openGraph: {
       title: data.name,
-      description: data.meta_description,
+      description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
+      url,
       images: data.images && data.images.length > 0 ? [{ url: data.images[0] }] : [],
+      type: 'article',
+      modifiedTime: data.updated_at ? new Date(data.updated_at).toISOString() : new Date().toISOString(),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: data.name,
+      description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
+      images: data.images && data.images.length > 0 ? [data.images[0]] : [],
     }
   };
 }

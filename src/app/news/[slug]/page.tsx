@@ -20,9 +20,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return { title: 'Post Not Found | TechTweak' };
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
+  const url = `${baseUrl}/news/${decodedSlug}`;
+
   return {
     title: post.meta_title || `${post.title} | TechTweak`,
     description: post.meta_description || post.excerpt || `Read ${post.title} on TechTweak`,
+    alternates: {
+      canonical: url,
+      languages: {
+        'en': url,
+        'x-default': url,
+      },
+    },
+    openGraph: {
+      title: post.title,
+      description: post.meta_description || post.excerpt,
+      url,
+      images: post.featured_image ? [{ url: post.featured_image }] : [],
+      type: 'article',
+      modifiedTime: post.published_at ? new Date(post.published_at).toISOString() : new Date().toISOString(),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.meta_description || post.excerpt,
+      images: post.featured_image ? [post.featured_image] : [],
+    }
   };
 }
 
