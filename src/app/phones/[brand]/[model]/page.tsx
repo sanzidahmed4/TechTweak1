@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
 
   if (!data) return { title: "Phone Not Found" };
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
   const url = `${baseUrl}/phones/${brand}/${model}`;
 
   return {

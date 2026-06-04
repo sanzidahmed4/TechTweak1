@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return { title: 'Post Not Found | TechTweak' };
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
   const url = `${baseUrl}/news/${decodedSlug}`;
 
   return {

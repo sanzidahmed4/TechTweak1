@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   
   if (!data) return { title: "Brand Not Found" };
   
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
   const url = `${baseUrl}/phones/${brand}`;
 
   return {
@@ -83,7 +83,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
     }));
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
   const currentUrl = `${baseUrl}/phones/${brand}`;
 
   const jsonLd = {

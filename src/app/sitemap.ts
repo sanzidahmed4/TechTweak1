@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await connectToDatabase()
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech'
 
   // Fetch dynamic routes
   let phonesData: any[] = []

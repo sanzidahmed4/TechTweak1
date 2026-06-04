@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   await connectToDatabase();
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://techtweak.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
 
   try {
     const rawPosts = await Post.find({ is_published: true })

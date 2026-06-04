@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "TechTweak | Premium Smartphone Reviews & Comparisons",
   description: "Discover the ultimate tech resource for smartphone reviews, detailed specifications, and side-by-side comparisons.",
   keywords: "smartphones, tech reviews, phone comparisons, specifications, tech news",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://techtweak.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.techtweak.tech"),
   alternates: {
     canonical: '/',
     languages: {

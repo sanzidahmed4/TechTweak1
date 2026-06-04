@@ -112,31 +112,34 @@ export default async function Home() {
             "@graph": [
               {
                 "@type": "Organization",
-                "@id": "https://techtweak.com/#organization",
+                "@id": "https://www.techtweak.tech/#organization",
                 "name": "TechTweak",
-                "url": "https://techtweak.com",
+                "url": "https://www.techtweak.tech",
                 "logo": {
                   "@type": "ImageObject",
-                  "url": "https://res.cloudinary.com/dcb4ilgpy/image/upload/v1716024976/tech_placeholder.jpg"
+                  "url": "https://www.techtweak.tech/icon.png"
                 },
                 "sameAs": [
+                  "https://facebook.com/techtweak",
                   "https://twitter.com/techtweak",
-                  "https://facebook.com/techtweak"
+                  "https://youtube.com/techtweak"
                 ]
               },
               {
+                "@context": "https://schema.org",
                 "@type": "WebSite",
-                "@id": "https://techtweak.com/#website",
-                "url": "https://techtweak.com",
+                "@id": "https://www.techtweak.tech/#website",
+                "url": "https://www.techtweak.tech",
                 "name": "TechTweak",
                 "publisher": {
-                  "@id": "https://techtweak.com/#organization"
-                },
-                "potentialAction": {
-                  "@type": "SearchAction",
-                  "target": "https://techtweak.com/search?q={search_term_string}",
-                  "query-input": "required name=search_term_string"
+                  "@id": "https://www.techtweak.tech/#organization"
                 }
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "SearchAction",
+                "target": "https://www.techtweak.tech/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
               }
             ]
           })
