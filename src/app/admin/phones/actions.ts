@@ -194,16 +194,21 @@ export async function addPhone(formData: FormData) {
   };
 
   // Auto-generate Pros, Cons, FAQs based on specs
-  const autoPros = [];
-  const autoCons = [];
-  const autoFaqs = [];
+  const autoPros: string[] = [];
+  const autoCons: string[] = [];
+  const autoFaqs: any[] = [];
+
+  const nfc = formData.get("has_nfc") === "on";
+  const storage_type = formData.get("storage_type") as string;
 
   if (has_5g) autoPros.push("Supports Latest 5G Network");
+  if (nfc) autoPros.push("NFC support for contactless payments");
   
   const parsedBattery = battery_capacity ? parseSafeNumber(battery_capacity) : null;
   if (parsedBattery && parsedBattery >= 5000) autoPros.push(`Large ${battery_capacity} Battery for all-day use`);
   
   if (display_type && (display_type.toLowerCase().includes('amoled') || display_type.toLowerCase().includes('oled'))) autoPros.push("Vibrant and crisp AMOLED/OLED display");
+  if (display_type && display_type.toLowerCase().includes('ltpo')) autoPros.push("LTPO technology for better battery efficiency");
   
   const refreshRateRaw = formData.get("refresh_rate") as string;
   const parsedRefresh = refreshRateRaw ? parseSafeNumber(refreshRateRaw) : null;
@@ -211,21 +216,29 @@ export async function addPhone(formData: FormData) {
   
   const parsedCam = cam_main_sensor ? parseSafeNumber(cam_main_sensor) : null;
   if (parsedCam && parsedCam >= 50) autoPros.push(`High resolution ${parsedCam}MP Main Camera`);
+  if (cam_main_sensor && cam_main_sensor.toLowerCase().includes('ois')) autoPros.push("Optical Image Stabilization (OIS) for steady shots");
   
-  if (formData.get("water_resistance") && (formData.get("water_resistance") as string).includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
+  const water_res = formData.get("water_resistance") as string;
+  if (water_res && water_res.includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
   
-  if (!formData.get("charger_included") || formData.get("charger_included") !== "on") autoCons.push("Charging adapter is not included in the box");
+  if (storage_type && (storage_type.includes("UFS 4.0") || storage_type.includes("NVMe"))) autoPros.push("Ultra-fast UFS 4.0 / NVMe storage");
+  
+  const charger_included = formData.get("charger_included") === "on";
+  if (!charger_included) autoCons.push("Charging adapter is not included in the box");
   if (!has_audio_jack) autoCons.push("Lacks a 3.5mm headphone jack");
   
   const weightRaw = formData.get("weight") as string;
   const parsedWeight = weightRaw ? parseSafeNumber(weightRaw) : null;
   if (parsedWeight && parsedWeight >= 210) autoCons.push("Device is relatively heavy");
+  if (parsedWeight && parsedWeight < 170) autoPros.push("Lightweight and comfortable to hold");
 
   if (charging_wired) autoFaqs.push({ question: "Does it support fast charging?", answer: `Yes, it supports ${charging_wired}.` });
   if (has_5g) autoFaqs.push({ question: "Does this smartphone support 5G?", answer: "Yes, it is fully compatible with 5G networks for high-speed internet." });
-  autoFaqs.push({ question: "Is the charger included in the box?", answer: (formData.get("charger_included") === "on") ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
-  if (formData.get("water_resistance")) autoFaqs.push({ question: "Is this phone water-resistant?", answer: formData.get("water_resistance") as string });
-  if (formData.get("made_in")) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${formData.get("made_in") as string}.` });
+  autoFaqs.push({ question: "Is the charger included in the box?", answer: charger_included ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
+  if (water_res) autoFaqs.push({ question: "Is this phone water-resistant?", answer: water_res });
+  
+  const made_in = formData.get("made_in") as string;
+  if (made_in) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${made_in}.` });
 
   phoneData.pros = autoPros;
   phoneData.cons = autoCons;
@@ -432,16 +445,21 @@ export async function editPhone(id: string, formData: FormData) {
   };
 
   // Auto-generate Pros, Cons, FAQs based on specs
-  const autoPros = [];
-  const autoCons = [];
-  const autoFaqs = [];
+  const autoPros: string[] = [];
+  const autoCons: string[] = [];
+  const autoFaqs: any[] = [];
+
+  const nfc = formData.get("has_nfc") === "on";
+  const storage_type = formData.get("storage_type") as string;
 
   if (has_5g) autoPros.push("Supports Latest 5G Network");
+  if (nfc) autoPros.push("NFC support for contactless payments");
   
   const parsedBattery = battery_capacity ? parseSafeNumber(battery_capacity) : null;
   if (parsedBattery && parsedBattery >= 5000) autoPros.push(`Large ${battery_capacity} Battery for all-day use`);
   
   if (display_type && (display_type.toLowerCase().includes('amoled') || display_type.toLowerCase().includes('oled'))) autoPros.push("Vibrant and crisp AMOLED/OLED display");
+  if (display_type && display_type.toLowerCase().includes('ltpo')) autoPros.push("LTPO technology for better battery efficiency");
   
   const refreshRateRaw = formData.get("refresh_rate") as string;
   const parsedRefresh = refreshRateRaw ? parseSafeNumber(refreshRateRaw) : null;
@@ -449,21 +467,29 @@ export async function editPhone(id: string, formData: FormData) {
   
   const parsedCam = cam_main_sensor ? parseSafeNumber(cam_main_sensor) : null;
   if (parsedCam && parsedCam >= 50) autoPros.push(`High resolution ${parsedCam}MP Main Camera`);
+  if (cam_main_sensor && cam_main_sensor.toLowerCase().includes('ois')) autoPros.push("Optical Image Stabilization (OIS) for steady shots");
   
-  if (formData.get("water_resistance") && (formData.get("water_resistance") as string).includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
+  const water_res = formData.get("water_resistance") as string;
+  if (water_res && water_res.includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
   
-  if (!formData.get("charger_included") || formData.get("charger_included") !== "on") autoCons.push("Charging adapter is not included in the box");
+  if (storage_type && (storage_type.includes("UFS 4.0") || storage_type.includes("NVMe"))) autoPros.push("Ultra-fast UFS 4.0 / NVMe storage");
+  
+  const charger_included = formData.get("charger_included") === "on";
+  if (!charger_included) autoCons.push("Charging adapter is not included in the box");
   if (!has_audio_jack) autoCons.push("Lacks a 3.5mm headphone jack");
   
   const weightRaw = formData.get("weight") as string;
   const parsedWeight = weightRaw ? parseSafeNumber(weightRaw) : null;
   if (parsedWeight && parsedWeight >= 210) autoCons.push("Device is relatively heavy");
+  if (parsedWeight && parsedWeight < 170) autoPros.push("Lightweight and comfortable to hold");
 
   if (charging_wired) autoFaqs.push({ question: "Does it support fast charging?", answer: `Yes, it supports ${charging_wired}.` });
   if (has_5g) autoFaqs.push({ question: "Does this smartphone support 5G?", answer: "Yes, it is fully compatible with 5G networks for high-speed internet." });
-  autoFaqs.push({ question: "Is the charger included in the box?", answer: (formData.get("charger_included") === "on") ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
-  if (formData.get("water_resistance")) autoFaqs.push({ question: "Is this phone water-resistant?", answer: formData.get("water_resistance") as string });
-  if (formData.get("made_in")) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${formData.get("made_in") as string}.` });
+  autoFaqs.push({ question: "Is the charger included in the box?", answer: charger_included ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
+  if (water_res) autoFaqs.push({ question: "Is this phone water-resistant?", answer: water_res });
+  
+  const made_in = formData.get("made_in") as string;
+  if (made_in) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${made_in}.` });
 
   phoneData.pros = autoPros;
   phoneData.cons = autoCons;
