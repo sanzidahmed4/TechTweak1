@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const brand = await Brand.findOne({ slug: 'motorola' });
     if (!brand) return NextResponse.json({ success: false, error: "Brand not found" });
 
-    const phones = await Phone.find({ brand_id: brand._id });
+    const phones = await Phone.find({ brand_id: brand._id }).sort({ release_date_parsed: -1, price_usd: -1, name: 1 });
 
     // Revalidate main routes
     revalidatePath('/', 'page');

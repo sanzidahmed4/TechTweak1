@@ -23,8 +23,8 @@ export default async function PhonesPage() {
   try {
     // Fetch phones with brand info
     const rawPhones = await Phone.find({ is_published: true })
-      .populate("brand_id", "name slug logo_url")
-      .sort({ created_at: -1 })
+      .populate('brand_id', 'name slug')
+      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .lean();
 
     totalCount = await Phone.countDocuments({ is_published: true });

@@ -58,7 +58,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
       brandData = bData;
       // Fetch Phones for this brand
       const rawPhones = await Phone.find({ brand_id: bData._id, is_published: true })
-        .sort({ release_date: -1 })
+        .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
         .lean();
         
       phones = rawPhones.map((p: any) => ({

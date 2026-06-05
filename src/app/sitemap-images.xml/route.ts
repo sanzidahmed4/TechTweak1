@@ -11,7 +11,7 @@ export async function GET() {
   try {
     const rawPhones = await Phone.find({ is_published: true })
       .select('slug name images brand_id')
-      .populate('brand_id', 'slug')
+      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .lean() as any[];
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>

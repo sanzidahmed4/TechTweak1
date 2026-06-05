@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const rawPhones = await Phone.find({ is_published: true })
       .select('slug updated_at brand_id')
       .populate('brand_id', 'slug')
+      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .lean()
     
     if (rawPhones) {

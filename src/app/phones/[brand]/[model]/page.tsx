@@ -116,17 +116,21 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       _id: { $ne: rawPhone._id },
       is_published: true
     })
+      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .populate("brand_id", "name slug")
       .limit(4)
       .lean();
 
     // 2. Price Match query
     if (rawPhone.price_usd) {
+      const minPrice = rawPhone.price_usd * 0.8;
+      const maxPrice = rawPhone.price_usd * 1.2;
       dbSamePricePhones = await Phone.find({
-        price_usd: { $gte: rawPhone.price_usd * 0.8, $lte: rawPhone.price_usd * 1.2 },
+        price_usd: { $gte: minPrice, $lte: maxPrice },
         _id: { $ne: rawPhone._id },
         is_published: true
       })
+        .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
         .populate("brand_id", "name slug")
         .limit(4)
         .lean();

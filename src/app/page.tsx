@@ -66,8 +66,8 @@ export default async function Home() {
   try {
     const rawPhones = (await Phone.find({ is_published: true })
       .populate('brand_id', 'name slug')
-      .sort({ created_at: -1 })
-      .limit(8)
+      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
+      .limit(10)
       .lean()) as unknown as RawPhone[];
       
     featuredPhones = rawPhones.map((p) => ({

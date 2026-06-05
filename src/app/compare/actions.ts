@@ -8,6 +8,7 @@ export async function searchPhonesForCompare(query: string) {
   try {
     const rawPhones = await Phone.find({ name: { $regex: query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } })
       .populate('brand_id', 'name')
+      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .limit(10)
       .lean();
       

@@ -41,9 +41,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   }
 
   let sortQuery: any = {};
-  if (sort === "newest") sortQuery = { release_date: -1 };
-  if (sort === "price_high") sortQuery = { price_usd: -1 };
-  if (sort === "price_low") sortQuery = { price_usd: 1 };
+  if (sort === "newest") sortQuery = { release_date_parsed: -1, price_usd: -1, name: 1 };
+  if (sort === "price_high") sortQuery = { price_usd: -1, release_date_parsed: -1, name: 1 };
+  if (sort === "price_low") sortQuery = { price_usd: 1, release_date_parsed: -1, name: 1 };
 
   let phones: any[] = [];
   try {

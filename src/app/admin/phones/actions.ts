@@ -16,6 +16,29 @@ function parseSafeNumber(value: any): number | null {
   return isNaN(parsed) ? null : parsed;
 }
 
+function parseReleaseDate(dateStr: string | null | undefined): Date | null {
+  if (!dateStr || dateStr.trim() === "") return null;
+  
+  let cleanStr = dateStr.replace(/exp\.|expected|announced/i, '').trim();
+
+  const parsed = new Date(cleanStr);
+  if (!isNaN(parsed.getTime())) {
+    return parsed;
+  }
+
+  const commaMatch = cleanStr.match(/^(\d{4}),\s*([a-zA-Z]+)$/);
+  if (commaMatch) {
+    const parsedComma = new Date(`${commaMatch[2]} ${commaMatch[1]}`);
+    if (!isNaN(parsedComma.getTime())) return parsedComma;
+  }
+
+  if (/^\d{4}$/.test(cleanStr)) {
+    return new Date(`${cleanStr}-01-01`);
+  }
+
+  return null;
+}
+
 export async function addPhone(formData: FormData) {
   await connectToDatabase();
 
@@ -78,6 +101,7 @@ export async function addPhone(formData: FormData) {
     upcoming: formData.get("upcoming") === "on",
     is_official: formData.get("is_official") === "on",
     release_date: formData.get("release_date") || null,
+    release_date_parsed: parseReleaseDate(formData.get("release_date") as string),
     colors,
     pros: [] as string[],
     cons: [] as string[],
@@ -327,6 +351,7 @@ export async function editPhone(id: string, formData: FormData) {
     upcoming: formData.get("upcoming") === "on",
     is_official: formData.get("is_official") === "on",
     release_date: formData.get("release_date") || null,
+    release_date_parsed: parseReleaseDate(formData.get("release_date") as string),
     colors,
     pros: [] as string[],
     cons: [] as string[],

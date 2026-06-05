@@ -36,7 +36,7 @@ export default async function AdminPhonesPage(props: {
 
     const rawPhones = await Phone.find(queryObj)
       .populate('brand_id', 'name')
-      .sort({ created_at: -1 })
+      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .lean();
       
     phones = rawPhones.map((p: any) => ({

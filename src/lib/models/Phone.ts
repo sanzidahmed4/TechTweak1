@@ -14,6 +14,7 @@ export interface IPhone extends Document {
   price_unofficial?: number;
   is_official?: boolean;
   release_date?: string;
+  release_date_parsed?: Date | null;
   is_published: boolean;
   is_featured: boolean;
   upcoming?: boolean;
@@ -158,6 +159,7 @@ const PhoneSchema: Schema = new Schema({
   price_unofficial: { type: Number },
   is_official: { type: Boolean, default: true },
   release_date: { type: String },
+  release_date_parsed: { type: Date, default: null },
   is_published: { type: Boolean, default: false },
   is_featured: { type: Boolean, default: false },
   upcoming: { type: Boolean, default: false },
