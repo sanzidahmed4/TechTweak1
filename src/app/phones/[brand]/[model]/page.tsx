@@ -374,7 +374,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
               </div>
 
               {/* Quick Info Grid */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <div className={`bg-white rounded-3xl border border-slate-200 p-5 grid grid-cols-2 gap-4 text-center ${rawPhone.made_in ? 'md:grid-cols-5' : 'md:grid-cols-4'}`}>
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">Colors</span>
                   <span className="text-xs font-semibold text-slate-700 line-clamp-1">{rawPhone.colors?.length > 0 ? rawPhone.colors.join(", ") : "N/A"}</span>
@@ -399,9 +399,13 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">OS Support</span>
                   <span className="text-xs font-semibold text-slate-700 line-clamp-1">{rawPhone.update_policy || "Standard"}</span>
                 </div>
+                {rawPhone.made_in && (
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">Made In</span>
+                    <span className="text-xs font-semibold text-slate-700 line-clamp-1">{rawPhone.made_in}</span>
+                  </div>
+                )}
               </div>
-
-            </div>
           </div>
 
           {/* Sticky spec tab navigation */}
