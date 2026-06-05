@@ -5,6 +5,7 @@ import ClientLayoutWrapper from "@/components/layout/ClientLayoutWrapper";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import AnalyticsTracker from "@/components/layout/AnalyticsTracker";
 import { Suspense } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -67,6 +68,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <AnalyticsTracker />
         </Suspense>
+        <SpeedInsights />
       </body>
     </html>
   );
