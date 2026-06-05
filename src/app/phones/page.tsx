@@ -85,35 +85,7 @@ export default async function PhonesPage() {
     console.error("Error fetching phones page data:", error);
   }
 
-  // Fallback demo data if DB is empty
-  if (phones.length === 0) {
-    const demoBrands = ["Samsung", "Apple", "Xiaomi", "Realme", "Vivo", "Oppo"];
-    phones = Array.from({ length: 24 }, (_, i) => ({
-      id: String(i + 1),
-      name: `${demoBrands[i % demoBrands.length]} Galaxy Pro ${i + 1}`,
-      slug: `demo-phone-${i + 1}`,
-      brand: { name: demoBrands[i % demoBrands.length], slug: demoBrands[i % demoBrands.length].toLowerCase() },
-      display: `6.${5 + (i % 4)}" AMOLED 120Hz`,
-      processor: i % 3 === 0 ? "Snapdragon 8 Gen 3" : i % 3 === 1 ? "Dimensity 9300" : "Apple A18 Pro",
-      ram: `${[6, 8, 12, 16][i % 4]}GB`,
-      storage: `${[128, 256, 512][i % 3]}GB`,
-      camera_main: `${[50, 64, 108, 200][i % 4]}MP`,
-      battery: `${[4500, 5000, 5500][i % 3]}mAh`,
-      network: i % 3 !== 0 ? "5G" : "4G",
-      price_usd: [250, 400, 600, 800, 1200][i % 5],
-      images: [],
-      is_featured: i < 4,
-      release_date: "2024",
-      antutu_score: i % 3 === 0 ? 1850000 : null,
-    }));
-    totalCount = 1250;
-  }
 
-  if (brands.length === 0) {
-    brands = ["Samsung", "Apple", "Xiaomi", "Redmi", "Realme", "Vivo", "Oppo", "OnePlus", "Motorola", "Tecno", "Infinix", "Google"].map(
-      (name, i) => ({ id: String(i), name, slug: name.toLowerCase().replace(" ", "-"), logo_url: null, count: Math.floor(Math.random() * 80) + 10 })
-    );
-  }
 
   return (
     <PhonesClientPage

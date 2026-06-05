@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         destination: '/news/:slug*',
         permanent: true,
       },
+      {
+        source: '/phones/motorola/thinkphone-by-motorola',
+        destination: '/phones/motorola/motorola-thinkphone',
+        permanent: true,
+      },
     ]
   },
 };

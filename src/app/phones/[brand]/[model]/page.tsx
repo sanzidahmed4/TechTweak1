@@ -15,12 +15,22 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   const { brand, model } = await params;
   await connectToDatabase();
 
-  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description images updated_at").lean() as any;
+  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description images og_image updated_at").lean() as any;
 
   if (!data) return { title: "Phone Not Found" };
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
   const url = `${baseUrl}/phones/${brand}/${model}`;
+
+  const getOgImageUrl = (imgUrl: string) => {
+    if (!imgUrl) return undefined;
+    if (imgUrl.includes('res.cloudinary.com') && imgUrl.includes('/upload/')) {
+      return imgUrl.replace('/upload/', '/upload/w_1200,h_630,c_pad,b_white/');
+    }
+    return imgUrl;
+  };
+
+  const finalOgImage = getOgImageUrl(data.og_image) || getOgImageUrl(data.images?.[0]);
 
   return {
     title: data.meta_title || `${data.name} Specs, Review, and Price | TechTweak`,
@@ -36,7 +46,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
       title: data.name,
       description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
       url,
-      images: data.images && data.images.length > 0 ? [{ url: data.images[0] }] : [],
+      images: finalOgImage ? [{ url: finalOgImage }] : [],
       type: 'article',
       modifiedTime: data.updated_at ? new Date(data.updated_at).toISOString() : new Date().toISOString(),
     },
@@ -44,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
       card: 'summary_large_image',
       title: data.name,
       description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
-      images: data.images && data.images.length > 0 ? [data.images[0]] : [],
+      images: finalOgImage ? [finalOgImage] : [],
     }
   };
 }
@@ -66,116 +76,8 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
     console.error(err);
   }
 
-  // Fallback demo object if not found in db
   if (!rawPhone) {
-    rawPhone = {
-      _id: "demo",
-      name: "Galaxy S26 Ultra (Demo)",
-      slug: model,
-      brand_id: { name: "Samsung", slug: "samsung" },
-      processor: "Snapdragon 8 Gen 4",
-      ram: "12GB / 16GB LPDDR5X",
-      storage: "256GB / 512GB / 1TB UFS 4.0",
-      display: "6.8 inch Dynamic AMOLED 2X, 144Hz",
-      battery: "5000 mAh",
-      charging: "45W Wired, 15W Wireless",
-      camera_main: "200MP + 50MP + 12MP + 10MP",
-      camera_front: "12MP",
-      os: "Android 16, One UI 8",
-      price_usd: 1250,
-      antutu_score: 2450000,
-      images: ["https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=1000"],
-      is_published: true,
-      is_official: true,
-      upcoming: false,
-      colors: ["Titanium Gray", "Titanium Black", "Titanium Yellow"],
-      model_number: "SM-S928B",
-
-      // Structured specs fallback
-      weight: "232 g (8.18 oz)",
-      dimensions: "162.3 x 79 x 8.6 mm",
-      build_material: "Glass front, titanium frame, glass back",
-      sim_type: "Nano-SIM and eSIM",
-      water_resistance: "IP68 dust/water resistant (up to 1.5m for 30 min)",
-
-      display_type: "Dynamic LTPO AMOLED 2X, 120Hz, HDR10+",
-      screen_size: "6.8 inches",
-      resolution: "1440 x 3120 pixels",
-      refresh_rate: "120Hz",
-      brightness: "2600 nits (peak)",
-      hdr: "HDR10+",
-      protection: "Corning Gorilla Armor",
-      pixel_density: "505 ppi",
-
-      cpu: "Octa-core (1x3.39GHz + 3x3.1GHz + 2x2.9GHz + 2x2.2GHz)",
-      gpu: "Adreno 750",
-      fabrication: "4 nm",
-      ram_variants: "12GB, 16GB LPDDR5X",
-      storage_variants: "256GB, 512GB, 1TB",
-      storage_type: "UFS 4.0",
-      geekbench_score: "2300 / 7200",
-      cooling_system: "Vapor chamber liquid cooling",
-
-      cam_main_sensor: "200 MP, f/1.7, 24mm (wide), Multi-directional PDAF, Laser AF, OIS",
-      cam_ultrawide: "12 MP, f/2.2, 13mm, 120˚ (ultrawide)",
-      cam_telephoto: "50 MP, f/3.4, 111mm (periscope telephoto), 5x optical zoom, OIS",
-      cam_macro: "10 MP, f/2.4, 67mm (telephoto), 3x optical zoom, OIS",
-      cam_ois: "Dual OIS Support",
-      cam_flash: "LED flash, auto-HDR, panorama",
-      cam_video: "8K@24/30fps, 4K@30/60/120fps, 1080p@30/60/240fps, HDR10+",
-
-      cam_front_resolution: "12 MP, f/2.2, 26mm (wide), Dual Pixel PDAF",
-      cam_front_hdr: "Auto-HDR, HDR10+",
-      cam_front_portrait: "Smart HDR, Portrait lighting",
-      cam_front_video: "4K@30/60fps, 1080p@30fps",
-
-      battery_capacity: "5000 mAh",
-      charging_wired: "45W wired, PD3.0, 65% in 30 min",
-      charging_wireless: "15W wireless (Qi/PMA)",
-      charging_reverse: "4.5W reverse wireless",
-      charger_included: false,
-      usb_type: "USB Type-C 3.2, OTG",
-
-      has_5g: true,
-      wifi_version: "Wi-Fi 802.11 a/b/g/n/ac/6e/7, tri-band",
-      bluetooth_version: "5.3, A2DP, LE",
-      has_nfc: true,
-      gps_specs: "GPS, GLONASS, BDS, GALILEO, QZSS",
-      has_ir_blaster: false,
-      has_audio_jack: false,
-      usb_version: "USB Type-C 3.2 Gen 2",
-
-      sensor_fingerprint: "Under-display (ultrasonic)",
-      has_gyroscope: true,
-      has_compass: true,
-      has_accelerometer: true,
-      has_face_unlock: true,
-
-      android_version: "Android 15",
-      ui_version: "One UI 7.1",
-      update_policy: "7 Years of Major OS Updates",
-      ai_features: ["Circle to Search", "Live Translate", "Generative Edit", "Note Assist", "Chat Assist"],
-      has_circle_to_search: true,
-      has_ai_editing: true,
-      has_live_translation: true,
-      has_ai_assistant: true,
-
-      pros: [
-        "Incredible Snapdragon 8 Gen 4 peak performance",
-        "Corning Gorilla Armor highly reduces reflections",
-        "Exceptional battery life and 5x optical telephoto camera",
-        "7 full years of Android software updates"
-      ],
-      cons: [
-        "Expensive launch price tag",
-        "No dedicated wall charging brick in the retail box",
-        "Heavy weight in hand during extended usage"
-      ],
-      faqs: [
-        { question: "Is the charger included in the box?", answer: "No, the retail box only contains the phone and a USB-C to USB-C cable. You need to purchase a 45W PPS charger separately." },
-        { question: "Does it support eSIM technology?", answer: "Yes, it supports dual eSIM or one physical nano-SIM card along with an eSIM." }
-      ]
-    };
+    notFound();
   }
 
   // Brand and model resolution
@@ -252,12 +154,22 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.techtweak.tech";
   const currentUrl = `${baseUrl}/phones/${brand}/${model}`;
 
+  const getOgImageUrl = (imgUrl: string) => {
+    if (!imgUrl) return undefined;
+    if (imgUrl.includes('res.cloudinary.com') && imgUrl.includes('/upload/')) {
+      return imgUrl.replace('/upload/', '/upload/w_1200,h_630,c_pad,b_white/');
+    }
+    return imgUrl;
+  };
+
+  const finalSchemaImage = getOgImageUrl(rawPhone.og_image) || getOgImageUrl(rawPhone.images?.[0]);
+
   const jsonLd: any[] = [
     {
       "@context": "https://schema.org",
       "@type": "Product",
       name: rawPhone.name,
-      image: rawPhone.images && rawPhone.images.length > 0 ? rawPhone.images[0] : undefined,
+      image: finalSchemaImage,
       description: rawPhone.meta_description || `Full specifications, features, and price for the ${rawPhone.name}.`,
       brand: {
         "@type": "Brand",

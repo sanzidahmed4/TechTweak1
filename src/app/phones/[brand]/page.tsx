@@ -73,16 +73,9 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
     console.error(err);
   }
 
-  // Fallback for demonstration
+  // If brand is not found, throw 404
   if (!brandData) {
-    brandData = { name: brand.charAt(0).toUpperCase() + brand.slice(1), description: `Discover the latest innovations from ${brand}.` };
-    phones = [1, 2, 3, 4, 5, 6].map(i => ({
-      id: i,
-      name: `${brandData.name} Model ${i}`,
-      slug: `${brand}-model-${i}`,
-      price_usd: 1250,
-      images: []
-    }));
+    notFound();
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';

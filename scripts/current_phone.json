@@ -1,0 +1,121 @@
+{
+  "name": "Moto G Play (2026)",
+  "slug": "moto-g-play-2026",
+  "price_usd": 169,
+  "price_bdt": null,
+  "price_official": null,
+  "price_unofficial": null,
+  "is_official": false,
+  "release_date": "November 2025",
+  "is_published": true,
+  "is_featured": false,
+  "upcoming": false,
+  "colors": ["Sapphire Blue", "Matte Black"],
+  "model_number": "[REQUIRES REVIEW]",
+  "phone_variants": "4GB/64GB",
+  "made_in": "China",
+  
+  "images": [
+    "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g-play-2024-1.jpg"
+  ],
+  
+  "chipset_highlight": "Dimensity 6300",
+  "camera_highlight": "32MP Single",
+  "display_highlight": "6.7\" LCD 120Hz",
+  "battery_highlight": "5200 mAh",
+  "benchmark_highlight": "[REQUIRES REVIEW]",
+  
+  "weight": "202 g",
+  "dimensions": "167.2 x 76.4 x 8.5 mm",
+  "build_material": "Glass front (Gorilla Glass 3), silicone polymer (eco-leather) back, plastic frame",
+  "sim_type": "Nano-SIM",
+  "water_resistance": "IP52 dust and splash resistant",
+  
+  "display_type": "IPS LCD",
+  "screen_size": "6.7 inches",
+  "resolution": "720 x 1604 pixels",
+  "refresh_rate": "120Hz",
+  "brightness": "1000 nits (peak)",
+  "hdr": "Not Supported",
+  "protection": "Corning Gorilla Glass 3",
+  "pixel_density": "~262 ppi",
+  
+  "cpu": "Octa-core",
+  "gpu": "Mali-G57 MC2",
+  "fabrication": "6 nm",
+  "ram_variants": "4GB",
+  "storage_variants": "64GB",
+  "storage_type": "UFS 2.2",
+  "geekbench_score": "[REQUIRES REVIEW]",
+  "cooling_system": "Not Supported",
+  
+  "cam_count": "Single",
+  "cam_main_sensor": "32 MP, f/2.0, (wide), PDAF",
+  "cam_ultrawide": "Not Supported",
+  "cam_telephoto": "Not Supported",
+  "cam_macro": "Not Supported",
+  "cam_depth": "Not Supported",
+  "cam_ois": "Not Supported",
+  "cam_flash": "LED flash, HDR, panorama",
+  "cam_video": "1080p@30fps",
+  
+  "cam_front_resolution": "8 MP, f/2.4, (wide)",
+  "cam_front_hdr": "HDR",
+  "cam_front_portrait": "[REQUIRES REVIEW]",
+  "cam_front_video": "1080p@30fps",
+  
+  "battery_capacity": "5200 mAh",
+  "charging_wired": "18W wired",
+  "charging_wireless": "Not Supported",
+  "charging_reverse": "Not Supported",
+  "charger_included": false,
+  "usb_type": "USB Type-C 2.0",
+  
+  "has_5g": true,
+  "wifi_version": "Wi-Fi 802.11 a/b/g/n/ac, dual-band",
+  "bluetooth_version": "5.3, A2DP, LE",
+  "has_nfc": true,
+  "gps_specs": "GPS, GLONASS, GALILEO",
+  "has_ir_blaster": false,
+  "has_audio_jack": true,
+  "usb_version": "2.0",
+  
+  "sensor_fingerprint": "Side-mounted",
+  "has_gyroscope": true,
+  "has_compass": true,
+  "has_accelerometer": true,
+  "has_face_unlock": true,
+  
+  "android_version": "Android 16",
+  "ui_version": "Stock Android",
+  "update_policy": "Not Supported",
+  "ai_features": [],
+  "has_circle_to_search": false,
+  "has_ai_editing": false,
+  "has_live_translation": false,
+  "has_ai_assistant": false,
+  
+  "pros": [
+    "Retains an affordable $170 price tag",
+    "Large 5200 mAh battery for excellent longevity",
+    "Smooth 120Hz display refresh rate",
+    "Finally adds 5G support to the entry-level Play series via Dimensity 6300"
+  ],
+  "cons": [
+    "Low 720p resolution screen",
+    "Only 64GB of base storage",
+    "Slow 18W charging takes a long time to fill the large battery",
+    "Single rear camera is very basic"
+  ],
+  
+  "faqs": [
+    { "question": "Does the Moto G Play (2026) support 5G?", "answer": "Yes, thanks to the Dimensity 6300 chipset, it is one of the cheapest 5G-capable devices available in the US." },
+    { "question": "Does it have a micro SD card slot?", "answer": "Yes, storage can be expanded up to 1TB." },
+    { "question": "Does it come with Android 16?", "answer": "Yes, it launches with Android 16 and Motorola's Hello UI out of the box." }
+  ],
+  
+  "meta_title": "Moto G Play (2026) Price in USA, Specs & Review",
+  "meta_description": "Official specs, price, and review of the Moto G Play (2026). Features a Dimensity 6300 chipset, 5G support, 120Hz screen, and a large 5200mAh battery.",
+  "meta_keywords": "Moto G Play 2026, Moto G Play USA, cheap 5G phone, $170 Motorola",
+  "og_image": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g-play-2024-1.jpg"
+}

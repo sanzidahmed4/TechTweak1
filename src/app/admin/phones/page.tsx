@@ -51,14 +51,8 @@ export default async function AdminPhonesPage(props: {
     console.error("MongoDB connection failed", err);
   }
 
-  // Dummy data fallback for preview
-  if (phones.length === 0) {
-    phones = [
-      { id: "1", name: "Galaxy S26 Ultra", slug: "galaxy-s26-ultra", brands: { name: "Samsung" }, is_published: true, price_usd: 1250, created_at: new Date().toISOString() },
-      { id: "2", name: "iPhone 16 Pro", slug: "iphone-16-pro", brands: { name: "Apple" }, is_published: true, price_usd: 999, created_at: new Date().toISOString() },
-      { id: "3", name: "Pixel 9 Pro", slug: "pixel-9-pro", brands: { name: "Google" }, is_published: false, price_usd: 899, created_at: new Date().toISOString() },
-    ];
-  }
+  // If no phones found, we just pass an empty array instead of dummy data.
+  // The table should handle empty states natively.
 
   const currentQuery = new URLSearchParams();
   if (searchQuery) currentQuery.set("q", searchQuery);

@@ -56,28 +56,6 @@ const CATEGORIES = [
   },
 ];
 
-const DEMO_PHONES: Record<string, { name: string; tag: string; price: string }[]> = {
-  gaming: [
-    { name: "ROG Phone 8 Pro", tag: "AnTuTu 2.1M", price: "$999" },
-    { name: "Xiaomi Black Shark 6", tag: "165Hz AMOLED", price: "$699" },
-    { name: "Lenovo Legion Y70", tag: "Snapdragon 8+", price: "$549" },
-  ],
-  camera: [
-    { name: "Samsung S25 Ultra", tag: "200MP Camera", price: "$1,299" },
-    { name: "Google Pixel 9 Pro", tag: "AI Camera", price: "$999" },
-    { name: "Xiaomi 15 Ultra", tag: "Leica 50MP", price: "$899" },
-  ],
-  battery: [
-    { name: "Xiaomi 15 Pro", tag: "6100mAh", price: "$799" },
-    { name: "Realme GT 7", tag: "6000mAh 120W", price: "$499" },
-    { name: "Vivo Y300 Plus", tag: "6500mAh", price: "$299" },
-  ],
-  budget: [
-    { name: "Redmi Note 14 Pro", tag: "Best Value", price: "$229" },
-    { name: "Realme C75", tag: "6000mAh", price: "$149" },
-    { name: "Samsung A56", tag: "AMOLED 120Hz", price: "$349" },
-  ],
-};
 
 interface Props {
   phones: PhoneData[];
@@ -100,10 +78,8 @@ export default function AIRecommendation({ phones }: Props) {
       brand: p.brand.slug,
     }));
 
-  const displayPhones =
-    filtered.length >= 2
-      ? filtered
-      : DEMO_PHONES[activeCategory].map((p) => ({ ...p, slug: "/phones", brand: "" }));
+  const displayPhones = filtered;
+  if (displayPhones.length === 0) return null;
 
   return (
     <section className="mt-16 mb-4">

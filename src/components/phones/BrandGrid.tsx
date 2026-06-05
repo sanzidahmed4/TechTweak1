@@ -2,21 +2,6 @@
 
 import Link from "next/link";
 
-const FALLBACK_BRANDS = [
-  { id: "1", name: "Samsung", slug: "samsung", logo_url: null, count: 95 },
-  { id: "2", name: "Apple", slug: "apple", logo_url: null, count: 42 },
-  { id: "3", name: "Xiaomi", slug: "xiaomi", logo_url: null, count: 78 },
-  { id: "4", name: "Redmi", slug: "redmi", logo_url: null, count: 55 },
-  { id: "5", name: "Realme", slug: "realme", logo_url: null, count: 63 },
-  { id: "6", name: "Vivo", slug: "vivo", logo_url: null, count: 48 },
-  { id: "7", name: "Oppo", slug: "oppo", logo_url: null, count: 52 },
-  { id: "8", name: "OnePlus", slug: "oneplus", logo_url: null, count: 34 },
-  { id: "9", name: "Motorola", slug: "motorola", logo_url: null, count: 40 },
-  { id: "10", name: "Tecno", slug: "tecno", logo_url: null, count: 29 },
-  { id: "11", name: "Infinix", slug: "infinix", logo_url: null, count: 26 },
-  { id: "12", name: "Google", slug: "google", logo_url: null, count: 15 },
-];
-
 interface Props {
   brands: { id: string; name: string; slug: string; logo_url: string | null; count: number }[];
   activeBrands: string[];
@@ -24,7 +9,7 @@ interface Props {
 }
 
 export default function BrandGrid({ brands, activeBrands, onBrandClick }: Props) {
-  const displayBrands = brands.length > 0 ? brands : FALLBACK_BRANDS;
+  const displayBrands = brands;
 
   return (
     <section className="bg-white border-b border-slate-100 py-6">
