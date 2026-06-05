@@ -71,7 +71,7 @@ export default function PhoneForm({ initialData, brands, action, title, descript
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Release Date</label>
-            <input type="date" name="release_date" defaultValue={initialData?.release_date || ""} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+            <input type="text" name="release_date" defaultValue={initialData?.release_date || ""} placeholder="e.g. May 2023" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Colors (Comma separated)</label>
