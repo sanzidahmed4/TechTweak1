@@ -15,7 +15,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const mongoQuery: any = { is_published: true };
   
   if (q) {
-    mongoQuery.name = { $regex: q, $options: 'i' };
+    mongoQuery.name = { $regex: q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
   }
   
   if (year) {
@@ -26,7 +26,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   }
 
   if (chipset) {
-    mongoQuery.processor = { $regex: chipset, $options: 'i' };
+    mongoQuery.processor = { $regex: chipset.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
   }
 
   // Filter by brand slug (requires finding brand ID first if we want to query by ID)

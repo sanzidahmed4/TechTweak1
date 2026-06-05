@@ -22,7 +22,8 @@ export default async function AdminPhonesPage(props: {
   try {
     const queryObj: any = {};
     if (searchQuery) {
-      queryObj.name = { $regex: searchQuery, $options: "i" };
+      const escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      queryObj.name = { $regex: escapedQuery, $options: "i" };
     }
     if (brandFilter) {
       queryObj.brand_id = brandFilter;

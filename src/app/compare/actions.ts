@@ -6,7 +6,7 @@ import Phone from "@/lib/models/Phone";
 export async function searchPhonesForCompare(query: string) {
   await connectToDatabase();
   try {
-    const rawPhones = await Phone.find({ name: { $regex: query, $options: 'i' } })
+    const rawPhones = await Phone.find({ name: { $regex: query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } })
       .populate('brand_id', 'name')
       .limit(10)
       .lean();

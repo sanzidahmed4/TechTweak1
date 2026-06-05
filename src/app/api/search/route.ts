@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     await connectToDatabase();
 
     const phones = await Phone.find({
-      name: { $regex: query, $options: 'i' },
+      name: { $regex: query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' },
       is_published: true
     })
     .select('name slug images release_date brand_id')
