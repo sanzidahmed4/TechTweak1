@@ -406,6 +406,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   </div>
                 )}
               </div>
+            </div>
           </div>
 
           {/* Sticky spec tab navigation */}
