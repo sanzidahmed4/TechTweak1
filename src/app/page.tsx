@@ -145,14 +145,7 @@ export default async function Home() {
           })
         }}
       />
-      
-      {/* Global Leaderboard Ad Slot */}
-      <div className="bg-white py-8 border-b border-slate-100">
-        <div className="container mx-auto px-4">
-          <AdSlot type="leaderboard" />
-        </div>
-      </div>
-      
+
       {/* Animated Trending Phones Carousel */}
       <section className="py-24 bg-slate-50 border-b border-slate-200/60 overflow-hidden relative">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>

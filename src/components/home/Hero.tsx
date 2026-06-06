@@ -28,12 +28,12 @@ export default function Hero() {
               Discover the Future of Mobile
             </div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]">
               Find Your Perfect <br className="hidden lg:block" />
               <span className="text-gradient">Smartphone.</span>
             </h1>
             
-            <p className="text-lg text-slate-600 mb-8 leading-relaxed max-w-xl">
+            <p className="text-base text-slate-600 mb-8 leading-relaxed max-w-xl">
               Compare specs, read in-depth reviews, and discover the latest technology trends with the most comprehensive smartphone platform.
             </p>
 
@@ -52,26 +52,6 @@ export default function Hero() {
                 Search
               </button>
             </form>
-
-            <div className="flex items-center gap-6 text-sm text-slate-500 font-medium">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center overflow-hidden text-slate-400">
-                      <User size={16} />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex flex-col ml-2">
-                  <div className="flex text-amber-400">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Star key={i} size={12} fill="currentColor" />
-                    ))}
-                  </div>
-                  <span className="text-xs mt-0.5">Trusted by 10M+ users</span>
-                </div>
-              </div>
-            </div>
           </motion.div>
 
           {/* Featured Visual */}
