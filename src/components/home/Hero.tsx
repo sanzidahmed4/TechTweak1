@@ -5,7 +5,7 @@ import { Search, Star, Smartphone, User } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+    <section className="relative pt-24 pb-8 lg:pt-32 lg:pb-16 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50"></div>
@@ -33,7 +33,7 @@ export default function Hero() {
               <span className="text-gradient">Smartphone.</span>
             </h1>
             
-            <p className="text-base text-slate-600 mb-8 leading-relaxed max-w-xl">
+            <p className="text-[13px] sm:text-sm text-slate-600 mb-4 leading-relaxed max-w-xl">
               Compare specs, read in-depth reviews, and discover the latest technology trends with the most comprehensive smartphone platform.
             </p>
           </motion.div>
