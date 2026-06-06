@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 
 interface Props {
@@ -9,19 +10,25 @@ interface Props {
 }
 
 export default function BrandGrid({ brands, activeBrands, onBrandClick }: Props) {
-  const displayBrands = brands;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const displayBrands = isExpanded ? brands : brands.slice(0, 10);
 
   return (
     <section className="bg-white border-b border-slate-100 py-6">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Top Brands</h2>
-          <Link href="/phones" className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-            View All →
-          </Link>
+          {brands.length > 10 && (
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)} 
+              className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              {isExpanded ? "Show Less ↑" : "View All →"}
+            </button>
+          )}
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-4">
           {displayBrands.map((brand) => {
             const isActive = activeBrands.includes(brand.slug);
 
