@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ChevronRight, Smartphone } from 'lucide-react';
 import { useCallback } from 'react';
 
-export default function TrendingCarousel({ phones }: { phones: any[] }) {
+export default function TrendingCarousel({ phones }: { phones: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' }, [Autoplay({ delay: 4000 })]);
 
   const scrollPrev = useCallback(() => {

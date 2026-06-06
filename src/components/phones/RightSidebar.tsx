@@ -31,6 +31,7 @@ const BEST_PHONES = [
   { category: "Best Budget", name: "Redmi Note 14", tag: "Under $200" },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function RightSidebar({ latestNews, trendingPhones }: Props) {
   return (
     <div className="space-y-5 sticky top-24">

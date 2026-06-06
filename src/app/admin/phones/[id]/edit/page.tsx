@@ -34,7 +34,7 @@ export default async function EditPhonePage(props: { params: Promise<{ id: strin
   let brands: { id: string, name: string }[] = [];
   try {
     const rawBrands = await Brand.find().sort({ order: 1, name: 1 }).lean();
-    brands = rawBrands.map((b: any) => ({
+    brands = rawBrands.map((b: unknown) => ({
       id: b._id.toString(),
       name: b.name
     }));

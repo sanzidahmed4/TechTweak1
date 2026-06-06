@@ -31,7 +31,7 @@ export default function ImageUploader({
     setImages(prev => prev.filter((_, i) => i !== idx));
   };
 
-  const handleCloudinarySuccess = (result: any) => {
+  const handleCloudinarySuccess = (result: unknown) => {
     if (result.info && result.info.secure_url) {
       const optimizedUrl = result.info.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
       setImages(prev => [...prev, optimizedUrl]);

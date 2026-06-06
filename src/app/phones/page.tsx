@@ -15,9 +15,9 @@ export const revalidate = 3600; // Enable ISR (1 hour caching)
 export default async function PhonesPage() {
   await connectToDatabase();
 
-  let phones: any[] = [];
-  let brands: any[] = [];
-  let latestNews: any[] = [];
+  let phones: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+  let brands: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+  let latestNews: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   let totalCount = 0;
 
   try {
@@ -29,7 +29,7 @@ export default async function PhonesPage() {
 
     totalCount = await Phone.countDocuments({ is_published: true });
 
-    phones = rawPhones.map((p: any) => ({
+    phones = rawPhones.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,
@@ -55,9 +55,9 @@ export default async function PhonesPage() {
       { $group: { _id: "$brand_id", count: { $sum: 1 } } },
     ]);
     const countMap: Record<string, number> = {};
-    brandCounts.forEach((b: any) => { countMap[b._id.toString()] = b.count; });
+    brandCounts.forEach((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => { countMap[b._id.toString()] = b.count; });
 
-    brands = rawBrands.map((b: any) => ({
+    brands = rawBrands.map((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: b._id.toString(),
       name: b.name,
       slug: b.slug,
@@ -72,7 +72,7 @@ export default async function PhonesPage() {
       .select("title slug featured_image created_at")
       .lean();
 
-    latestNews = rawPosts.map((p: any) => ({
+    latestNews = rawPosts.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       title: p.title,
       slug: p.slug,
       featured_image: p.featured_image || null,

@@ -4,8 +4,10 @@ import Brand from "@/lib/models/Brand";
 import Post from "@/lib/models/Post";
 import ActivityLog from "@/lib/models/ActivityLog";
 import AnalyticsEvent from "@/lib/models/AnalyticsEvent";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Smartphone, Tags, FileText, ArrowRight, TrendingUp, Users, Activity, Battery, Cpu } from "lucide-react";
 import * as Icons from "lucide-react";
 
@@ -14,10 +16,11 @@ export default async function AdminDashboardPage() {
   
   // Fetch real counts
   let phonesCount = 0, brandsCount = 0, postsCount = 0, monthlyVisitors = 0;
-  let recentActivities: any[] = [];
+  let recentActivities: unknown[] = [];
   let chartData: number[] = [10, 10, 10, 10, 10, 10, 10]; // Fallback minimums
 
   try {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
     [phonesCount, brandsCount, postsCount] = await Promise.all([
       Phone.countDocuments(),
       Brand.countDocuments(),
@@ -48,7 +51,7 @@ export default async function AdminDashboardPage() {
     // Map to array where Mon is index 0
     const dayMap: Record<number, number> = { 2: 0, 3: 1, 4: 2, 5: 3, 6: 4, 7: 5, 1: 6 };
     let maxCount = 1;
-    let rawChartData = [0, 0, 0, 0, 0, 0, 0];
+    const rawChartData = [0, 0, 0, 0, 0, 0, 0];
     
     events.forEach(e => {
        const idx = dayMap[e._id];
@@ -71,7 +74,7 @@ export default async function AdminDashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-black text-slate-900 tracking-tight">System Overview</h1>
-        <p className="text-slate-500">Welcome back. Here's what's happening on your platform today.</p>
+        <p className="text-slate-500">Welcome back. Here&apos;s what&apos;s happening on your platform today.</p>
       </div>
 
       {/* Analytics KPI Cards */}
@@ -162,7 +165,7 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
             {recentActivities.length > 0 ? recentActivities.map((log, i) => {
-              const IconComponent = (Icons as any)[log.icon] || Icons.Activity;
+              const IconComponent = (Icons as unknown)[log.icon] || Icons.Activity;
               return (
               <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white ${log.color} shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10`}>

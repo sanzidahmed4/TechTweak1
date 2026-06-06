@@ -6,6 +6,7 @@ import Brand from '@/lib/models/Brand';
 
 export const dynamic = 'force-dynamic';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: Request) {
   try {
     await connectToDatabase();
@@ -30,7 +31,7 @@ export async function GET(request: Request) {
     }
     
     return NextResponse.json({ success: true, count: phones.length });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }

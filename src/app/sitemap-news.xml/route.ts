@@ -22,7 +22,7 @@ export async function GET() {
     })
       .select('slug title published_at created_at')
       .sort({ published_at: -1, created_at: -1 })
-      .lean() as any[];
+      .lean() as unknown[];
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"

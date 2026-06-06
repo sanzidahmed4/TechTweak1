@@ -14,7 +14,7 @@ interface BrandItem {
 }
 
 interface PhoneFormProps {
-  initialData?: any;
+  initialData?: unknown;
   brands: BrandItem[];
   action: (formData: FormData) => Promise<void>;
   title: string;

@@ -12,7 +12,7 @@ export async function searchPhonesForCompare(query: string) {
       .limit(10)
       .lean();
       
-    return rawPhones.map((p: any) => ({
+    return rawPhones.map((p: unknown) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,

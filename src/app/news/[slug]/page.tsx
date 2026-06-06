@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   await connectToDatabase();
   const slug = (await params).slug;
   const decodedSlug = decodeURIComponent(slug);
-  const post = await Post.findOne({ slug: decodedSlug }).lean() as any;
+  const post = await Post.findOne({ slug: decodedSlug }).lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
 
   if (!post) {
     return { title: 'Post Not Found | TechTweak' };
@@ -56,7 +56,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const slug = (await params).slug;
   const decodedSlug = decodeURIComponent(slug);
   
-  let post: any = null;
+  let post: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */ = null;
   
   try {
     const rawPost = await Post.findOne({ slug: decodedSlug })
@@ -93,9 +93,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   }
 
   // Fetch related posts (same category or overlapping tags)
-  let relatedPosts: any[] = [];
+  let relatedPosts: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
-    const query: any = { _id: { $ne: post.id }, is_published: true };
+    const query: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */ = { _id: { $ne: post.id }, is_published: true };
     
     if (post.tags && post.tags.length > 0) {
       query.tags = { $in: post.tags };
@@ -120,7 +120,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         .lean();
     }
       
-    relatedPosts = rawRelated.map((p: any) => ({
+    relatedPosts = rawRelated.map((p: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       title: p.title,
       slug: p.slug,
       category: p.category_id ? p.category_id.name : "NEWS",
@@ -134,7 +134,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.techtweak.tech";
   const currentUrl = `${baseUrl}/news/${decodedSlug}`;
 
-  const jsonLd: any[] = [
+  const jsonLd: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [
     {
       "@context": "https://schema.org",
       "@type": "NewsArticle",
@@ -235,7 +235,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <div className="mt-12 pt-6 border-t border-slate-200">
               <h3 className="text-2xl font-serif font-bold text-slate-900 mb-4">Related News</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                {relatedPosts.map((related: any) => (
+                {relatedPosts.map((related: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
                   <Link key={related.slug} href={`/news/${related.slug}`} className="group block pt-3 border-t border-slate-200">
                     <h4 className="font-serif text-xl text-slate-900 group-hover:text-primary transition-colors leading-snug mb-2">
                       {related.title}

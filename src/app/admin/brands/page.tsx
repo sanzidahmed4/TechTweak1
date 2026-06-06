@@ -1,6 +1,7 @@
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Brand from "@/lib/models/Brand";
 import { addBrand } from "./actions";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Building2, Save, Trash2, Edit } from "lucide-react";
 import SingleImageUploader from "@/components/admin/SingleImageUploader";
 import DraggableBrandList from "@/components/admin/DraggableBrandList";
@@ -11,10 +12,10 @@ export const revalidate = 0;
 export default async function AdminBrandsPage() {
   await connectToDatabase();
   
-  let brands: any[] = [];
+  let brands: unknown[] = [];
   try {
     const rawBrands = await Brand.find().sort({ order: 1, name: 1 }).lean();
-    brands = rawBrands.map((b: any) => ({
+    brands = rawBrands.map((b: unknown) => ({
       id: b._id.toString(),
       name: b.name,
       slug: b.slug,

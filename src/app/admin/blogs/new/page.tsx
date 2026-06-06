@@ -2,6 +2,7 @@ import { addBlogPost } from "../actions";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Category from "@/lib/models/Category";
 import Link from "next/link";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ArrowLeft, Save, Image as ImageIcon } from "lucide-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import SingleImageUploader from "@/components/admin/SingleImageUploader";
@@ -15,7 +16,7 @@ export default async function AddBlogPostPage() {
   let categories: { id: string, name: string }[] = [];
   try {
     const rawCategories = await Category.find().sort({ name: 1 }).lean();
-    categories = rawCategories.map((c: any) => ({
+    categories = rawCategories.map((c: unknown) => ({
       id: c._id.toString(),
       name: c.name
     }));

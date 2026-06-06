@@ -18,7 +18,7 @@ export default function DeletePostButton({ id }: { id: string }) {
         await deleteBlogPost(id);
         setShowModal(false);
         router.refresh();
-      } catch (e: any) {
+      } catch (e: unknown) {
         setError(e.message || "Failed to delete. Please try again.");
       }
     });

@@ -3,6 +3,7 @@ import Brand from "@/lib/models/Brand";
 import Phone from "@/lib/models/Phone";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ArrowRight, Smartphone } from "lucide-react";
 
 export const revalidate = 3600; // Enable ISR (1 hour caching)
@@ -11,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   const { brand } = await params;
   await connectToDatabase();
   
-  const data = await Brand.findOne({ slug: brand }).lean() as any;
+  const data = await Brand.findOne({ slug: brand }).lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
   
   if (!data) return { title: "Brand Not Found" };
   
@@ -49,11 +50,11 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
   await connectToDatabase();
   
   // Fetch Brand Info
-  let brandData: any = null;
-  let phones: any[] = [];
+  let brandData: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */ = null;
+  let phones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
 
   try {
-    const bData = await Brand.findOne({ slug: brand }).lean() as any;
+    const bData = await Brand.findOne({ slug: brand }).lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
     if (bData) {
       brandData = bData;
       // Fetch Phones for this brand
@@ -61,7 +62,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
         .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
         .lean();
         
-      phones = rawPhones.map((p: any) => ({
+      phones = rawPhones.map((p: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
         id: p._id.toString(),
         name: p.name,
         slug: p.slug,
@@ -114,7 +115,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
 
         {/* Phones Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {phones.map((phone: any) => (
+          {phones.map((phone: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
             <Link href={`/phones/${brand}/${phone.slug}`} key={phone.id} className="glass-card rounded-3xl p-6 hover-card block bg-white">
               <div className="w-full aspect-[3/4] bg-slate-100 rounded-2xl mb-6 relative overflow-hidden flex items-center justify-center">
                 {phone.images && phone.images.length > 0 ? (

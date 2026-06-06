@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { UploadCloud, X, Image as ImageIcon } from "lucide-react";
+import { X, Image as ImageIcon } from "lucide-react";
 import { CldUploadWidget } from 'next-cloudinary';
 
 interface SingleImageUploaderProps {
@@ -19,7 +19,7 @@ export default function SingleImageUploader({
 }: SingleImageUploaderProps) {
   const [image, setImage] = useState<string>(initialImage);
 
-  const handleCloudinarySuccess = (result: any) => {
+  const handleCloudinarySuccess = (result: unknown) => {
     if (result.info && result.info.secure_url) {
       const optimizedUrl = result.info.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
       setImage(optimizedUrl);

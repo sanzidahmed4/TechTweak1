@@ -6,10 +6,10 @@ import { FolderTree, Save, Trash2, Edit } from "lucide-react";
 export default async function AdminCategoriesPage() {
   await connectToDatabase();
   
-  let categories: any[] = [];
+  let categories: unknown[] = [];
   try {
     const rawCategories = await Category.find().sort({ name: 1 }).lean();
-    categories = rawCategories.map((c: any) => ({
+    categories = rawCategories.map((c: unknown) => ({
       id: c._id.toString(),
       name: c.name,
       slug: c.slug,

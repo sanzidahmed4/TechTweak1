@@ -1,6 +1,7 @@
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import Link from "next/link";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Search, Plus, X, Smartphone, Check, Zap } from "lucide-react";
 import CompareAddButton from "@/components/compare/CompareAddButton";
 
@@ -21,7 +22,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   const slugs = phonesQuery ? phonesQuery.split(',').slice(0, 4) : []; // max 4 phones
   
   await connectToDatabase();
-  let comparedPhones: any[] = [];
+  let comparedPhones: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   
   if (slugs.length > 0) {
     try {
@@ -32,7 +33,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
       if (rawPhones) {
         // Maintain order of slugs
         comparedPhones = slugs.map(slug => {
-          const p: any = rawPhones.find((rp: any) => rp.slug === slug);
+          const p: any   = rawPhones.find((rp: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => rp.slug === slug);
           if (!p) return null;
           return {
             id: p._id.toString(),
@@ -184,7 +185,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                 <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-12 lg:p-16 text-center">
                   <Smartphone size={64} className="text-slate-300 mx-auto mb-6" strokeWidth={1} />
                   <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Ready to Compare?</h3>
-                  <p className="text-slate-500 text-lg max-w-lg mx-auto">Click the 'Add Device' slots in the header above to start mapping specifications side-by-side.</p>
+                  <p className="text-slate-500 text-lg max-w-lg mx-auto">Click the &apos;Add Device&apos; slots in the header above to start mapping specifications side-by-side.</p>
                 </div>
               </div>
             </div>

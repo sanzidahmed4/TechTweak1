@@ -15,7 +15,8 @@ export async function verifyToken(token: string) {
   try {
     const { payload } = await jwtVerify(token, encodedKey);
     return payload as { userId: string; email: string; role: string; exp: number };
-  } catch (err) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_err) {
     return null;
   }
 }

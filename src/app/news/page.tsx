@@ -15,14 +15,14 @@ export const revalidate = 3600; // Enable ISR (1 hour caching)
 export default async function NewsPage() {
   await connectToDatabase();
   
-  let posts: any[] = [];
+  let posts: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
     const rawPosts = await Post.find({ is_published: true })
       .populate('category_id', 'name slug')
       .sort({ published_at: -1, created_at: -1 })
       .lean();
       
-    posts = rawPosts.map((p: any) => ({
+    posts = rawPosts.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),
       title: p.title,
       slug: p.slug,

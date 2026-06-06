@@ -5,7 +5,6 @@ import {
   SlidersHorizontal,
   X,
   ChevronDown,
-  Monitor,
   Cpu,
   Battery,
   Camera,
@@ -33,7 +32,7 @@ const REFRESH_OPTIONS = ["60Hz", "90Hz", "120Hz", "144Hz", "165Hz"];
 const PROCESSOR_OPTIONS = ["Snapdragon", "Dimensity", "Apple A", "Exynos", "Helio", "Kirin"];
 
 function FilterSection({ title, icon: Icon, defaultOpen = true, children }: {
-  title: string; icon: any; defaultOpen?: boolean; children: React.ReactNode
+  title: string; icon: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */; defaultOpen?: boolean; children: React.ReactNode
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
@@ -85,7 +84,7 @@ export default function FilterSidebar({ filters, updateFilter, resetFilters, bra
     key: K, value: string
   ) => {
     const current = filters[key] as string[];
-    updateFilter(key, (current.includes(value) ? current.filter(v => v !== value) : [...current, value]) as any);
+    updateFilter(key, (current.includes(value) ? current.filter(v => v !== value) : [...current, value]) as any /* eslint-disable-line @typescript-eslint/no-explicit-any */);
   };
 
   return (

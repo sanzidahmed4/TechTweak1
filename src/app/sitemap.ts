@@ -11,9 +11,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech'
 
   // Fetch dynamic routes
-  let phonesData: any[] = []
-  let brandsData: any[] = []
-  let postsData: any[] = []
+  let phonesData: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = []
+  let brandsData: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = []
+  let postsData: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = []
   
   try {
     // Phones
@@ -24,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .lean()
     
     if (rawPhones) {
-      phonesData = rawPhones.map((p: any) => ({
+      phonesData = rawPhones.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
         slug: p.slug,
         updated_at: p.updated_at || new Date(),
         brands: { slug: p.brand_id?.slug }
@@ -37,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .lean()
       
     if (rawBrands) {
-      brandsData = rawBrands.map((b: any) => ({
+      brandsData = rawBrands.map((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
         slug: b.slug,
         updated_at: b.updated_at || new Date()
       }))
@@ -49,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .lean()
       
     if (rawPosts) {
-      postsData = rawPosts.map((p: any) => ({
+      postsData = rawPosts.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
         slug: p.slug,
         updated_at: p.updated_at || new Date()
       }))

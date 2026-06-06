@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { redirect } from "next/navigation";
 
-function parseSafeNumber(value: any): number | null {
+function parseSafeNumber(value: unknown): number | null {
   if (!value) return null;
   if (typeof value === "number") return value;
   // Extract numbers, negative sign, and decimal point
@@ -19,7 +19,7 @@ function parseSafeNumber(value: any): number | null {
 function parseReleaseDate(dateStr: string | null | undefined): Date | null {
   if (!dateStr || dateStr.trim() === "") return null;
   
-  let cleanStr = dateStr.replace(/exp\.|expected|announced/i, '').trim();
+  const cleanStr = dateStr.replace(/exp\.|expected|announced/i, '').trim();
 
   const parsed = new Date(cleanStr);
   if (!isNaN(parsed.getTime())) {
@@ -105,7 +105,7 @@ export async function addPhone(formData: FormData) {
     colors,
     pros: [] as string[],
     cons: [] as string[],
-    faqs: [] as any[],
+    faqs: [] as unknown[],
     model_number: formData.get("model_number") as string,
     phone_variants: formData.get("phone_variants") as string,
     made_in: formData.get("made_in") as string,
@@ -220,7 +220,7 @@ export async function addPhone(formData: FormData) {
   // Auto-generate Pros, Cons, FAQs based on specs
   const autoPros: string[] = [];
   const autoCons: string[] = [];
-  const autoFaqs: any[] = [];
+  const autoFaqs: unknown[] = [];
 
   const nfc = formData.get("has_nfc") === "on";
   const storage_type = formData.get("storage_type") as string;
@@ -279,7 +279,7 @@ export async function addPhone(formData: FormData) {
       icon: 'Smartphone',
       color: 'text-blue-500 bg-blue-50',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error inserting phone:", error);
     throw new Error(error.message);
   }
@@ -355,7 +355,7 @@ export async function editPhone(id: string, formData: FormData) {
     colors,
     pros: [] as string[],
     cons: [] as string[],
-    faqs: [] as any[],
+    faqs: [] as unknown[],
     model_number: formData.get("model_number") as string,
     phone_variants: formData.get("phone_variants") as string,
     made_in: formData.get("made_in") as string,
@@ -472,7 +472,7 @@ export async function editPhone(id: string, formData: FormData) {
   // Auto-generate Pros, Cons, FAQs based on specs
   const autoPros: string[] = [];
   const autoCons: string[] = [];
-  const autoFaqs: any[] = [];
+  const autoFaqs: unknown[] = [];
 
   const nfc = formData.get("has_nfc") === "on";
   const storage_type = formData.get("storage_type") as string;
@@ -531,7 +531,7 @@ export async function editPhone(id: string, formData: FormData) {
       icon: 'Smartphone',
       color: 'text-purple-500 bg-purple-50',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating phone:", error);
     throw new Error(error.message);
   }

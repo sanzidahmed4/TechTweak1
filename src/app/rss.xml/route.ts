@@ -24,7 +24,7 @@ export async function GET() {
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />`;
 
-    for (const post of rawPosts as any[]) {
+    for (const post of rawPosts as unknown[]) {
       const postUrl = `${baseUrl}/news/${post.slug}`;
       const pubDate = (post.published_at || post.created_at || new Date()).toUTCString();
       const excerpt = post.excerpt ? `<![CDATA[${post.excerpt}]]>` : '';

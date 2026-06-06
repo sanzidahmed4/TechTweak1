@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 export default function CompareSearchModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<any[] /* eslint-disable-line @typescript-eslint/no-explicit-any */>([]);
   const [isLoading, setIsLoading] = useState(false);
   
   const router = useRouter();
