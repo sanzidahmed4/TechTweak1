@@ -78,7 +78,7 @@ export default function NavbarSearch() {
     <div className="relative" ref={wrapperRef}>
       {/* Search Input */}
       <div 
-        className="flex items-center bg-slate-100 rounded-full border border-slate-200 focus-within:bg-white focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-300 w-[160px] sm:w-64 md:w-80 shadow-sm"
+        className="flex items-center bg-slate-100/80 rounded-full border border-slate-200/80 shadow-inner focus-within:bg-slate-100 focus-within:border-slate-300 transition-all duration-300 w-[200px] sm:w-72 md:w-96"
       >
         <input
           type="text"
