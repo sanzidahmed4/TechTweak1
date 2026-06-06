@@ -8,6 +8,8 @@ import Phone from "@/lib/models/Phone";
 import Post from "@/lib/models/Post";
 import "@/lib/models/Category";
 
+import UpcomingCarousel from "@/components/home/UpcomingCarousel";
+
 export const revalidate = 3600; // Enable ISR (1 hour caching), invalidated instantly on admin actions
 
 // --- DTO Interfaces ---
@@ -61,16 +63,32 @@ export default async function Home() {
   await connectToDatabase();
   
   let featuredPhones: IPhoneSummary[] = [];
+  let upcomingPhones: IPhoneSummary[] = [];
   let latestArticles: IArticleSummary[] = [];
   
   try {
-    const rawPhones = (await Phone.find({ is_published: true })
+    const rawPhones = (await Phone.find({ is_published: true, upcoming: { $ne: true } })
       .populate('brand_id', 'name slug')
       .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .limit(10)
       .lean()) as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as RawPhone[];
       
     featuredPhones = rawPhones.map((p) => ({
+      id: p._id.toString(),
+      name: p.name,
+      slug: p.slug,
+      brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
+      price_usd: p.price_usd || 0,
+      images: p.images || []
+    }));
+
+    const rawUpcoming = (await Phone.find({ is_published: true, upcoming: true })
+      .populate('brand_id', 'name slug')
+      .sort({ release_date_parsed: -1, name: 1 })
+      .limit(10)
+      .lean()) as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as RawPhone[];
+      
+    upcomingPhones = rawUpcoming.map((p) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,
@@ -171,6 +189,25 @@ export default async function Home() {
           )}
         </div>
       </section>
+
+      {/* Upcoming Phones Section */}
+      {upcomingPhones.length > 0 && (
+        <section className="py-20 bg-white border-b border-slate-200/60 overflow-hidden relative">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="mb-10 sm:mb-14">
+              <div className="flex items-center justify-between gap-4 mb-2 sm:mb-4">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Upcoming Phones</h2>
+                <Link href="/upcoming-phones" className="text-xs sm:text-sm font-semibold text-purple-600 hover:text-purple-700 transition-colors whitespace-nowrap shrink-0">
+                  View All →
+                </Link>
+              </div>
+              <p className="text-slate-500 text-sm sm:text-base lg:text-lg max-w-2xl">Get an exclusive look at the future of mobile technology before it launches.</p>
+            </div>
+            
+            <UpcomingCarousel phones={upcomingPhones} />
+          </div>
+        </section>
+      )}
 
       {/* Premium Comparison CTA */}
       <section className="py-24 relative overflow-hidden bg-slate-900 text-white">
