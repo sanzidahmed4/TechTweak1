@@ -6,10 +6,10 @@ export default function Footer() {
   return (
     <footer className="bg-slate-50 border-t border-slate-200 mt-auto">
       <div className="container mx-auto px-4 lg:px-8 py-10 lg:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6 lg:gap-12">
           
           {/* Brand Column */}
-          <div className="space-y-6">
+          <div className="col-span-2 lg:col-span-1 space-y-6">
             <Link href="/" className="flex items-center gap-3">
               <div className="relative w-10 h-10">
                 <Image src="/sitelogo.svg" alt="TechTweak Logo" fill className="object-contain" />
@@ -31,7 +31,7 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="col-span-1 border-r border-slate-200/80 pr-4 lg:border-none lg:pr-0">
             <h3 className="font-semibold text-slate-900 mb-6 uppercase tracking-wider text-sm">Explore</h3>
             <ul className="space-y-4">
               {[
@@ -51,7 +51,7 @@ export default function Footer() {
           </div>
 
           {/* Popular Brands */}
-          <div>
+          <div className="col-span-1 pl-2 lg:pl-0">
             <h3 className="font-semibold text-slate-900 mb-6 uppercase tracking-wider text-sm">Top Brands</h3>
             <ul className="space-y-4">
               {["Apple", "Samsung", "Google", "OnePlus", "Xiaomi"].map((brand) => (
@@ -65,7 +65,7 @@ export default function Footer() {
           </div>
 
           {/* Newsletter */}
-          <div>
+          <div className="col-span-2 lg:col-span-1">
             <h3 className="font-semibold text-slate-900 mb-6 uppercase tracking-wider text-sm">Stay Updated</h3>
             <p className="text-slate-500 text-sm mb-4">
               Get the latest tech news and smartphone reviews delivered to your inbox.
