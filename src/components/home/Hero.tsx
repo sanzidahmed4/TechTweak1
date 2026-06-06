@@ -23,11 +23,6 @@ export default function Hero() {
             transition={{ duration: 0.5 }}
             className="max-w-2xl"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-sm font-medium text-slate-600 mb-6">
-              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-              Discover the Future of Mobile
-            </div>
-            
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]">
               Find Your Perfect <br className="hidden lg:block" />
               <span className="text-gradient">Smartphone.</span>
