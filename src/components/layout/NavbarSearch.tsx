@@ -120,7 +120,7 @@ export default function NavbarSearch() {
 
       {/* Dropdown Results */}
       {isOpen && query.length >= 2 && (
-        <div className="absolute md:absolute top-full right-0 mt-2 w-[calc(100vw-32px)] md:w-[400px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden z-50 md:right-0 left-0 md:left-auto">
+        <div className="absolute top-full right-0 mt-2 w-[calc(100vw-32px)] sm:w-[400px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden z-50">
           {isSearching ? (
             <div className="flex items-center justify-center py-10 text-slate-500">
               <Loader2 className="animate-spin mr-2" size={20} />
