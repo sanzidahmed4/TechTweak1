@@ -6,10 +6,10 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-let cached = (global as unknown).mongoose;
+let cached = (global as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as { mongoose: any }).mongoose;
 
 if (!cached) {
-  cached = (global as unknown).mongoose = { conn: null, promise: null };
+  cached = (global as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as { mongoose: any }).mongoose = { conn: null, promise: null };
 }
 
 async function connectToDatabase() {

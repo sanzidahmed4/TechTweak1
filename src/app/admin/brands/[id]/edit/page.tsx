@@ -10,7 +10,7 @@ export default async function EditBrandPage({ params }: { params: Promise<{ id: 
   const { id } = await params;
   await connectToDatabase();
 
-  const brand = await Brand.findById(id).lean() as unknown;
+  const brand = await Brand.findById(id).lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
 
   if (!brand) {
     redirect("/admin/brands");

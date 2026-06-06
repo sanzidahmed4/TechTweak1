@@ -51,7 +51,7 @@ export async function addBlogPost(formData: FormData) {
       icon: 'FileText',
       color: 'text-amber-500 bg-amber-50',
     });
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error inserting post:", error);
     throw new Error(error.message);
   }
@@ -108,7 +108,7 @@ export async function updateBlogPost(id: string, formData: FormData) {
       icon: 'FileText',
       color: 'text-amber-500 bg-amber-50',
     });
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error updating post:", error);
     throw new Error(error.message);
   }
@@ -134,7 +134,7 @@ export async function deleteBlogPost(id: string) {
         color: 'text-red-500 bg-red-50',
       });
     }
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error deleting post:", error);
     throw new Error(error.message);
   }
@@ -154,7 +154,7 @@ export async function createInlineCategory(name: string) {
   try {
     const newCat = await Category.create({ name, slug });
     return { id: newCat._id.toString(), name: newCat.name };
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error creating inline category:", error);
     throw new Error(error.message);
   }

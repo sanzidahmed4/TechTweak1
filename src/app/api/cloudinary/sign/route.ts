@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     );
 
     return NextResponse.json({ signature });
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error generating signature:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -12,10 +12,10 @@ export const revalidate = 0;
 export default async function AdminBrandsPage() {
   await connectToDatabase();
   
-  let brands: unknown[] = [];
+  let brands: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
     const rawBrands = await Brand.find().sort({ order: 1, name: 1 }).lean();
-    brands = rawBrands.map((b: unknown) => ({
+    brands = rawBrands.map((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: b._id.toString(),
       name: b.name,
       slug: b.slug,

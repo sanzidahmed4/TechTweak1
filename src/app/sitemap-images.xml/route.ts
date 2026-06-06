@@ -12,7 +12,7 @@ export async function GET() {
     const rawPhones = await Phone.find({ is_published: true })
       .select('slug name images brand_id')
       .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
-      .lean() as unknown[];
+      .lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */[];
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"

@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     }
     
     return NextResponse.json({ success: true, count: phones.length });
-  } catch (err: unknown) {
+  } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }

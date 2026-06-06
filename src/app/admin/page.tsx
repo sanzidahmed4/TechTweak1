@@ -16,7 +16,7 @@ export default async function AdminDashboardPage() {
   
   // Fetch real counts
   let phonesCount = 0, brandsCount = 0, postsCount = 0, monthlyVisitors = 0;
-  let recentActivities: unknown[] = [];
+  let recentActivities: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   let chartData: number[] = [10, 10, 10, 10, 10, 10, 10]; // Fallback minimums
 
   try {
@@ -165,7 +165,7 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
             {recentActivities.length > 0 ? recentActivities.map((log, i) => {
-              const IconComponent = (Icons as unknown)[log.icon] || Icons.Activity;
+              const IconComponent = (Icons as any /* eslint-disable-line @typescript-eslint/no-explicit-any */)[log.icon] || Icons.Activity;
               return (
               <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white ${log.color} shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10`}>

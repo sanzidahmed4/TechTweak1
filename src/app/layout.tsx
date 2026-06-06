@@ -27,10 +27,10 @@ export const metadata: Metadata = {
     siteName: "TechTweak",
     images: [
       {
-        url: "https://res.cloudinary.com/dcb4ilgpy/image/upload/v1716024976/tech_placeholder.jpg",
+        url: "/sitelogo.svg",
         width: 1200,
         height: 630,
-        alt: "TechTweak Open Graph Image",
+        alt: "TechTweak Logo",
       }
     ],
     locale: "en_US",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "TechTweak | Premium Smartphone Reviews",
     description: "Discover the ultimate tech resource for smartphone reviews and side-by-side comparisons.",
-    images: ["https://res.cloudinary.com/dcb4ilgpy/image/upload/v1716024976/tech_placeholder.jpg"],
+    images: ["/sitelogo.svg"],
   },
   appleWebApp: {
     capable: true,

@@ -17,7 +17,7 @@ export async function addCategory(formData: FormData) {
 
   try {
     await Category.create({ name, slug });
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error inserting category:", error);
     throw new Error(error.message);
   }

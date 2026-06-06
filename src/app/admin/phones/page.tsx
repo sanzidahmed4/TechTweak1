@@ -11,16 +11,16 @@ export default async function AdminPhonesPage(props: {
   
   const { q: searchQuery = "", brand: brandFilter = "", status: statusFilter = "" } = await props.searchParams;
 
-  let brands: unknown[] = [];
+  let brands: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
     brands = await Brand.find().sort({ name: 1 }).lean();
   } catch (err) {
     console.error("Failed to fetch brands for filter list", err);
   }
 
-  let phones: unknown[] = [];
+  let phones: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
-    const queryObj: unknown = {};
+    const queryObj: any /* eslint-disable-line @typescript-eslint/no-explicit-any */ = {};
     if (searchQuery) {
       const escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       queryObj.name = { $regex: escapedQuery, $options: "i" };
@@ -39,7 +39,7 @@ export default async function AdminPhonesPage(props: {
       .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .lean();
       
-    phones = rawPhones.map((p: unknown) => ({
+    phones = rawPhones.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,
@@ -107,7 +107,7 @@ export default async function AdminPhonesPage(props: {
               className="bg-white border border-slate-200 rounded-xl text-sm px-4 py-2 outline-none focus:border-primary shadow-sm"
             >
               <option value="">All Brands</option>
-              {brands.map((brand: unknown) => (
+              {brands.map((brand: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
                 <option key={brand._id.toString()} value={brand._id.toString()}>
                   {brand.name}
                 </option>

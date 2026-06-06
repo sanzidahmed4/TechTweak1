@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X, Smartphone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import NavbarSearch from "./NavbarSearch";
 import CategoriesDropdown from "./CategoriesDropdown";
 
@@ -55,11 +56,11 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="bg-primary/10 p-2 rounded-xl text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-            <Smartphone size={24} strokeWidth={2.5} />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-8 h-8 md:w-10 md:h-10">
+            <Image src="/sitelogo.svg" alt="TechTweak Logo" fill className="object-contain" />
           </div>
-          <span className="font-bold text-xl tracking-tight text-slate-900">
+          <span className="font-bold text-xl md:text-2xl tracking-tight text-slate-900 hidden sm:block">
             Tech<span className="text-primary">Tweak</span>
           </span>
         </Link>

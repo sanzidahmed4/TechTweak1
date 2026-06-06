@@ -7,10 +7,10 @@ import DeletePostButton from "./DeletePostButton";
 export default async function AdminBlogsPage() {
   await connectToDatabase();
   
-  let posts: unknown[] = [];
+  let posts: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
     const rawPosts = await Post.find().populate('category_id', 'name').sort({ created_at: -1 }).lean();
-    posts = rawPosts.map((p: unknown) => ({
+    posts = rawPosts.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),
       title: p.title,
       slug: p.slug,

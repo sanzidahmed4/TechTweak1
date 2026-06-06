@@ -19,9 +19,10 @@ export default function SingleImageUploader({
 }: SingleImageUploaderProps) {
   const [image, setImage] = useState<string>(initialImage);
 
-  const handleCloudinarySuccess = (result: unknown) => {
-    if (result.info && result.info.secure_url) {
-      const optimizedUrl = result.info.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
+  const handleCloudinarySuccess = (result: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => {
+    const info = (result as { info?: { secure_url?: string } }).info;
+    if (info && info.secure_url) {
+      const optimizedUrl = info.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
       setImage(optimizedUrl);
     }
   };

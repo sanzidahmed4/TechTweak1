@@ -6,7 +6,7 @@ export async function GET() {
   try {
     await connectToDatabase();
     const categories = await Category.find().sort({ name: 1 }).lean();
-    const data = categories.map((c: unknown) => ({
+    const data = categories.map((c: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: c._id.toString(),
       name: c.name,
       slug: c.slug,

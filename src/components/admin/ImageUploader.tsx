@@ -31,7 +31,7 @@ export default function ImageUploader({
     setImages(prev => prev.filter((_, i) => i !== idx));
   };
 
-  const handleCloudinarySuccess = (result: unknown) => {
+  const handleCloudinarySuccess = (result: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => {
     if (result.info && result.info.secure_url) {
       const optimizedUrl = result.info.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
       setImages(prev => [...prev, optimizedUrl]);

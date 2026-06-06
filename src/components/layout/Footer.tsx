@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Smartphone, Globe, Mail, MessageCircle, Share2 } from "lucide-react";
 
@@ -9,9 +10,9 @@ export default function Footer() {
           
           {/* Brand Column */}
           <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="bg-primary/10 p-2 rounded-xl text-primary">
-                <Smartphone size={24} strokeWidth={2.5} />
+            <Link href="/" className="flex items-center gap-3">
+              <div className="relative w-10 h-10">
+                <Image src="/sitelogo.svg" alt="TechTweak Logo" fill className="object-contain" />
               </div>
               <span className="font-bold text-2xl tracking-tight text-slate-900">
                 Tech<span className="text-primary">Tweak</span>

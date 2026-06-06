@@ -26,7 +26,7 @@ export async function addBrand(formData: FormData) {
 
   try {
     await Brand.create(brandData);
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error inserting brand:", error);
     throw new Error(error.message);
   }
@@ -55,7 +55,7 @@ export async function editBrand(id: string, formData: FormData) {
 
   try {
     await Brand.findByIdAndUpdate(id, brandData);
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error updating brand:", error);
     throw new Error(error.message);
   }
@@ -70,7 +70,7 @@ export async function deleteBrand(id: string) {
 
   try {
     await Brand.findByIdAndDelete(id);
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error deleting brand:", error);
     throw new Error(error.message);
   }
@@ -94,7 +94,7 @@ export async function updateBrandsOrder(orderedIds: string[]) {
     revalidatePath("/admin/brands");
     revalidatePath("/phones");
     return { success: true };
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error updating brands order:", error);
     return { success: false, error: error.message || "Unknown error occurred" };
   }

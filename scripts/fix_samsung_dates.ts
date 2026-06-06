@@ -1,51 +1,43 @@
-import mongoose from "mongoose";
-import * as dotenv from "dotenv";
-import path from "path";
+import { config } from 'dotenv';
+import path from 'path';
+config({ path: path.resolve(process.cwd(), '.env.local') });
+import connectToDatabase from '../src/lib/mongodb/mongoose';
+import Phone from '../src/lib/models/Phone';
 
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
-
-const phoneUpdates = [
-  { slug: "samsung-galaxy-s24-ultra", dateStr: "2024-01-31" },
-  { slug: "samsung-galaxy-s24-plus", dateStr: "2024-01-31" },
-  { slug: "samsung-galaxy-s24", dateStr: "2024-01-31" },
-  { slug: "samsung-galaxy-s24-fe", dateStr: "2024-10-01" }, // Approximated
-  { slug: "samsung-galaxy-s23-ultra", dateStr: "2023-02-17" },
-  { slug: "samsung-galaxy-s23-plus", dateStr: "2023-02-17" },
-  { slug: "samsung-galaxy-s23", dateStr: "2023-02-17" },
-  { slug: "samsung-galaxy-s23-fe", dateStr: "2023-10-26" }
+const samsungUpdates = [
+  { name: "Samsung Galaxy S24 Ultra", release_date: "January 31, 2024", parsed: new Date("2024-01-31") },
+  { name: "Samsung Galaxy S24+", release_date: "January 31, 2024", parsed: new Date("2024-01-31") },
+  { name: "Samsung Galaxy S24", release_date: "January 31, 2024", parsed: new Date("2024-01-31") },
+  { name: "Samsung Galaxy S24 FE", release_date: "October 3, 2024", parsed: new Date("2024-10-03") },
+  { name: "Samsung Galaxy S23 Ultra", release_date: "February 17, 2023", parsed: new Date("2023-02-17") },
+  { name: "Samsung Galaxy S23+", release_date: "February 17, 2023", parsed: new Date("2023-02-17") },
+  { name: "Samsung Galaxy S23", release_date: "February 17, 2023", parsed: new Date("2023-02-17") },
+  { name: "Samsung Galaxy S23 FE", release_date: "October 26, 2023", parsed: new Date("2023-10-26") }
 ];
 
-async function run() {
-  if (!process.env.MONGODB_URI) {
-    console.error("No MONGODB_URI found");
-    process.exit(1);
-  }
-
-  await mongoose.connect(process.env.MONGODB_URI);
-  console.log("Connected to MongoDB.");
-
-  const Phone = mongoose.models.Phone || mongoose.model("Phone", new mongoose.Schema({}, { strict: false }));
-
-  for (const update of phoneUpdates) {
-    const parsed = new Date(update.dateStr);
-    
-    // Formatting dateStr nicely for the frontend text display
-    const formattedText = parsed.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
-
+async function updateSamsungPhones() {
+  await connectToDatabase();
+  
+  for (const update of samsungUpdates) {
     const result = await Phone.updateOne(
-      { slug: update.slug },
-      { 
-        $set: { 
-          release_date: formattedText,
-          release_date_parsed: parsed
-        } 
-      }
+      { name: update.name },
+      { $set: { release_date: update.release_date, release_date_parsed: update.parsed } }
     );
-    console.log(`Updated ${update.slug}: ${result.modifiedCount} document(s)`);
+    console.log(`Updated ${update.name}: matched ${result.matchedCount}, modified ${result.modifiedCount}`);
   }
-
-  console.log("Samsung dates fixed.");
+  
+  console.log("Generating final report...");
+  const totalPhones = await Phone.countDocuments();
+  const missingDates = await Phone.countDocuments({ release_date_parsed: null });
+  const invalidDates = await Phone.find({ release_date_parsed: { $exists: true, $type: "string" } }).countDocuments(); // Date type check
+  const atBottom = await Phone.countDocuments({ release_date_parsed: null });
+  
+  console.log(`Total phones: ${totalPhones}`);
+  console.log(`Missing release dates: ${missingDates}`);
+  console.log(`Invalid dates: ${invalidDates}`);
+  console.log(`Phones placed at bottom due to missing dates: ${atBottom}`);
+  
   process.exit(0);
 }
 
-run();
+updateSamsungPhones().catch(console.error);

@@ -16,7 +16,7 @@ export default async function AddBlogPostPage() {
   let categories: { id: string, name: string }[] = [];
   try {
     const rawCategories = await Category.find().sort({ name: 1 }).lean();
-    categories = rawCategories.map((c: unknown) => ({
+    categories = rawCategories.map((c: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: c._id.toString(),
       name: c.name
     }));

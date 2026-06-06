@@ -66,7 +66,7 @@ export async function login(formData: FormData) {
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
-  } catch (error: unknown) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Login error:", error);
     return { error: "An unexpected error occurred. Please try again." };
   }

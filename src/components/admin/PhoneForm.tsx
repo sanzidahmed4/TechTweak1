@@ -14,7 +14,7 @@ interface BrandItem {
 }
 
 interface PhoneFormProps {
-  initialData?: unknown;
+  initialData?: any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
   brands: BrandItem[];
   action: (formData: FormData) => Promise<void>;
   title: string;

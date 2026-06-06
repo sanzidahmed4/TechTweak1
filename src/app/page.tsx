@@ -68,7 +68,7 @@ export default async function Home() {
       .populate('brand_id', 'name slug')
       .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .limit(10)
-      .lean()) as unknown as RawPhone[];
+      .lean()) as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as RawPhone[];
       
     featuredPhones = rawPhones.map((p) => ({
       id: p._id.toString(),
@@ -83,7 +83,7 @@ export default async function Home() {
       .populate('category_id', 'name')
       .sort({ created_at: -1 })
       .limit(3)
-      .lean()) as unknown as RawPost[];
+      .lean()) as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as RawPost[];
       
     latestArticles = rawPosts.map((p) => ({
       id: p._id.toString(),
