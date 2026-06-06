@@ -348,7 +348,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
             ) : (
               <>
                 <div className={gridView === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5"
+                  ? "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5"
                   : "flex flex-col gap-4"
                 }>
                   {paginatedPhones.map((phone) => (

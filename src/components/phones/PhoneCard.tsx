@@ -146,19 +146,19 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
           </div>
 
           {/* Right: wishlist + compare */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <button
               onClick={() => setIsWishlisted(!isWishlisted)}
-              className="w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-red-50 transition-colors"
+              className="w-[44px] h-[44px] rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-red-50 transition-colors"
             >
-              <Heart size={12} className={isWishlisted ? "fill-red-500 text-red-500" : "text-slate-400"} />
+              <Heart size={16} className={isWishlisted ? "fill-red-500 text-red-500" : "text-slate-400"} />
             </button>
             <button
               onClick={() => onCompareToggle(phone.id)}
               disabled={!canAddToCompare}
-              className={`w-7 h-7 rounded-full backdrop-blur-sm shadow flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isComparing ? "bg-blue-600 text-white" : "bg-white/90 text-slate-400 hover:bg-blue-50 hover:text-blue-600"}`}
+              className={`w-[44px] h-[44px] rounded-full backdrop-blur-sm shadow flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isComparing ? "bg-blue-600 text-white" : "bg-white/90 text-slate-400 hover:bg-blue-50 hover:text-blue-600"}`}
             >
-              <GitCompare size={12} />
+              <GitCompare size={16} />
             </button>
           </div>
         </div>
@@ -172,22 +172,22 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
       </div>
 
       {/* ── Info Area — minimal ── */}
-      <div className="p-3.5 flex flex-col flex-1">
+      <div className="p-3 flex flex-col flex-1">
         <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wide mb-0.5">{phone.brand.name}</p>
-        <h3 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2 flex-1 group-hover:text-blue-700 transition-colors">
+        <h3 className="font-bold text-slate-900 text-[13px] sm:text-sm leading-snug line-clamp-2 flex-1 group-hover:text-blue-700 transition-colors" title={phone.name}>
           {phone.name}
         </h3>
 
         {/* Price + CTA */}
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
           <div className="flex flex-col">
-            <span className="text-base font-black text-slate-900">
+            <span className="text-sm sm:text-base font-black text-slate-900 truncate max-w-[80px] sm:max-w-full">
               {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA"}
             </span>
           </div>
           <Link
             href={`/phones/${phone.brand.slug}/${phone.slug}`}
-            className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors"
+            className="px-4 py-2 min-h-[44px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-[11px] sm:text-xs font-bold rounded-xl transition-colors"
           >
             Details
           </Link>

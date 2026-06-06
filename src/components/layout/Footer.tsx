@@ -5,8 +5,8 @@ import { Smartphone, Globe, Mail, MessageCircle, Share2 } from "lucide-react";
 export default function Footer() {
   return (
     <footer className="bg-slate-50 border-t border-slate-200 mt-auto">
-      <div className="container mx-auto px-4 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+      <div className="container mx-auto px-4 lg:px-8 py-10 lg:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           
           {/* Brand Column */}
           <div className="space-y-6">
