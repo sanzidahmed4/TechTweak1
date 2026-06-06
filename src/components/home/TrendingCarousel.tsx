@@ -22,25 +22,25 @@ export default function TrendingCarousel({ phones }: { phones: any /* eslint-dis
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex -ml-4">
           {phones.map((phone, idx) => (
-            <div key={idx} className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] lg:flex-[0_0_25%] pl-4">
-              <Link href={`/phones/${phone.brands?.slug || 'brand'}/${phone.slug}`} className="glass-card rounded-3xl p-6 hover-card block bg-white h-full relative overflow-hidden group">
-                <div className="absolute top-4 right-4 bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full z-10">
+            <div key={idx} className="flex-[0_0_65%] min-w-0 sm:flex-[0_0_40%] md:flex-[0_0_33.33%] lg:flex-[0_0_25%] pl-3 sm:pl-4">
+              <Link href={`/phones/${phone.brands?.slug || 'brand'}/${phone.slug}`} className="glass-card rounded-3xl p-4 hover-card block bg-white h-full relative overflow-hidden group">
+                <div className="absolute top-3 right-3 bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full z-10">
                   Trending
                 </div>
-                <div className="w-full aspect-[3/4] bg-slate-50 rounded-2xl mb-6 relative overflow-hidden flex items-center justify-center group-hover:scale-105 smooth-transition">
+                <div className="w-full aspect-[4/5] bg-slate-50 rounded-2xl mb-4 relative overflow-hidden flex items-center justify-center group-hover:scale-105 smooth-transition p-2">
                   {phone.images && phone.images.length > 0 ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-cover" />
+                    <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-contain" />
                   ) : (
-                    <Smartphone size={48} className="text-slate-300" />
+                    <Smartphone size={32} className="text-slate-300" />
                   )}
                 </div>
-                <div className="space-y-2 relative z-10">
-                  <div className="text-xs font-bold text-primary tracking-wider uppercase">{phone.brands?.name}</div>
-                  <h3 className="text-lg font-bold text-slate-900 line-clamp-1">{phone.name}</h3>
-                  <div className="pt-4 flex items-center justify-between">
+                <div className="space-y-1.5 relative z-10">
+                  <div className="text-[10px] font-bold text-primary tracking-wider uppercase">{phone.brands?.name}</div>
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 line-clamp-1">{phone.name}</h3>
+                  <div className="pt-3 flex items-center justify-between">
                     <div className="flex flex-col">
-                      <span className="text-lg font-bold text-slate-900">
+                      <span className="text-base font-bold text-slate-900">
                         {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'TBA'}
                       </span>
                     </div>

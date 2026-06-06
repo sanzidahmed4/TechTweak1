@@ -152,8 +152,8 @@ export default async function Home() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-end mb-16 gap-4">
             <div className="max-w-2xl">
-              <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Trending Right Now</h2>
-              <p className="text-slate-500 text-lg">Discover the most sought-after devices currently dominating the market charts.</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-2 sm:mb-4 tracking-tight">Trending Right Now</h2>
+              <p className="text-slate-500 text-sm sm:text-base lg:text-lg">Discover the most sought-after devices currently dominating the market charts.</p>
             </div>
             <Link href="/phones" className="flex items-center gap-2 text-primary font-bold hover:text-primary/80 transition-colors bg-primary/10 px-5 py-2.5 rounded-full">
               View All Catalog <ArrowRight size={18} />
