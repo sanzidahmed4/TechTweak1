@@ -40,10 +40,20 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     }
   }
 
+  const allBrands = await Brand.find({}).sort({ name: 1 }).lean();
+  
+  const dates = await Phone.find({ is_published: true, release_date: { $exists: true, $ne: "" } }).select("release_date").lean();
+  const uniqueYears = Array.from(new Set(dates.map((d: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => {
+    const dateStr = d.release_date;
+    if (!dateStr) return null;
+    const yr = new Date(dateStr).getFullYear();
+    return isNaN(yr) ? null : yr;
+  }).filter(Boolean))).sort((a: any /* eslint-disable-line @typescript-eslint/no-explicit-any */, b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => b - a);
+
   let sortQuery: any /* eslint-disable-line @typescript-eslint/no-explicit-any */ = {};
-  if (sort === "newest") sortQuery = { release_date_parsed: -1, price_usd: -1, name: 1 };
-  if (sort === "price_high") sortQuery = { price_usd: -1, release_date_parsed: -1, name: 1 };
-  if (sort === "price_low") sortQuery = { price_usd: 1, release_date_parsed: -1, name: 1 };
+  if (sort === "newest") sortQuery = { release_date: -1, price_usd: -1, name: 1 };
+  if (sort === "price_high") sortQuery = { price_usd: -1, release_date: -1, name: 1 };
+  if (sort === "price_low") sortQuery = { price_usd: 1, release_date: -1, name: 1 };
 
   let phones: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
@@ -95,11 +105,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Brand</label>
                 <select name="brand" defaultValue={brand} className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-primary transition-all text-xs font-medium">
                   <option value="">Any Brand</option>
-                  <option value="samsung">Samsung</option>
-                  <option value="apple">Apple</option>
-                  <option value="google">Google</option>
-                  <option value="xiaomi">Xiaomi</option>
-                  <option value="oneplus">OnePlus</option>
+                  {allBrands.map((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
+                    <option key={b._id.toString()} value={b.slug}>{b.name}</option>
+                  ))}
                 </select>
               </div>
               
@@ -107,10 +115,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Release Year</label>
                 <select name="year" defaultValue={year} className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-primary transition-all text-xs font-medium">
                   <option value="">Any Year</option>
-                  <option value="2025">2025</option>
-                  <option value="2024">2024</option>
-                  <option value="2023">2023</option>
-                  <option value="2022">2022</option>
+                  {uniqueYears.map((y: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
+                    <option key={y} value={y.toString()}>{y}</option>
+                  ))}
                 </select>
               </div>
 
