@@ -79,7 +79,7 @@ export default function Hero() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="relative lg:h-[600px] flex justify-center items-center"
+            className="relative lg:h-[600px] hidden lg:flex justify-center items-center"
           >
             {/* Abstract representations of phones if images are missing */}
             <div className="relative w-full max-w-sm aspect-[1/2] glass-card rounded-[2.5rem] border-8 border-slate-900 shadow-2xl overflow-hidden flex flex-col z-20">
