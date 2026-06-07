@@ -30,90 +30,85 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-  // Active check: exact match for "/", startsWith for others
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Sync mobile menu state changes with other components (like MobileNav)
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("mobile-menu-state-change", { detail: mobileMenuOpen }));
+  }, [mobileMenuOpen]);
+
+  // Listen for toggle commands from other components
+  useEffect(() => {
+    const handleToggle = () => setMobileMenuOpen((prev) => !prev);
+    window.addEventListener("toggle-mobile-menu", handleToggle);
+    return () => window.removeEventListener("toggle-mobile-menu", handleToggle);
+  }, []);
+
+  const isActive = (path: string) => {
+    if (path === "/") return pathname === "/";
+    return pathname.startsWith(path);
+  };
 
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-          isCategoryOpen
-            ? isScrolled
-              ? "bg-white border-b border-slate-200/50 shadow-sm py-3"
-              : "bg-white py-5"
-            : isScrolled
-            ? "bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm py-3"
-            : "bg-white/95 backdrop-blur-md py-5"
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+          isScrolled ? "bg-white/90 backdrop-blur-lg shadow-sm border-b border-slate-200" : "bg-white border-b border-slate-100"
         }`}
       >
-        <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-8 h-8 md:w-10 md:h-10">
-              <Image src="/sitelogo.svg" alt="TechTweak Logo" fill className="object-contain" />
-            </div>
-            <span className="font-bold text-xl md:text-2xl tracking-tight text-slate-900 hidden sm:block">
-              Tech<span className="text-primary">Tweak</span>
-            </span>
-          </Link>
-
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => {
-              const active = isActive(link.href);
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`text-sm font-medium transition-colors relative group ${
-                    active ? "text-primary" : "text-slate-600 hover:text-primary"
-                  }`}
-                >
-                  {link.name}
-                  <span
-                    className={`absolute -bottom-1 left-0 h-0.5 bg-primary rounded-full transition-all duration-300 ${
-                      active ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
-                  />
-                </Link>
-              );
-            })}
-
-            {/* Categories Dropdown */}
-            <CategoriesDropdown isScrolled={isScrolled} onOpenChange={setIsCategoryOpen} />
-          </nav>
-
-          {/* Right Actions */}
-          <div className="flex items-center gap-3 md:gap-4">
-            <NavbarSearch />
-            <Link
-              href="/compare"
-              className="hidden md:flex bg-primary text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
-            >
-              Compare Phones
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20 gap-4 lg:gap-8">
+            <Link href="/" className="flex items-center gap-2 lg:gap-3 shrink-0" onClick={() => setMobileMenuOpen(false)}>
+              <Image src="/icon.png" alt="TechTweak Logo" width={32} height={32} className="w-8 h-8 lg:w-10 lg:h-10 object-contain" />
+              <span className="text-xl lg:text-2xl font-black tracking-tight text-slate-900">
+                Tech<span className="text-primary">Tweak</span>
+              </span>
             </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center justify-center gap-1 flex-1 px-4 max-w-2xl">
+              {navLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className={`px-4 lg:px-5 py-2.5 rounded-full text-sm lg:text-base font-semibold transition-all smooth-transition ${
+                      active
+                        ? "text-primary bg-primary/10 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
+              <CategoriesDropdown />
+            </nav>
+
+            <div className="flex items-center gap-3 lg:gap-4 shrink-0">
+              <NavbarSearch />
+            </div>
           </div>
         </div>
 
-        {/* Mobile Menu Overlay */}
+        {/* Top Mobile Dropdown Menu (Overlay) */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="md:hidden bg-white/95 backdrop-blur-xl border-b border-slate-100 shadow-xl overflow-hidden absolute top-full left-0 w-full"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-slate-100 overflow-hidden bg-white/95 backdrop-blur-xl absolute top-full left-0 w-full shadow-xl"
             >
-              <div className="px-4 py-6 flex flex-col gap-4">
+              <div className="p-4 flex flex-col gap-2 max-h-[calc(100vh-64px)] overflow-y-auto">
                 {mobileNavLinks.map((link) => {
                   const active = isActive(link.href);
                   return (
@@ -144,42 +139,6 @@ export default function Navbar() {
           )}
         </AnimatePresence>
       </header>
-
-      {/* Sticky Bottom Nav Bar for Mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 safe-area-pb">
-        <div className="flex items-center justify-around px-2 py-2">
-          {[
-            { name: "Home", href: "/", icon: Home },
-            { name: "Phones", href: "/phones", icon: Smartphone },
-            { name: "Compare", href: "/compare", icon: Scale },
-            { name: "Search", href: "/search", icon: Search },
-          ].map((item) => {
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex flex-col items-center justify-center gap-1 p-2 w-full min-h-[44px] transition-colors ${
-                  active ? "text-primary" : "text-slate-500 hover:text-slate-800"
-                }`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <item.icon size={22} strokeWidth={active ? 2.5 : 2} />
-                <span className="text-[10px] font-medium">{item.name}</span>
-              </Link>
-            );
-          })}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`flex flex-col items-center justify-center gap-1 p-2 w-full min-h-[44px] transition-colors ${
-              mobileMenuOpen ? "text-primary" : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            {mobileMenuOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2} />}
-            <span className="text-[10px] font-medium">Menu</span>
-          </button>
-        </div>
-      </nav>
     </>
   );
 }

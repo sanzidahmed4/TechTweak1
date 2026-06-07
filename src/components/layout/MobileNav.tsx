@@ -3,25 +3,23 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Smartphone, Search, Scale, UserCircle } from "lucide-react";
+import { Home, Smartphone, Search, Scale, Menu, X } from "lucide-react";
 
 export default function MobileNav() {
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      // In mobile Safari, scrollY can be negative (elastic scroll). Prevent weird behavior.
       const currentScrollY = Math.max(0, window.scrollY);
       
       if (currentScrollY < 50) {
         setIsVisible(true);
       } else if (currentScrollY > lastScrollY.current) {
-        // Scrolling down
         setIsVisible(false);
       } else if (currentScrollY < lastScrollY.current) {
-        // Scrolling up
         setIsVisible(true);
       }
       
@@ -32,36 +30,59 @@ export default function MobileNav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    // Listen for state changes from the main Navbar to sync the Menu/X icon
+    const handleMenuState = (e: any) => setIsMenuOpen(e.detail);
+    window.addEventListener("mobile-menu-state-change", handleMenuState);
+    return () => window.removeEventListener("mobile-menu-state-change", handleMenuState);
+  }, []);
+
+  const isActive = (path: string) => {
+    if (path === "/") return pathname === "/";
+    return pathname.startsWith(path);
+  };
+
   const navItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "Phones", href: "/phones", icon: Smartphone },
-    { name: "Search", href: "/search", icon: Search },
     { name: "Compare", href: "/compare", icon: Scale },
+    { name: "Search", href: "/search", icon: Search },
   ];
 
   return (
     <div 
-      className={`fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200/50 flex justify-around items-center p-3 sm:hidden z-50 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.05)] transition-transform duration-300 ease-in-out ${
+      className={`fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg border-t border-slate-200 z-50 safe-area-pb shadow-[0_-4px_20px_rgba(0,0,0,0.05)] transition-transform duration-300 ease-in-out sm:hidden ${
         isVisible ? "translate-y-0" : "translate-y-[150%]"
       }`}
     >
-      {navItems.map((item) => {
-        const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
-        return (
-          <Link 
-            key={item.name} 
-            href={item.href}
-            className={`flex flex-col items-center gap-1 min-w-[60px] ${isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"}`}
-          >
-            <div className={`p-1.5 rounded-xl transition-all ${isActive ? "bg-primary/10" : ""}`}>
-              <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-            </div>
-            <span className={`text-[10px] font-bold ${isActive ? "opacity-100" : "opacity-0 h-0 overflow-hidden"}`}>
-              {item.name}
-            </span>
-          </Link>
-        );
-      })}
+      <div className="flex items-center justify-around px-2 py-2">
+        {navItems.map((item) => {
+          const active = isActive(item.href);
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex flex-col items-center justify-center gap-1 p-2 w-full min-h-[44px] transition-colors ${
+                active ? "text-primary" : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <item.icon size={22} strokeWidth={active ? 2.5 : 2} />
+              <span className="text-[10px] font-medium">{item.name}</span>
+            </Link>
+          );
+        })}
+        
+        {/* Menu Toggle Button */}
+        <button
+          onClick={() => window.dispatchEvent(new Event("toggle-mobile-menu"))}
+          className={`flex flex-col items-center justify-center gap-1 p-2 w-full min-h-[44px] transition-colors ${
+            isMenuOpen ? "text-primary" : "text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          {isMenuOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2} />}
+          <span className="text-[10px] font-medium">Menu</span>
+        </button>
+      </div>
     </div>
   );
 }
