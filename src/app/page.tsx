@@ -210,18 +210,18 @@ export default async function Home() {
       </section>
 
       {/* Premium Comparison CTA */}
-      <section className="py-24 relative overflow-hidden bg-slate-900 text-white">
+      <section className="py-12 lg:py-24 relative overflow-hidden bg-slate-900 text-white">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=2000')] bg-cover bg-center opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="text-primary font-bold tracking-widest uppercase text-sm mb-4 block">Ultimate Tech Engine</span>
-            <h2 className="text-5xl font-black mb-6 tracking-tight text-white">Torn Between Flagships?</h2>
-            <p className="text-xl text-slate-300 mb-10 leading-relaxed">
+            <span className="text-primary font-bold tracking-widest uppercase text-xs lg:text-sm mb-3 lg:mb-4 block">Ultimate Tech Engine</span>
+            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black mb-4 lg:mb-6 tracking-tight text-white">Torn Between Flagships?</h2>
+            <p className="text-sm sm:text-base lg:text-xl text-slate-300 mb-8 lg:mb-10 leading-relaxed">
               Use our advanced comparison engine to map over 50 data points side-by-side. From sensor sizes to AnTuTu benchmarks, make the right choice instantly.
             </p>
-            <Link href="/compare" className="inline-flex items-center gap-3 bg-white text-slate-900 font-bold px-8 py-4 rounded-2xl hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] smooth-transition text-lg">
-              Start Comparing <Zap size={20} className="text-primary" />
+            <Link href="/compare" className="inline-flex items-center gap-2 lg:gap-3 bg-white text-slate-900 font-bold px-6 py-3 lg:px-8 lg:py-4 rounded-xl lg:rounded-2xl hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] smooth-transition text-sm sm:text-base lg:text-lg">
+              Start Comparing <Zap size={20} className="text-primary w-4 h-4 lg:w-5 lg:h-5" />
             </Link>
           </div>
         </div>
