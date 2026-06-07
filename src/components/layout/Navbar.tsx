@@ -22,6 +22,7 @@ const mobileNavLinks = [
   { name: "Compare", href: "/compare" },
   { name: "News", href: "/news" },
   { name: "Categories", href: "/phones" },
+  { name: "Advanced Search", href: "/search" },
 ];
 
 export default function Navbar() {

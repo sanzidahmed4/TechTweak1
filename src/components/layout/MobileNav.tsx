@@ -46,7 +46,6 @@ export default function MobileNav() {
     { name: "Home", href: "/", icon: Home },
     { name: "Phones", href: "/phones", icon: Smartphone },
     { name: "Compare", href: "/compare", icon: Scale },
-    { name: "Search", href: "/search", icon: Search },
   ];
 
   return (
