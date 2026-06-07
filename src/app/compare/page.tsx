@@ -81,7 +81,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
           EMPTY STATE HEADER (When 0 phones selected)
           ========================================= */}
       {comparedPhones.length === 0 && (
-        <div className="pt-12 pb-6 lg:pt-16 lg:pb-12">
+        <div className="pt-2 pb-6 lg:pt-16 lg:pb-12">
           <div className="max-w-6xl mx-auto px-4 lg:px-8">
             {/* Mobile Title (Hidden on Desktop) */}
             <div className="lg:hidden text-center mb-8">
