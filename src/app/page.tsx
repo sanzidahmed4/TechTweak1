@@ -166,7 +166,7 @@ export default async function Home() {
 
       {/* Upcoming Phones Section */}
       {upcomingPhones.length > 0 && (
-        <section className="py-20 bg-white border-b border-slate-200/60 overflow-hidden relative">
+        <section className="pt-8 pb-16 bg-white border-b border-slate-200/60 overflow-hidden relative">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="mb-10 sm:mb-14">
               <div className="flex items-center justify-between gap-4 mb-2 sm:mb-4">
