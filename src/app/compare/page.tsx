@@ -40,14 +40,14 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
             name: p.name,
             slug: p.slug,
             brands: { name: p.brand_id?.name },
-            processor: p.processor,
-            ram: p.ram,
-            storage: p.storage,
-            display: p.display,
-            camera_main: p.camera_main,
-            camera_front: p.camera_front,
-            battery: p.battery,
-            charging: p.charging,
+            processor: p.processor || p.cpu,
+            ram: p.ram || p.ram_variants,
+            storage: p.storage || p.storage_variants,
+            display: p.display || p.screen_size,
+            camera_main: p.camera_main || p.cam_main_sensor,
+            camera_front: p.camera_front || p.cam_front_resolution,
+            battery: p.battery || p.battery_capacity,
+            charging: p.charging || p.charging_wired,
             os: (p.android_version || p.os) ? `${p.android_version || p.os} (Upgradable)` : undefined,
             price_usd: p.price_usd,
             antutu_score: p.antutu_score,
@@ -129,11 +129,11 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
               <table className={`w-full text-left border-collapse table-fixed ${comparedPhones.length > 2 ? 'min-w-[800px]' : 'min-w-full'}`}>
                 <thead className="bg-slate-50/50 border-b border-slate-100">
                   <tr>
-                    <th className="p-4 lg:p-6 w-[30%] lg:w-[20%] text-sm font-bold text-slate-900 uppercase tracking-wider border-r border-slate-100 align-bottom">
+                    <th className="p-3 lg:p-6 w-[28%] lg:w-[20%] text-xs lg:text-sm font-bold text-slate-900 uppercase tracking-wider border-r border-slate-100 align-bottom">
                       Specifications
                     </th>
                     {comparedPhones.map((phone, idx) => (
-                      <th key={idx} className={`p-4 lg:p-6 text-center align-bottom border-slate-100 ${idx < comparedPhones.length - 1 ? 'border-r' : ''}`}>
+                      <th key={idx} className={`p-3 lg:p-6 text-center align-bottom border-slate-100 ${idx < comparedPhones.length - 1 ? 'border-r' : ''}`}>
                         <div className="w-16 h-20 mx-auto bg-white rounded-xl mb-3 flex items-center justify-center overflow-hidden border border-slate-100 p-1 shadow-sm">
                           {phone.images && phone.images[0] ? (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -164,7 +164,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 
                     return (
                       <tr key={spec.key} className="hover:bg-slate-50/50 transition-colors">
-                        <th className="p-5 lg:p-6 w-[20%] bg-slate-50/50 text-sm font-bold text-slate-900 uppercase tracking-wider border-r border-slate-100 align-top">
+                        <th className="p-3 lg:p-6 bg-slate-50/50 text-xs lg:text-sm font-bold text-slate-900 uppercase tracking-wider border-r border-slate-100 align-top">
                           {spec.label}
                         </th>
                         {comparedPhones.map((phone, idx) => {
@@ -172,10 +172,10 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                           const isBest = idx === bestValueIdx;
                           
                           return (
-                            <td key={idx} className={`p-5 lg:p-6 align-top ${idx < comparedPhones.length - 1 ? 'border-r border-slate-100' : ''}`}>
+                            <td key={idx} className={`p-3 lg:p-6 align-top ${idx < comparedPhones.length - 1 ? 'border-r border-slate-100' : ''}`}>
                               {value ? (
-                                <div className={`flex flex-col gap-2 ${isBest ? "text-green-700" : "text-slate-600"}`}>
-                                  <span className={`text-base font-medium ${isBest ? "font-bold" : ""}`}>
+                                <div className={`flex flex-col gap-1.5 lg:gap-2 ${isBest ? "text-green-700" : "text-slate-600"}`}>
+                                  <span className={`text-sm lg:text-base font-medium ${isBest ? "font-bold" : ""}`}>
                                     {spec.prefix}{value}
                                   </span>
                                   {isBest && (
