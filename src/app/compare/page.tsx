@@ -77,13 +77,56 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="bg-slate-50 min-h-screen pt-24 pb-20">
-      {/* Top Sticky Bar for Phone Selection */}
-      <div className="bg-white sticky top-[60px] sm:top-[76px] z-40 shadow-sm border-b border-slate-200 py-3 transition-all">
+      {/* =========================================
+          DESKTOP STICKY HEADER (Original UI)
+          ========================================= */}
+      <div className={`hidden lg:block transition-all ${comparedPhones.length > 0 ? "bg-white border-b border-slate-200 sticky top-[72px] z-40 shadow-sm py-6" : "pt-12 pb-6"}`}>
         <div className="max-w-6xl mx-auto px-4 lg:px-8">
-          <div className="flex items-center gap-3 lg:gap-6 overflow-x-auto custom-scrollbar pb-2 sm:pb-0">
+          <div className="grid grid-cols-5 gap-4 items-end">
+            <div className="col-span-1">
+              <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
+              <p className="text-slate-500 text-sm pr-4">Select up to 4 devices to map their specifications.</p>
+            </div>
+
+            {/* Render selected phones in Header */}
+            {comparedPhones.map((phone, idx) => (
+              <div key={idx} className="bg-white p-3 rounded-2xl border border-slate-200 relative text-center group smooth-transition hover:border-primary/30 shadow-sm">
+                <Link 
+                  href={`/compare?phones=${slugs.filter((s) => s !== phone.slug).join(',')}`}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-slate-200 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-full flex items-center justify-center transition-colors shadow-sm z-10"
+                  title="Remove"
+                >
+                  <X size={14} />
+                </Link>
+                <div className="w-12 h-16 mx-auto bg-slate-50 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-slate-100">
+                  {phone.images && phone.images[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Smartphone size={20} className="text-slate-300" />
+                  )}
+                </div>
+                <p className="text-[10px] font-bold text-primary uppercase mb-0.5">{phone.brands?.name}</p>
+                <h3 className="font-bold text-slate-900 line-clamp-1 text-xs">{phone.name}</h3>
+              </div>
+            ))}
+
+            {/* Empty Slots */}
+            {Array.from({ length: 4 - comparedPhones.length }).map((_, idx) => (
+              <CompareAddButton key={`empty-${idx}`} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================
+          MOBILE STICKY HEADER (New UI)
+          ========================================= */}
+      <div className="lg:hidden bg-white sticky top-[60px] sm:top-[76px] z-40 shadow-sm border-b border-slate-200 py-3 transition-all">
+        <div className="max-w-6xl mx-auto px-4 lg:px-8">
+          <div className="flex items-center gap-3 overflow-x-auto custom-scrollbar pb-2 sm:pb-0">
             <div className="shrink-0 mr-2">
-              <h2 className="text-xl lg:text-2xl font-black text-slate-900">Compare</h2>
-              <p className="text-slate-500 text-[10px] lg:text-xs hidden md:block">Select up to 4 devices to map their specifications.</p>
+              <h2 className="text-xl font-black text-slate-900">Compare</h2>
             </div>
             
             {/* Render selected phones horizontally */}
@@ -121,19 +164,21 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 lg:px-8 pt-8">
+      <div className={`max-w-6xl mx-auto px-4 lg:px-8 ${comparedPhones.length > 0 ? "pt-8 lg:pt-12" : "pt-4"}`}>
         {/* Comparison Table */}
         {comparedPhones.length > 0 ? (
           <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto custom-scrollbar">
-              <table className={`w-full text-left border-collapse table-fixed ${comparedPhones.length > 2 ? 'min-w-[800px]' : 'min-w-full'}`}>
-                <thead className="bg-slate-50/50 border-b border-slate-100">
+              <table className={`w-full text-left border-collapse table-fixed lg:min-w-[800px] ${comparedPhones.length > 2 ? 'min-w-[800px]' : 'min-w-full'}`}>
+                
+                {/* Mobile Thead (Hidden on Desktop) */}
+                <thead className="lg:hidden bg-slate-50/50 border-b border-slate-100">
                   <tr>
-                    <th className="p-3 lg:p-6 w-[28%] lg:w-[20%] text-xs lg:text-sm font-bold text-slate-900 uppercase tracking-wider border-r border-slate-100 align-bottom">
-                      Specifications
+                    <th className="p-3 w-[28%] text-xs font-bold text-slate-900 uppercase tracking-wider border-r border-slate-100 align-bottom">
+                      Specs
                     </th>
                     {comparedPhones.map((phone, idx) => (
-                      <th key={idx} className={`p-3 lg:p-6 text-center align-bottom border-slate-100 ${idx < comparedPhones.length - 1 ? 'border-r' : ''}`}>
+                      <th key={idx} className={`p-3 text-center align-bottom border-slate-100 ${idx < comparedPhones.length - 1 ? 'border-r' : ''}`}>
                         <div className="w-16 h-20 mx-auto bg-white rounded-xl mb-3 flex items-center justify-center overflow-hidden border border-slate-100 p-1 shadow-sm">
                           {phone.images && phone.images[0] ? (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -142,11 +187,12 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                             <Smartphone size={24} className="text-slate-300" />
                           )}
                         </div>
-                        <h3 className="font-bold text-slate-900 text-sm">{phone.name}</h3>
+                        <h3 className="font-bold text-slate-900 text-sm leading-tight">{phone.name}</h3>
                       </th>
                     ))}
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-slate-100">
                   {specs.map((spec) => {
                     // Find the best value for highlighting
@@ -164,7 +210,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 
                     return (
                       <tr key={spec.key} className="hover:bg-slate-50/50 transition-colors">
-                        <th className="p-3 lg:p-6 bg-slate-50/50 text-xs lg:text-sm font-bold text-slate-900 uppercase tracking-wider border-r border-slate-100 align-top">
+                        <th className="p-3 lg:p-6 w-[28%] lg:w-[20%] bg-slate-50/50 text-xs lg:text-sm font-bold text-slate-900 uppercase tracking-wider border-r border-slate-100 align-top">
                           {spec.label}
                         </th>
                         {comparedPhones.map((phone, idx) => {
@@ -172,7 +218,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                           const isBest = idx === bestValueIdx;
                           
                           return (
-                            <td key={idx} className={`p-3 lg:p-6 align-top ${idx < comparedPhones.length - 1 ? 'border-r border-slate-100' : ''}`}>
+                            <td key={idx} className="p-3 lg:p-6 lg:w-[20%] align-top border-r border-slate-100 last:border-r-0">
                               {value ? (
                                 <div className={`flex flex-col gap-1.5 lg:gap-2 ${isBest ? "text-green-700" : "text-slate-600"}`}>
                                   <span className={`text-sm lg:text-base font-medium ${isBest ? "font-bold" : ""}`}>
@@ -190,6 +236,10 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                             </td>
                           );
                         })}
+                        {/* Desktop Empty Columns (Hidden on Mobile) */}
+                        {Array.from({ length: 4 - comparedPhones.length }).map((_, idx) => (
+                          <td key={`empty-td-${idx}`} className="hidden lg:table-cell p-3 lg:p-6 lg:w-[20%] bg-slate-50/30 border-r border-slate-100 last:border-r-0"></td>
+                        ))}
                       </tr>
                     );
                   })}
