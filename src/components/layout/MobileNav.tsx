@@ -1,11 +1,37 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Smartphone, Search, Scale, UserCircle } from "lucide-react";
 
 export default function MobileNav() {
   const pathname = usePathname();
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Always show when near the top
+      if (currentScrollY < 50) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        // Scrolling down - hide it
+        setIsVisible(false);
+      } else {
+        // Scrolling up - show it
+        setIsVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    // Add listener with passive flag for better scroll performance
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
@@ -15,7 +41,11 @@ export default function MobileNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200/50 flex justify-around items-center p-3 sm:hidden z-50 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+    <div 
+      className={`fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200/50 flex justify-around items-center p-3 sm:hidden z-50 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.05)] transition-transform duration-300 ease-in-out ${
+        isVisible ? "translate-y-0" : "translate-y-[150%]"
+      }`}
+    >
       {navItems.map((item) => {
         const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
         return (
