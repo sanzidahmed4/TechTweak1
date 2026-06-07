@@ -124,7 +124,7 @@ export default function NavbarSearch() {
           {isSearching ? (
             <div className="flex items-center justify-center py-10 text-slate-500">
               <Loader2 className="animate-spin mr-2" size={20} />
-              <span className="text-sm font-medium">Searching MongoDB...</span>
+              <span className="text-sm font-medium">Searching...</span>
             </div>
           ) : results.length > 0 ? (
             <div className="py-2">
