@@ -75,21 +75,23 @@ export default function Navbar() {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center justify-center gap-1 flex-1 px-4 max-w-2xl">
+            <nav className="hidden md:flex items-center gap-8 px-4 flex-1 justify-center max-w-2xl">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
                 return (
                   <Link
                     key={link.name}
                     href={link.href}
-                    className={`px-4 lg:px-5 py-2.5 rounded-full text-sm lg:text-base font-semibold transition-all smooth-transition ${
-                      active
-                        ? "text-primary bg-primary/10 shadow-sm"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    className={`text-sm lg:text-base font-medium transition-colors relative group ${
+                      active ? "text-primary font-semibold" : "text-slate-600 hover:text-primary"
                     }`}
                   >
                     {link.name}
+                    <span
+                      className={`absolute -bottom-1.5 left-0 h-0.5 bg-primary rounded-full transition-all duration-300 ${
+                        active ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                    />
                   </Link>
                 );
               })}

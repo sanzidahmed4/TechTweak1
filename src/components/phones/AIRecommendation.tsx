@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Sparkles, Gamepad2, Camera, Battery, Wallet, ChevronRight, Zap } from "lucide-react";
+import { Sparkles, Gamepad2, Camera, Battery, Wallet, ChevronRight, Zap, Search } from "lucide-react";
 import type { PhoneData } from "./PhonesClientPage";
+import PhoneAdvisorModal from "./PhoneAdvisorModal";
 
 const CATEGORIES = [
   {
@@ -63,6 +64,7 @@ interface Props {
 
 export default function AIRecommendation({ phones }: Props) {
   const [activeCategory, setActiveCategory] = useState("gaming");
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
 
   const cat = CATEGORIES.find((c) => c.key === activeCategory)!;
 
@@ -82,61 +84,70 @@ export default function AIRecommendation({ phones }: Props) {
   if (displayPhones.length === 0) return null;
 
   return (
-    <section className="mt-16 mb-4">
-      {/* Header */}
-      <div className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-3xl overflow-hidden p-8 md:p-12">
-        {/* Background effects */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl" />
-          {/* Animated particles */}
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-blue-400/40 rounded-full animate-pulse"
-              style={{
-                top: `${15 + i * 14}%`,
-                left: `${10 + i * 15}%`,
-                animationDelay: `${i * 0.4}s`,
-                animationDuration: `${2 + i * 0.5}s`,
-              }}
-            />
-          ))}
-        </div>
+    <section className="relative py-16 md:py-24 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 overflow-hidden border-b border-white/10">
+      {/* Background effects */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-violet-500/10 rounded-full blur-[100px]" />
+        {/* Animated particles */}
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-blue-400/40 rounded-full animate-pulse"
+            style={{
+              top: `${15 + i * 14}%`,
+              left: `${10 + i * 15}%`,
+              animationDelay: `${i * 0.4}s`,
+              animationDuration: `${2 + i * 0.5}s`,
+            }}
+          />
+        ))}
+      </div>
 
-        <div className="relative z-10">
-          {/* Title */}
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <Sparkles size={18} className="text-white" />
-            </div>
+      <div className="container max-w-4xl mx-auto px-4 lg:px-8 relative z-10">
+          {/* Title & Action */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
-              <p className="text-[11px] text-blue-400 font-semibold uppercase tracking-widest">Powered by AI</p>
-              <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-                AI Recommended For You
-              </h2>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                  <Sparkles size={18} className="text-white" />
+                </div>
+                <div>
+                  <p className="text-[11px] text-blue-400 font-semibold uppercase tracking-widest">Powered by AI</p>
+                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                    AI Recommended For You
+                  </h2>
+                </div>
+              </div>
+              <p className="text-blue-300/60 text-sm ml-[52px]">
+                Smart picks based on your usage profile
+              </p>
             </div>
+
+            {/* Trigger Button for Quiz */}
+            <button 
+              onClick={() => setIsQuizOpen(true)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-bold hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all shrink-0 group"
+            >
+              <Search size={18} className="text-blue-600 group-hover:animate-pulse" />
+              Find My Perfect Phone
+            </button>
           </div>
-          <p className="text-blue-300/60 text-sm mb-8 ml-[52px]">
-            Smart picks based on your usage profile
-          </p>
 
           {/* Category Tabs */}
-          <div className="flex flex-wrap gap-3 mb-8">
+          <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-8 w-full">
             {CATEGORIES.map((c) => {
-              const Icon = c.icon;
               const isActive = activeCategory === c.key;
               return (
                 <button
                   key={c.key}
                   onClick={() => setActiveCategory(c.key)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-300 border ${
+                  className={`flex items-center justify-center px-1 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[11px] sm:text-sm font-bold transition-all duration-300 border ${
                     isActive
                       ? `bg-gradient-to-r ${c.color} text-white border-transparent shadow-lg ${c.glow}`
                       : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  <Icon size={15} />
                   {c.label}
                 </button>
               );
@@ -178,7 +189,8 @@ export default function AIRecommendation({ phones }: Props) {
             </p>
           </div>
         </div>
-      </div>
+
+      <PhoneAdvisorModal isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
     </section>
   );
 }

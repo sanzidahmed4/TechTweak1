@@ -8,6 +8,8 @@ import Phone from "@/lib/models/Phone";
 import Post from "@/lib/models/Post";
 import "@/lib/models/Category";
 
+import AIRecommendation from "@/components/phones/AIRecommendation";
+import type { PhoneData } from "@/components/phones/PhonesClientPage";
 import UpcomingCarousel from "@/components/home/UpcomingCarousel";
 
 export const revalidate = 3600; // Enable ISR (1 hour caching), invalidated instantly on admin actions
@@ -65,21 +67,42 @@ export default async function Home() {
   let featuredPhones: IPhoneSummary[] = [];
   let upcomingPhones: IPhoneSummary[] = [];
   let latestArticles: IArticleSummary[] = [];
+  let aiPhones: PhoneData[] = [];
   
   try {
     const rawPhones = (await Phone.find({ is_published: true, upcoming: { $ne: true } })
       .populate('brand_id', 'name slug')
       .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
-      .limit(10)
+      .limit(50)
       .lean()) as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as RawPhone[];
       
-    featuredPhones = rawPhones.map((p) => ({
+    featuredPhones = rawPhones.slice(0, 10).map((p: any) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,
       brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
       price_usd: p.price_usd || 0,
       images: p.images || []
+    }));
+
+    aiPhones = rawPhones.map((p: any) => ({
+      id: p._id.toString(),
+      name: p.name,
+      slug: p.slug,
+      brand: { name: p.brand_id?.name || "Unknown", slug: p.brand_id?.slug || "" },
+      display: p.display || null,
+      processor: p.processor || null,
+      ram: p.ram || null,
+      storage: p.storage || null,
+      camera_main: p.camera_main || null,
+      battery: p.battery || null,
+      network: p.network || null,
+      price_usd: p.price_usd || null,
+      price_bdt: p.price_bdt || null,
+      images: p.images || [],
+      is_featured: p.is_featured || false,
+      release_date: p.release_date || null,
+      antutu_score: p.antutu_score || null,
     }));
 
     const rawUpcoming = (await Phone.find({ is_published: true, upcoming: true })
@@ -208,6 +231,9 @@ export default async function Home() {
           )}
         </div>
       </section>
+
+      {/* AI Recommendation Section */}
+      <AIRecommendation phones={aiPhones} />
 
       {/* Premium Comparison CTA */}
       <section className="py-12 lg:py-24 relative overflow-hidden bg-slate-900 text-white">

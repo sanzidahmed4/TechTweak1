@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Smartphone, Building2, FileText, Image as ImageIcon, Settings, FolderTree } from "lucide-react";
+import { LayoutDashboard, Smartphone, Building2, FileText, Image as ImageIcon, Settings, FolderTree, Sparkles } from "lucide-react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
 
   const navItems = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { name: "AI Advisor", href: "/admin/advisor", icon: Sparkles },
     { name: "Phones", href: "/admin/phones", icon: Smartphone },
     { name: "Brands", href: "/admin/brands", icon: Building2 },
     { name: "Categories", href: "/admin/categories", icon: FolderTree },

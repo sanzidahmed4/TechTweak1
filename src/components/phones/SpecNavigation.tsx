@@ -94,7 +94,7 @@ export default function SpecNavigation() {
   };
 
   return (
-    <div className="sticky top-[73px] z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/60 shadow-sm py-3 mb-10 overflow-x-auto scrollbar-none">
+    <div className="hidden md:block sticky top-[73px] z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/60 shadow-sm py-3 mb-10 overflow-x-auto scrollbar-none">
       <div className="container mx-auto px-4 lg:px-8 flex flex-wrap md:flex-nowrap justify-between items-center gap-4">
         {/* Navigation Links */}
         <div className="flex justify-start items-center gap-1 sm:gap-2 min-w-max">

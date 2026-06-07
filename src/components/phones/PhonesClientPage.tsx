@@ -6,7 +6,7 @@ import FilterSidebar from "./FilterSidebar";
 import PhoneCard from "./PhoneCard";
 import BrandGrid from "./BrandGrid";
 import RightSidebar from "./RightSidebar";
-import AIRecommendation from "./AIRecommendation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   SlidersHorizontal,
   ChevronDown,
@@ -172,7 +172,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
     }
     if (filters.priceMin > 0 || filters.priceMax < 300000) {
       result = result.filter(
-        (p) => p.price_bdt !== null && p.price_bdt >= filters.priceMin && p.price_bdt <= filters.priceMax
+        (p) => p.price_usd !== null && p.price_usd >= filters.priceMin && p.price_usd <= filters.priceMax
       );
     }
     if (filters.is5G) {
@@ -198,10 +198,10 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
 
     switch (sort) {
       case "price_asc":
-        result.sort((a, b) => (a.price_bdt || 9999999) - (b.price_bdt || 9999999));
+        result.sort((a, b) => (a.price_usd || 9999999) - (b.price_usd || 9999999));
         break;
       case "price_desc":
-        result.sort((a, b) => (b.price_bdt || 0) - (a.price_bdt || 0));
+        result.sort((a, b) => (b.price_usd || 0) - (a.price_usd || 0));
         break;
       case "gaming":
         result.sort((a, b) => (b.antutu_score || 0) - (a.antutu_score || 0));
@@ -266,8 +266,9 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
       <div className="container mx-auto px-4 lg:px-8 py-10">
 
         {/* ── Toolbar Row ── */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative z-40">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3 flex-wrap">
             <p className="text-slate-500 text-sm">
               Showing <span className="font-bold text-slate-900">{filteredPhones.length}</span> of {totalCount.toLocaleString()} smartphones
             </p>
@@ -289,7 +290,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
                 <ChevronDown size={14} className={`transition-transform ${sortOpen ? "rotate-180" : ""}`} />
               </button>
               {sortOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-30 py-2 overflow-hidden">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-30 py-2 overflow-hidden">
                   {SORT_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
@@ -315,13 +316,15 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
 
             {/* Mobile Filter Button */}
             <button
-              onClick={() => setMobileFilterOpen(true)}
+              onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
               className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold shadow-md shadow-blue-500/20"
             >
               <SlidersHorizontal size={16} />
               Filters {activeFilterCount > 0 && <span className="bg-white text-blue-600 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">{activeFilterCount}</span>}
             </button>
           </div>
+
+        </div>
         </div>
 
         {/* ── 3 Column Layout ── */}
@@ -408,9 +411,6 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
                 )}
               </>
             )}
-
-            {/* AI Recommendation */}
-            <AIRecommendation phones={initialPhones} />
           </main>
 
           {/* Right Sidebar — Desktop */}
@@ -420,23 +420,37 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
         </div>
       </div>
 
-      {/* ── Mobile Filter Overlay ── */}
-      {mobileFilterOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileFilterOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-[85vw] max-w-sm bg-white shadow-2xl overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-slate-100">
-              <h3 className="font-bold text-slate-900 text-lg">Filters</h3>
-              <button onClick={() => setMobileFilterOpen(false)} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500">
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-4">
-              <FilterSidebar filters={filters} updateFilter={updateFilter} resetFilters={resetFilters} brands={brands} activeFilterCount={activeFilterCount} />
-            </div>
+      {/* ── Mobile Filter Overlay (Slide from right) ── */}
+      <AnimatePresence>
+        {mobileFilterOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden flex justify-end">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm" 
+              onClick={() => setMobileFilterOpen(false)} 
+            />
+            <motion.div 
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative h-full w-[85vw] max-w-sm bg-white shadow-2xl overflow-y-auto flex flex-col"
+            >
+              <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0 bg-white sticky top-0 z-10">
+                <h3 className="font-bold text-slate-900 text-lg">Filters</h3>
+                <button onClick={() => setMobileFilterOpen(false)} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-4 flex-1">
+                <FilterSidebar filters={filters} updateFilter={updateFilter} resetFilters={resetFilters} brands={brands} activeFilterCount={activeFilterCount} />
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* ── Compare Bar ── */}
       {compareList.length > 0 && (

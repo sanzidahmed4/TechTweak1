@@ -226,18 +226,18 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
         <div className="container mx-auto px-4 lg:px-8">
 
           {/* Breadcrumb Navigation */}
-          <nav className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-8 overflow-x-auto whitespace-nowrap pb-2">
+          <nav className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm font-medium text-slate-500 mb-4 sm:mb-8 overflow-x-auto whitespace-nowrap pb-2 custom-scrollbar">
             <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <span>/</span>
+            <span className="text-slate-300">/</span>
             <Link href="/phones" className="hover:text-primary transition-colors">Phones</Link>
-            <span>/</span>
+            <span className="text-slate-300">/</span>
             <Link href={`/phones?brand=${brandSlug}`} className="hover:text-primary transition-colors uppercase tracking-wider">{brandName}</Link>
-            <span>/</span>
-            <span className="text-slate-900 font-bold">{rawPhone.name}</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-900 font-bold truncate max-w-[150px] sm:max-w-none">{rawPhone.name}</span>
           </nav>
 
           {/* Overview top header */}
-          <div id="overview" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-10">
+          <div id="overview" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-5 lg:mb-10">
 
             {/* Gallery Section */}
             <div className="lg:col-span-5 relative">
@@ -262,7 +262,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   ) : null}
                 </div>
 
-                <h1 className="text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
                   {rawPhone.name}
                 </h1>
 
@@ -284,41 +284,41 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                 </div>
 
                 {/* Quick features highlight grid */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
+                  <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
+                    <div className="hidden sm:flex w-10 h-10 rounded-xl bg-blue-50 text-blue-600 items-center justify-center flex-shrink-0">
                       <Cpu size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Processor</p>
-                      <p className="font-bold text-slate-800 text-sm leading-tight line-clamp-1">{rawPhone.chipset_highlight || rawPhone.processor || "N/A"}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Processor</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.chipset_highlight || rawPhone.processor || "N/A"}</p>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
+                    <div className="hidden sm:flex w-10 h-10 rounded-xl bg-purple-50 text-purple-600 items-center justify-center flex-shrink-0">
                       <Camera size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Main Camera</p>
-                      <p className="font-bold text-slate-800 text-sm leading-tight line-clamp-1">{rawPhone.camera_highlight || rawPhone.camera_main?.split("+")[0] || "N/A"}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Main Camera</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.camera_highlight || rawPhone.camera_main?.split("+")[0] || "N/A"}</p>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
+                    <div className="hidden sm:flex w-10 h-10 rounded-xl bg-orange-50 text-orange-600 items-center justify-center flex-shrink-0">
                       <Smartphone size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Display</p>
-                      <p className="font-bold text-slate-800 text-sm leading-tight line-clamp-1">{rawPhone.display_highlight || rawPhone.display?.split(",")[0] || "N/A"}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Display</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.display_highlight || rawPhone.display?.split(",")[0] || "N/A"}</p>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
+                    <div className="hidden sm:flex w-10 h-10 rounded-xl bg-green-50 text-green-600 items-center justify-center flex-shrink-0">
                       <Battery size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Battery</p>
-                      <p className="font-bold text-slate-800 text-sm leading-tight line-clamp-1">{rawPhone.battery_highlight || rawPhone.battery || "N/A"}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Battery</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.battery_highlight || rawPhone.battery || "N/A"}</p>
                     </div>
                   </div>
                 </div>
@@ -421,10 +421,10 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
           <SpecNavigation />
 
           {/* 2-COLUMN MAIN CONTENT & SIDEBAR GRID */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
 
             {/* Left Main Content Column (Takes 8/12 of space) */}
-            <div className="lg:col-span-8 space-y-8">
+            <div className="lg:col-span-8 space-y-5 lg:space-y-8">
 
               {/* General Info */}
               <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
@@ -744,7 +744,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
             </div>
 
             {/* Right Sidebar Column (Takes 4/12 of space - filling the red marked empty space) */}
-            <div className="lg:col-span-4 space-y-8 lg:sticky lg:top-24">
+            <div className="lg:col-span-4 space-y-5 lg:space-y-8 lg:sticky lg:top-24">
 
               {/* 1. Suggested Smartphones */}
               {similarSection.length > 0 && (
