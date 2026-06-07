@@ -90,7 +90,7 @@ export default function NavbarSearch() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search..."
-          className="bg-transparent border-none outline-none text-xs sm:text-sm text-slate-900 py-2 sm:py-2.5 pl-3 sm:pl-4 pr-1 transition-all duration-300 w-full"
+          className="bg-transparent border-none outline-none text-[16px] sm:text-sm text-slate-900 py-2 sm:py-2.5 pl-3 sm:pl-4 pr-1 transition-all duration-300 w-full"
         />
         <div className="flex items-center pr-2 sm:pr-3">
           {query && isOpen && (
