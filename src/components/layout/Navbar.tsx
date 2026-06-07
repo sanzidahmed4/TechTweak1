@@ -65,9 +65,11 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20 gap-4 lg:gap-8">
-            <Link href="/" className="flex items-center gap-2 lg:gap-3 shrink-0" onClick={() => setMobileMenuOpen(false)}>
-              <Image src="/icon.png" alt="TechTweak Logo" width={32} height={32} className="w-8 h-8 lg:w-10 lg:h-10 object-contain" />
-              <span className="text-xl lg:text-2xl font-black tracking-tight text-slate-900">
+            <Link href="/" className="flex items-center gap-3 group" onClick={() => setMobileMenuOpen(false)}>
+              <div className="relative w-8 h-8 md:w-10 md:h-10">
+                <Image src="/sitelogo.svg" alt="TechTweak Logo" fill className="object-contain" />
+              </div>
+              <span className="font-bold text-xl md:text-2xl tracking-tight text-slate-900 hidden sm:block">
                 Tech<span className="text-primary">Tweak</span>
               </span>
             </Link>
