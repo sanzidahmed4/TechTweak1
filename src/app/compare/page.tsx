@@ -281,11 +281,12 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
           </div>
         ) : (
           <div>
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-10">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-10 lg:mb-16">
               <div className="hidden lg:block lg:col-span-1"></div>
               <div className="lg:col-span-4">
-                <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-8 lg:p-10 text-center">
-                  <Smartphone size={48} className="text-slate-300 mx-auto mb-4" strokeWidth={1} />
+                <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-8 lg:p-16 text-center">
+                  <Smartphone size={48} className="lg:hidden text-slate-300 mx-auto mb-4" strokeWidth={1} />
+                  <Smartphone size={64} className="hidden lg:block text-slate-300 mx-auto mb-6" strokeWidth={1} />
                   <h3 className="text-2xl lg:text-3xl font-black text-slate-900 mb-2 lg:mb-4 tracking-tight">Ready to Compare?</h3>
                   <p className="text-slate-500 text-base lg:text-lg max-w-lg mx-auto">Click the &apos;Add Device&apos; slots in the header above to start mapping specifications side-by-side.</p>
                 </div>
