@@ -78,91 +78,115 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   return (
     <div className="bg-slate-50 min-h-screen pt-24 pb-20">
       {/* =========================================
-          DESKTOP STICKY HEADER (Original UI)
+          EMPTY STATE HEADER (When 0 phones selected)
           ========================================= */}
-      <div className={`hidden lg:block transition-all ${comparedPhones.length > 0 ? "bg-white border-b border-slate-200 sticky top-[72px] z-40 shadow-sm py-6" : "pt-12 pb-6"}`}>
-        <div className="max-w-6xl mx-auto px-4 lg:px-8">
-          <div className="grid grid-cols-5 gap-4 items-end">
-            <div className="col-span-1">
-              <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
-              <p className="text-slate-500 text-sm pr-4">Select up to 4 devices to map their specifications.</p>
-            </div>
-
-            {/* Render selected phones in Header */}
-            {comparedPhones.map((phone, idx) => (
-              <div key={idx} className="bg-white p-3 rounded-2xl border border-slate-200 relative text-center group smooth-transition hover:border-primary/30 shadow-sm">
-                <Link 
-                  href={`/compare?phones=${slugs.filter((s) => s !== phone.slug).join(',')}`}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-slate-200 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-full flex items-center justify-center transition-colors shadow-sm z-10"
-                  title="Remove"
-                >
-                  <X size={14} />
-                </Link>
-                <div className="w-12 h-16 mx-auto bg-slate-50 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-slate-100">
-                  {phone.images && phone.images[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <Smartphone size={20} className="text-slate-300" />
-                  )}
-                </div>
-                <p className="text-[10px] font-bold text-primary uppercase mb-0.5">{phone.brands?.name}</p>
-                <h3 className="font-bold text-slate-900 line-clamp-1 text-xs">{phone.name}</h3>
+      {comparedPhones.length === 0 && (
+        <div className="pt-12 pb-6">
+          <div className="max-w-6xl mx-auto px-4 lg:px-8">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+              <div className="hidden lg:block col-span-1">
+                <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
+                <p className="text-slate-500 text-sm pr-4">Select up to 4 devices to map their specifications.</p>
               </div>
-            ))}
-
-            {/* Empty Slots */}
-            {Array.from({ length: 4 - comparedPhones.length }).map((_, idx) => (
-              <CompareAddButton key={`empty-${idx}`} />
-            ))}
+              {/* Empty Slots */}
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <CompareAddButton key={`empty-${idx}`} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* =========================================
+          DESKTOP STICKY HEADER (Original UI)
+          ========================================= */}
+      {comparedPhones.length > 0 && (
+        <div className="hidden lg:block transition-all bg-white border-b border-slate-200 sticky top-[72px] z-40 shadow-sm py-6">
+          <div className="max-w-6xl mx-auto px-4 lg:px-8">
+            <div className="grid grid-cols-5 gap-4 items-end">
+              <div className="col-span-1">
+                <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
+                <p className="text-slate-500 text-sm pr-4">Select up to 4 devices to map their specifications.</p>
+              </div>
+
+              {/* Render selected phones in Header */}
+              {comparedPhones.map((phone, idx) => (
+                <div key={idx} className="bg-white p-3 rounded-2xl border border-slate-200 relative text-center group smooth-transition hover:border-primary/30 shadow-sm">
+                  <Link 
+                    href={`/compare?phones=${slugs.filter((s) => s !== phone.slug).join(',')}`}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-slate-200 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-full flex items-center justify-center transition-colors shadow-sm z-10"
+                    title="Remove"
+                  >
+                    <X size={14} />
+                  </Link>
+                  <div className="w-12 h-16 mx-auto bg-slate-50 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-slate-100">
+                    {phone.images && phone.images[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Smartphone size={20} className="text-slate-300" />
+                    )}
+                  </div>
+                  <p className="text-[10px] font-bold text-primary uppercase mb-0.5">{phone.brands?.name}</p>
+                  <h3 className="font-bold text-slate-900 line-clamp-1 text-xs">{phone.name}</h3>
+                </div>
+              ))}
+
+              {/* Empty Slots */}
+              {Array.from({ length: 4 - comparedPhones.length }).map((_, idx) => (
+                <CompareAddButton key={`empty-${idx}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* =========================================
           MOBILE STICKY HEADER (New UI)
           ========================================= */}
-      <div className="lg:hidden bg-white sticky top-[60px] sm:top-[76px] z-40 shadow-sm border-b border-slate-200 py-3 transition-all">
-        <div className="max-w-6xl mx-auto px-4 lg:px-8">
-          <div className="flex items-center gap-3 overflow-x-auto custom-scrollbar pb-2 sm:pb-0">
-            <div className="shrink-0 mr-2">
-              <h2 className="text-xl font-black text-slate-900">Compare</h2>
-            </div>
-            
-            {/* Render selected phones horizontally */}
-            {comparedPhones.map((phone) => (
-              <div key={phone.slug} className="shrink-0 flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl p-2 pr-4 relative min-w-[160px] group hover:border-primary/30 transition-colors">
-                <Link 
-                  href={`/compare?phones=${slugs.filter((s) => s !== phone.slug).join(',')}`}
-                  className="absolute -top-2 -right-2 w-5 h-5 bg-white border border-slate-200 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-full flex items-center justify-center transition-colors shadow-sm z-10"
-                  title="Remove"
-                >
-                  <X size={12} />
-                </Link>
-                <div className="w-10 h-10 shrink-0 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-slate-100 p-1">
-                  {phone.images && phone.images[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-contain" />
-                  ) : (
-                    <Smartphone size={16} className="text-slate-300" />
-                  )}
-                </div>
-                <div className="flex flex-col justify-center">
-                  <span className="text-[9px] font-bold text-primary uppercase leading-tight">{phone.brands?.name}</span>
-                  <span className="text-xs font-bold text-slate-900 line-clamp-1 leading-tight">{phone.name}</span>
-                </div>
+      {comparedPhones.length > 0 && (
+        <div className="lg:hidden bg-white sticky top-[60px] sm:top-[76px] z-40 shadow-sm border-b border-slate-200 py-3 transition-all">
+          <div className="max-w-6xl mx-auto px-4 lg:px-8">
+            <div className="flex items-center gap-3 overflow-x-auto custom-scrollbar pb-2 sm:pb-0">
+              <div className="shrink-0 mr-2">
+                <h2 className="text-xl font-black text-slate-900">Compare</h2>
               </div>
-            ))}
+              
+              {/* Render selected phones horizontally */}
+              {comparedPhones.map((phone) => (
+                <div key={phone.slug} className="shrink-0 flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl p-2 pr-4 relative min-w-[160px] group hover:border-primary/30 transition-colors">
+                  <Link 
+                    href={`/compare?phones=${slugs.filter((s) => s !== phone.slug).join(',')}`}
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-white border border-slate-200 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-full flex items-center justify-center transition-colors shadow-sm z-10"
+                    title="Remove"
+                  >
+                    <X size={12} />
+                  </Link>
+                  <div className="w-10 h-10 shrink-0 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-slate-100 p-1">
+                    {phone.images && phone.images[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-contain" />
+                    ) : (
+                      <Smartphone size={16} className="text-slate-300" />
+                    )}
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <span className="text-[9px] font-bold text-primary uppercase leading-tight">{phone.brands?.name}</span>
+                    <span className="text-xs font-bold text-slate-900 line-clamp-1 leading-tight">{phone.name}</span>
+                  </div>
+                </div>
+              ))}
 
-            {/* Add Device Button (Compact) */}
-            {comparedPhones.length < 4 && (
-              <div className="shrink-0 h-[58px]">
-                <CompareAddButton compact={true} />
-              </div>
-            )}
+              {/* Add Device Button (Compact) */}
+              {comparedPhones.length < 4 && (
+                <div className="shrink-0 h-[58px]">
+                  <CompareAddButton compact={true} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className={`max-w-6xl mx-auto px-4 lg:px-8 ${comparedPhones.length > 0 ? "pt-8 lg:pt-12" : "pt-4"}`}>
         {/* Comparison Table */}
