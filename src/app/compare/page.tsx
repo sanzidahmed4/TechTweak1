@@ -77,52 +77,65 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="bg-slate-50 min-h-screen pt-24 pb-20">
-      {/* Sticky Header Section */}
-      <div className={`transition-all ${comparedPhones.length > 0 ? "bg-white border-b border-slate-200 sticky top-[72px] sm:top-[76px] z-40 shadow-sm py-6" : "pt-12 pb-6"}`}>
-        <div className="max-w-6xl mx-auto px-4 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-            <div className="hidden lg:block col-span-1">
-              <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
-              <p className="text-slate-500 text-sm pr-4">Select up to 4 devices to map their specifications.</p>
-            </div>
-
-            {/* Render selected phones in Header */}
-            {comparedPhones.map((phone, idx) => (
-              <div key={idx} className="bg-white p-3 rounded-2xl border border-slate-200 relative text-center group smooth-transition hover:border-primary/30 shadow-sm">
-                <Link 
-                  href={`/compare?phones=${slugs.filter((s) => s !== phone.slug).join(',')}`}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-slate-200 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-full flex items-center justify-center transition-colors shadow-sm z-10"
-                  title="Remove"
-                >
-                  <X size={14} />
-                </Link>
-                <div className="w-12 h-16 mx-auto bg-slate-50 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-slate-100">
-                  {phone.images && phone.images[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <Smartphone size={20} className="text-slate-300" />
-                  )}
-                </div>
-                <p className="text-[10px] font-bold text-primary uppercase mb-0.5">{phone.brands?.name}</p>
-                <h3 className="font-bold text-slate-900 line-clamp-1 text-xs">{phone.name}</h3>
+      {/* Conditionally Render Empty State Header */}
+      {comparedPhones.length === 0 && (
+        <div className="pt-12 pb-6">
+          <div className="max-w-6xl mx-auto px-4 lg:px-8">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+              <div className="hidden lg:block col-span-1">
+                <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
+                <p className="text-slate-500 text-sm pr-4">Select up to 4 devices to map their specifications.</p>
               </div>
-            ))}
-
-            {/* Empty Slots */}
-            {Array.from({ length: 4 - comparedPhones.length }).map((_, idx) => (
-              <CompareAddButton key={`empty-${idx}`} />
-            ))}
+              {/* Empty Slots */}
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <CompareAddButton key={`empty-${idx}`} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      <div className={`max-w-6xl mx-auto px-4 lg:px-8 ${comparedPhones.length > 0 ? "pt-12" : "pt-4"}`}>
+      <div className={`max-w-6xl mx-auto px-4 lg:px-8 ${comparedPhones.length > 0 ? "pt-6" : "pt-4"}`}>
         {/* Comparison Table */}
         {comparedPhones.length > 0 ? (
           <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left border-collapse min-w-[800px]">
+                <thead className="bg-white sticky top-[60px] sm:top-[76px] z-40 shadow-sm outline outline-1 outline-slate-200">
+                  <tr>
+                    <th className="p-4 lg:p-6 w-[20%] align-bottom bg-slate-50/50 border-r border-slate-100">
+                      <h1 className="text-xl lg:text-3xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
+                      <p className="text-slate-500 text-[10px] lg:text-xs hidden lg:block">Select up to 4 devices to map their specifications.</p>
+                    </th>
+                    {comparedPhones.map((phone, idx) => (
+                      <th key={idx} className={`p-3 lg:p-5 w-[20%] align-bottom bg-white border-slate-100 relative text-center group ${idx < comparedPhones.length - 1 ? 'border-r' : ''}`}>
+                        <Link 
+                          href={`/compare?phones=${slugs.filter((s) => s !== phone.slug).join(',')}`}
+                          className="absolute top-2 right-2 w-6 h-6 bg-white border border-slate-200 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-full flex items-center justify-center transition-colors shadow-sm z-10"
+                          title="Remove"
+                        >
+                          <X size={14} />
+                        </Link>
+                        <div className="w-12 h-16 mx-auto bg-slate-50 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-slate-100">
+                          {phone.images && phone.images[0] ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <Smartphone size={20} className="text-slate-300" />
+                          )}
+                        </div>
+                        <p className="text-[10px] font-bold text-primary uppercase mb-0.5">{phone.brands?.name}</p>
+                        <h3 className="font-bold text-slate-900 line-clamp-1 text-xs">{phone.name}</h3>
+                      </th>
+                    ))}
+                    {/* Empty Slots */}
+                    {Array.from({ length: 4 - comparedPhones.length }).map((_, idx) => (
+                      <th key={`empty-${idx}`} className={`p-3 lg:p-5 w-[20%] align-bottom bg-slate-50/30 border-slate-100 ${idx < 3 - comparedPhones.length ? 'border-r' : ''}`}>
+                        <CompareAddButton />
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
                 <tbody className="divide-y divide-slate-100">
                   {specs.map((spec) => {
                     // Find the best value for highlighting
