@@ -164,6 +164,25 @@ export default async function Home() {
         }}
       />
 
+      {/* Upcoming Phones Section */}
+      {upcomingPhones.length > 0 && (
+        <section className="py-20 bg-white border-b border-slate-200/60 overflow-hidden relative">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="mb-10 sm:mb-14">
+              <div className="flex items-center justify-between gap-4 mb-2 sm:mb-4">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Upcoming Phones</h2>
+                <Link href="/upcoming-phones" className="text-xs sm:text-sm font-semibold text-purple-600 hover:text-purple-700 transition-colors whitespace-nowrap shrink-0">
+                  View All →
+                </Link>
+              </div>
+              <p className="text-slate-500 text-sm sm:text-base lg:text-lg max-w-2xl">Get an exclusive look at the future of mobile technology before it launches.</p>
+            </div>
+            
+            <UpcomingCarousel phones={upcomingPhones} />
+          </div>
+        </section>
+      )}
+
       {/* Animated Trending Phones Carousel */}
       <section className="pt-12 pb-20 bg-slate-50 border-b border-slate-200/60 overflow-hidden relative">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
@@ -189,25 +208,6 @@ export default async function Home() {
           )}
         </div>
       </section>
-
-      {/* Upcoming Phones Section */}
-      {upcomingPhones.length > 0 && (
-        <section className="py-20 bg-white border-b border-slate-200/60 overflow-hidden relative">
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="mb-10 sm:mb-14">
-              <div className="flex items-center justify-between gap-4 mb-2 sm:mb-4">
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Upcoming Phones</h2>
-                <Link href="/upcoming-phones" className="text-xs sm:text-sm font-semibold text-purple-600 hover:text-purple-700 transition-colors whitespace-nowrap shrink-0">
-                  View All →
-                </Link>
-              </div>
-              <p className="text-slate-500 text-sm sm:text-base lg:text-lg max-w-2xl">Get an exclusive look at the future of mobile technology before it launches.</p>
-            </div>
-            
-            <UpcomingCarousel phones={upcomingPhones} />
-          </div>
-        </section>
-      )}
 
       {/* Premium Comparison CTA */}
       <section className="py-24 relative overflow-hidden bg-slate-900 text-white">
