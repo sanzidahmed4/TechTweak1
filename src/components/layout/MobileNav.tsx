@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Smartphone, Search, Scale, UserCircle } from "lucide-react";
@@ -8,30 +8,29 @@ import { Home, Smartphone, Search, Scale, UserCircle } from "lucide-react";
 export default function MobileNav() {
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+      // In mobile Safari, scrollY can be negative (elastic scroll). Prevent weird behavior.
+      const currentScrollY = Math.max(0, window.scrollY);
       
-      // Always show when near the top
       if (currentScrollY < 50) {
         setIsVisible(true);
-      } else if (currentScrollY > lastScrollY) {
-        // Scrolling down - hide it
+      } else if (currentScrollY > lastScrollY.current) {
+        // Scrolling down
         setIsVisible(false);
-      } else {
-        // Scrolling up - show it
+      } else if (currentScrollY < lastScrollY.current) {
+        // Scrolling up
         setIsVisible(true);
       }
       
-      setLastScrollY(currentScrollY);
+      lastScrollY.current = currentScrollY;
     };
 
-    // Add listener with passive flag for better scroll performance
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
