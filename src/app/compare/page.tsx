@@ -81,13 +81,21 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
           EMPTY STATE HEADER (When 0 phones selected)
           ========================================= */}
       {comparedPhones.length === 0 && (
-        <div className="pt-16 pb-6">
+        <div className="pt-12 pb-6 lg:pt-16 lg:pb-12">
           <div className="max-w-6xl mx-auto px-4 lg:px-8">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl lg:text-4xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
-              <p className="text-slate-500 text-sm lg:text-base">Select up to 4 devices to map their specifications.</p>
+            {/* Mobile Title (Hidden on Desktop) */}
+            <div className="lg:hidden text-center mb-8">
+              <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
+              <p className="text-slate-500 text-sm">Select up to 4 devices to map their specifications.</p>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 items-end max-w-4xl lg:max-w-none mx-auto">
+              {/* Desktop Title (Hidden on Mobile) */}
+              <div className="hidden lg:block col-span-1">
+                <h1 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Compare</h1>
+                <p className="text-slate-500 text-sm pr-4">Select up to 4 devices to map their specifications.</p>
+              </div>
+
               {/* Empty Slots */}
               {Array.from({ length: 4 }).map((_, idx) => (
                 <CompareAddButton key={`empty-${idx}`} />
