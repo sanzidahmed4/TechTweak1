@@ -228,53 +228,64 @@ export default async function Home() {
       </section>
 
       {/* Interactive Chipset / Specs Showcase */}
-      <section className="py-24 bg-white">
+      <section className="py-12 lg:py-24 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">The Anatomy of a Flagship</h2>
-            <p className="text-slate-500 text-lg">What makes a phone truly premium? We analyze every critical component.</p>
+          <div className="text-center max-w-3xl mx-auto mb-8 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-2 lg:mb-4 tracking-tight">The Anatomy of a Flagship</h2>
+            <p className="text-slate-500 text-sm sm:text-base lg:text-lg">What makes a phone truly premium? We analyze every critical component.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group">
-              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 smooth-transition">
-                <Cpu size={32} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+            <div className="bg-slate-50 p-5 lg:p-8 rounded-2xl lg:rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 shrink-0 bg-blue-100 text-blue-600 rounded-xl lg:rounded-2xl flex items-center justify-center lg:mb-6 group-hover:scale-110 smooth-transition">
+                <Cpu className="w-6 h-6 lg:w-8 lg:h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Next-Gen Silicon</h3>
-              <p className="text-slate-500">We track the latest 3nm architectures from Snapdragon, Apple Silicon, and MediaTek.</p>
+              <div className="text-left">
+                <h3 className="text-base lg:text-xl font-bold text-slate-900 mb-1 lg:mb-3 leading-tight">Next-Gen Silicon</h3>
+                <p className="text-xs lg:text-base text-slate-500 leading-snug lg:leading-normal">We track the latest 3nm architectures from Snapdragon, Apple Silicon, and MediaTek.</p>
+              </div>
             </div>
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group">
-              <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 smooth-transition">
-                <Camera size={32} />
+            
+            <div className="bg-slate-50 p-5 lg:p-8 rounded-2xl lg:rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 shrink-0 bg-purple-100 text-purple-600 rounded-xl lg:rounded-2xl flex items-center justify-center lg:mb-6 group-hover:scale-110 smooth-transition">
+                <Camera className="w-6 h-6 lg:w-8 lg:h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Computational Photography</h3>
-              <p className="text-slate-500">In-depth sensor analysis, 1-inch optics, and periscope zoom capabilities.</p>
+              <div className="text-left">
+                <h3 className="text-base lg:text-xl font-bold text-slate-900 mb-1 lg:mb-3 leading-tight">Computational Photo</h3>
+                <p className="text-xs lg:text-base text-slate-500 leading-snug lg:leading-normal">In-depth sensor analysis, 1-inch optics, and periscope zoom capabilities.</p>
+              </div>
             </div>
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group">
-              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 smooth-transition">
-                <Battery size={32} />
+            
+            <div className="bg-slate-50 p-5 lg:p-8 rounded-2xl lg:rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 shrink-0 bg-green-100 text-green-600 rounded-xl lg:rounded-2xl flex items-center justify-center lg:mb-6 group-hover:scale-110 smooth-transition">
+                <Battery className="w-6 h-6 lg:w-8 lg:h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Endurance Metrics</h3>
-              <p className="text-slate-500">Real-world active use tests, screen-on times, and ultra-fast charging speeds.</p>
+              <div className="text-left">
+                <h3 className="text-base lg:text-xl font-bold text-slate-900 mb-1 lg:mb-3 leading-tight">Endurance Metrics</h3>
+                <p className="text-xs lg:text-base text-slate-500 leading-snug lg:leading-normal">Real-world active use tests, screen-on times, and ultra-fast charging speeds.</p>
+              </div>
             </div>
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group">
-              <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 smooth-transition">
-                <CheckCircle2 size={32} />
+            
+            <div className="bg-slate-50 p-5 lg:p-8 rounded-2xl lg:rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 shrink-0 bg-orange-100 text-orange-600 rounded-xl lg:rounded-2xl flex items-center justify-center lg:mb-6 group-hover:scale-110 smooth-transition">
+                <CheckCircle2 className="w-6 h-6 lg:w-8 lg:h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Editor&apos;s Verification</h3>
-              <p className="text-slate-500">Independent expert reviews scoring UI fluidity, haptics, and daily reliability.</p>
+              <div className="text-left">
+                <h3 className="text-base lg:text-xl font-bold text-slate-900 mb-1 lg:mb-3 leading-tight">Editor&apos;s Verification</h3>
+                <p className="text-xs lg:text-base text-slate-500 leading-snug lg:leading-normal">Independent expert reviews scoring UI fluidity, haptics, and daily reliability.</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Latest Articles Grid */}
-      <section className="py-24 bg-slate-50 border-t border-slate-200">
+      <section className="py-12 lg:py-24 bg-slate-50 border-t border-slate-200">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="flex justify-between items-end mb-12">
+          <div className="flex justify-between items-end mb-8 lg:mb-12">
             <div>
-              <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Editorial Insights</h2>
-              <p className="text-slate-500 text-lg">In-depth reviews, leaks, and technology breakdowns.</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-2 lg:mb-4 tracking-tight">Editorial Insights</h2>
+              <p className="text-slate-500 text-sm sm:text-base lg:text-lg">In-depth reviews, leaks, and technology breakdowns.</p>
             </div>
             <Link href="/news" className="hidden sm:flex items-center gap-2 text-primary font-bold hover:text-primary/80 transition-colors">
               View All Articles <ArrowRight size={18} />
