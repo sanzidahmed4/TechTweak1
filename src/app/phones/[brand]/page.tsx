@@ -12,16 +12,22 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   const { brand } = await params;
   await connectToDatabase();
   
-  const data = await Brand.findOne({ slug: brand }).lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
+  const data = await Brand.findOne({ slug: brand })
+    .select("name description logo_url meta_title meta_description canonical_url og_image primary_keyword")
+    .lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
   
   if (!data) return { title: "Brand Not Found" };
   
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
-  const url = `${baseUrl}/phones/${brand}`;
+  const url = data.canonical_url || `${baseUrl}/phones/${brand}`;
+  
+  const title = data.meta_title || `${data.name} Phones | TechTweak`;
+  const description = data.meta_description || data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`;
+  const finalOgImage = data.og_image || data.logo_url;
 
   return {
-    title: `${data.name} Phones | TechTweak`,
-    description: data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`,
+    title: title,
+    description: description,
     alternates: {
       canonical: url,
       languages: {
@@ -30,17 +36,17 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
       },
     },
     openGraph: {
-      title: `${data.name} Phones | TechTweak`,
-      description: data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`,
+      title: title,
+      description: description,
       url,
-      images: data.logo_url ? [{ url: data.logo_url }] : [],
+      images: finalOgImage ? [{ url: finalOgImage }] : [],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${data.name} Phones | TechTweak`,
-      description: data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`,
-      images: data.logo_url ? [data.logo_url] : [],
+      title: title,
+      description: description,
+      images: finalOgImage ? [finalOgImage] : [],
     }
   };
 }

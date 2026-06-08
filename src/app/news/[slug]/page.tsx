@@ -15,18 +15,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   await connectToDatabase();
   const slug = (await params).slug;
   const decodedSlug = decodeURIComponent(slug);
-  const post = await Post.findOne({ slug: decodedSlug }).lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
+  const post = await Post.findOne({ slug: decodedSlug })
+    .select("title excerpt meta_title meta_description featured_image og_title og_description twitter_title twitter_description canonical_url published_at")
+    .lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
 
   if (!post) {
     return { title: 'Post Not Found | TechTweak' };
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
-  const url = `${baseUrl}/news/${decodedSlug}`;
+  const url = post.canonical_url || `${baseUrl}/news/${decodedSlug}`;
+
+  const title = post.meta_title || `${post.title} | TechTweak`;
+  const description = post.meta_description || post.excerpt || `Read ${post.title} on TechTweak`;
 
   return {
-    title: post.meta_title || `${post.title} | TechTweak`,
-    description: post.meta_description || post.excerpt || `Read ${post.title} on TechTweak`,
+    title: title,
+    description: description,
     alternates: {
       canonical: url,
       languages: {
@@ -35,8 +40,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       },
     },
     openGraph: {
-      title: post.title,
-      description: post.meta_description || post.excerpt,
+      title: post.og_title || title,
+      description: post.og_description || description,
       url,
       images: post.featured_image ? [{ url: post.featured_image }] : [],
       type: 'article',
@@ -44,8 +49,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
-      description: post.meta_description || post.excerpt,
+      title: post.twitter_title || post.og_title || title,
+      description: post.twitter_description || post.og_description || description,
       images: post.featured_image ? [post.featured_image] : [],
     }
   };

@@ -1,13 +1,22 @@
+import { getSiteSettings } from "@/app/actions/settings";
+import SettingsForm from "@/components/admin/SettingsForm";
+
 export const metadata = {
-  title: 'Settings | TechTweak',
-  description: 'Explore the latest on TechTweak.',
+  title: 'Global Settings | TechTweak Admin',
+  description: 'Manage global configuration for TechTweak.',
 };
 
-export default function Page() {
+export default async function AdminSettingsPage() {
+  const initialSettings = await getSiteSettings();
+
   return (
-    <div className="min-h-screen py-24 px-4 container mx-auto">
-      <h1 className="text-4xl font-bold capitalize">settings</h1>
-      <p className="mt-4 text-slate-600">This page is under construction.</p>
+    <div className="space-y-8 pb-12">
+      <div>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Global Settings</h1>
+        <p className="text-slate-500 mt-2">Manage all website configurations, SEO, and social integrations from one place.</p>
+      </div>
+
+      <SettingsForm initialSettings={initialSettings || {}} />
     </div>
   );
 }

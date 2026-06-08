@@ -1,26 +1,31 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '@/lib/mongodb/mongoose';
-import Post from '@/lib/models/Post';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  await connectToDatabase();
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
 
-  const posts = await Post.find({ is_published: true })
-    .select('slug published_at')
-    .sort({ published_at: -1 })
-    .lean();
+  const staticPaths = [
+    '',
+    '/phones',
+    '/compare',
+    '/upcoming-phones',
+    '/news',
+    '/articles',
+    '/reviews',
+    '/best',
+    '/about',
+    '/contact'
+  ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${posts.map((post: any) => `
+  ${staticPaths.map((route) => `
   <url>
-    <loc>${baseUrl}/news/${post.slug}</loc>
-    <lastmod>${new Date(post.published_at || new Date()).toISOString()}</lastmod>
+    <loc>${baseUrl}${route}</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.7</priority>
+    <priority>${route === '' ? '1.0' : '0.8'}</priority>
   </url>`).join('')}
 </urlset>`;
 

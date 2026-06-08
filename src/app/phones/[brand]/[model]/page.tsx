@@ -12,41 +12,45 @@ import {
 import PhoneGallery from "@/components/phones/PhoneGallery";
 import SpecNavigation from "@/components/phones/SpecNavigation";
 import Link from "next/link";
+import { FileText } from "lucide-react";
+
+import { SEOEngine } from "@/lib/seo/SEOEngine";
+import { InternalLinkEngine } from "@/lib/seo/InternalLinkEngine";
+import EditorialContent from "@/components/phones/EditorialContent";
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string, model: string }> }) {
   const { brand, model } = await params;
   await connectToDatabase();
 
-  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description images og_image updated_at").lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
+  const data = await Phone.findOne({ slug: model })
+    .select("name meta_title meta_description images og_image og_title og_description twitter_title twitter_description canonical_url updated_at")
+    .lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
 
   if (!data) return { title: "Phone Not Found" };
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
-  const url = `${baseUrl}/phones/${brand}/${model}`;
-
-  const getOgImageUrl = (imgUrl: string) => {
-    if (!imgUrl) return undefined;
-    if (imgUrl.includes('res.cloudinary.com') && imgUrl.includes('/upload/')) {
-      return imgUrl.replace('/upload/', '/upload/w_1200,h_630,c_pad,b_white/');
-    }
-    return imgUrl;
-  };
-
-  const finalOgImage = getOgImageUrl(data.og_image) || getOgImageUrl(data.images?.[0]);
+  const fallbacks = SEOEngine.generatePhoneFallbacks(data, brand);
+  const url = data.canonical_url || fallbacks.canonical_url;
+  const title = data.meta_title || fallbacks.meta_title;
+  const description = data.meta_description || fallbacks.meta_description;
+  const finalOgImage = data.og_image || fallbacks.og_image;
 
   return {
-    title: data.meta_title || `${data.name} Specs, Review, and Price | TechTweak`,
-    description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
+    title: title,
+    description: description,
     alternates: {
       canonical: url,
       languages: {
+        'en-US': `${url}?region=us`,
+        'en-IN': `${url}?region=in`,
+        'en-GB': `${url}?region=gb`,
+        'en-BD': `${url}?region=bd`,
         'en': url,
         'x-default': url,
       },
     },
     openGraph: {
-      title: data.name,
-      description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
+      title: data.og_title || title,
+      description: data.og_description || description,
       url,
       images: finalOgImage ? [{ url: finalOgImage }] : [],
       type: 'article',
@@ -54,8 +58,8 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
     },
     twitter: {
       card: 'summary_large_image',
-      title: data.name,
-      description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
+      title: data.twitter_title || data.og_title || title,
+      description: data.twitter_description || data.og_description || description,
       images: finalOgImage ? [finalOgImage] : [],
     }
   };
@@ -107,54 +111,21 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       .join(" ");
   }
 
-  // Load suggested items from database
-  let dbSimilarPhones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
-  let dbSamePricePhones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
-  let dbComparePhones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+  // Load suggested items from database using the new InternalLinkEngine
+  let dbSimilarPhones: any[] = [];
+  let dbComparePhones: any[] = [];
+  let dbBrandNews: any[] = [];
 
   try {
-    // 1. Similar Phones query
-    dbSimilarPhones = await Phone.find({
-      brand_id: rawPhone.brand_id?._id || rawPhone.brand_id,
-      _id: { $ne: rawPhone._id },
-      is_published: true
-    })
-      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
-      .populate("brand_id", "name slug")
-      .limit(4)
-      .lean();
-
-    // 2. Price Match query
-    if (rawPhone.price_usd) {
-      const minPrice = rawPhone.price_usd * 0.8;
-      const maxPrice = rawPhone.price_usd * 1.2;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-      dbSamePricePhones = await Phone.find({
-        price_usd: { $gte: minPrice, $lte: maxPrice },
-        _id: { $ne: rawPhone._id },
-        is_published: true
-      })
-        .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
-        .populate("brand_id", "name slug")
-        .limit(4)
-        .lean();
-    }
-
-    // 3. Alternatives/Compare suggestions query
-    dbComparePhones = await Phone.find({
-      is_featured: true,
-      _id: { $ne: rawPhone._id },
-      is_published: true
-    })
-      .populate("brand_id", "name slug")
-      .limit(6)
-      .lean();
+    dbSimilarPhones = await InternalLinkEngine.getRelatedPhones(rawPhone, 4);
+    dbComparePhones = await InternalLinkEngine.getCompareSuggestions(rawPhone, 6);
+    dbBrandNews = await InternalLinkEngine.getBrandNews(rawPhone.brand_id?._id || rawPhone.brand_id, 3);
   } catch (err) {
-    console.error("Error querying recommendations:", err);
+    console.error("Error querying internal linking engine:", err);
   }
 
   // Consolidate suggestions
-  const similarSection = rawPhone.related_similar_ids?.length > 0 ? rawPhone.related_similar_ids : dbSimilarPhones.slice(0, 4);
+  const similarSection = rawPhone.related_similar_ids?.length > 0 ? rawPhone.related_similar_ids : dbSimilarPhones;
   const betterSection = rawPhone.related_better_ids?.length > 0 ? rawPhone.related_better_ids : dbComparePhones.slice(0, 4);
   const compareSection = rawPhone.related_compare_ids?.length > 0 ? rawPhone.related_compare_ids : dbComparePhones.slice(2, 6);
 
@@ -189,7 +160,15 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
         price: rawPhone.price_usd || "0.00",
         priceCurrency: "USD",
         availability: rawPhone.is_published ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
-      }
+      },
+      ...(rawPhone.verdict && {
+        review: {
+          "@type": "Review",
+          author: { "@type": "Organization", name: "TechTweak" },
+          reviewBody: rawPhone.verdict,
+          datePublished: rawPhone.release_date_parsed ? new Date(rawPhone.release_date_parsed).toISOString() : undefined,
+        }
+      })
     },
     {
       "@context": "https://schema.org",
@@ -424,7 +403,9 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
 
             {/* Left Main Content Column (Takes 8/12 of space) */}
-            <div className="lg:col-span-8 space-y-5 lg:space-y-8">
+            <div className="lg:col-span-8 space-y-5 lg:space-y-8 min-w-0">
+
+              <EditorialContent phone={rawPhone} />
 
               {/* General Info */}
               <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
@@ -437,12 +418,40 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                 <div className="divide-y divide-slate-100">
                   {/* Price rows with special styling */}
                   <div className="flex flex-col sm:flex-row p-5 text-sm">
-                    <div className="w-full sm:w-1/3 font-bold text-slate-800 uppercase tracking-wider text-[11px] self-center">Official Price</div>
-                    <div className="w-full sm:w-2/3 mt-1.5 sm:mt-0">
-                      {rawPhone.price_usd ? (
-                        <span className="font-black text-green-700 text-base">${rawPhone.price_usd.toLocaleString()} <span className="text-xs font-semibold text-green-500">(Official)</span></span>
-                      ) : (
-                        <span className="text-slate-400 font-semibold">Not specified</span>
+                    <div className="w-full sm:w-1/3 font-bold text-slate-800 uppercase tracking-wider text-[11px] self-center">Global Pricing</div>
+                    <div className="w-full sm:w-2/3 mt-1.5 sm:mt-0 flex flex-wrap gap-3">
+                      {rawPhone.price_usd && (
+                        <div className="bg-green-50 px-3 py-1.5 rounded-lg border border-green-100 flex items-center gap-1.5">
+                          <span className="font-black text-green-700">${rawPhone.price_usd.toLocaleString()}</span>
+                          <span className="text-[10px] font-bold text-green-600 uppercase tracking-wider">USD</span>
+                        </div>
+                      )}
+                      {rawPhone.price_inr && (
+                        <div className="bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100 flex items-center gap-1.5">
+                          <span className="font-black text-orange-700">₹{rawPhone.price_inr.toLocaleString()}</span>
+                          <span className="text-[10px] font-bold text-orange-600 uppercase tracking-wider">INR</span>
+                        </div>
+                      )}
+                      {rawPhone.price_bdt && (
+                        <div className="bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-100 flex items-center gap-1.5">
+                          <span className="font-black text-teal-700">৳{rawPhone.price_bdt.toLocaleString()}</span>
+                          <span className="text-[10px] font-bold text-teal-600 uppercase tracking-wider">BDT</span>
+                        </div>
+                      )}
+                      {rawPhone.price_eur && (
+                        <div className="bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 flex items-center gap-1.5">
+                          <span className="font-black text-blue-700">€{rawPhone.price_eur.toLocaleString()}</span>
+                          <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">EUR</span>
+                        </div>
+                      )}
+                      {rawPhone.price_gbp && (
+                        <div className="bg-purple-50 px-3 py-1.5 rounded-lg border border-purple-100 flex items-center gap-1.5">
+                          <span className="font-black text-purple-700">£{rawPhone.price_gbp.toLocaleString()}</span>
+                          <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider">GBP</span>
+                        </div>
+                      )}
+                      {!rawPhone.price_usd && !rawPhone.price_inr && !rawPhone.price_bdt && !rawPhone.price_eur && !rawPhone.price_gbp && (
+                        <span className="text-slate-400 font-semibold py-1.5">Price not announced yet</span>
                       )}
                     </div>
                   </div>
@@ -782,7 +791,33 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   </h3>
                   <div className="space-y-4">
                     {compareSection.map((p: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
-                      <SidebarPhoneRow key={p._id} phone={p} />
+                      <SidebarCompareRow key={p._id} targetPhone={p} currentSlug={rawPhone.slug} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Brand News */}
+              {dbBrandNews.length > 0 && (
+                <div className="bg-white rounded-[2rem] border border-slate-200 p-6 shadow-sm">
+                  <h3 className="text-sm font-black text-slate-900 mb-4 tracking-wider uppercase flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <FileText size={16} className="text-amber-500" /> Latest {brandName} News
+                  </h3>
+                  <div className="space-y-4">
+                    {dbBrandNews.map((news: any) => (
+                      <Link href={`/news/${news.slug}`} key={news._id} className="group block">
+                        <div className="flex gap-3 items-center">
+                          {news.featured_image && (
+                            <img src={news.featured_image.replace('/upload/', '/upload/w_100,h_100,c_fill/')} alt="" className="w-16 h-16 rounded-xl object-cover" />
+                          )}
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors line-clamp-2 leading-tight mb-1">{news.title}</h4>
+                            {news.published_at && (
+                              <div className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{new Date(news.published_at).toLocaleDateString()}</div>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -828,6 +863,44 @@ function SidebarPhoneRow({ phone }: { phone: any   /* eslint-disable-line @types
         <span className="text-xs font-black text-slate-900 mt-1 block">
           {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "TBA"}
         </span>
+      </div>
+    </Link>
+  );
+}
+// Minimalist list item row for the sidebar comparison links
+function SidebarCompareRow({ targetPhone, currentSlug }: { targetPhone: any, currentSlug: string }) {
+  return (
+    <Link
+      href={`/compare/${currentSlug}-vs-${targetPhone.slug}`}
+      className="group flex gap-3.5 items-center p-2 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-150 transition-all duration-200"
+    >
+      <div className="w-14 h-14 bg-white border border-slate-200/80 rounded-xl p-1 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden relative">
+        {targetPhone.images && targetPhone.images[0] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={targetPhone.images[0].replace('/upload/', '/upload/w_100,h_100,c_pad,b_white/')}
+            alt={targetPhone.name}
+            className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <Smartphone className="text-slate-300" size={20} />
+        )}
+        <div className="absolute -bottom-1 -right-1 bg-cyan-500 text-white p-0.5 rounded-md border border-white">
+          <GitCompare size={10} />
+        </div>
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <h4 className="text-xs font-bold text-slate-800 truncate group-hover:text-cyan-600 transition-colors">
+          vs {targetPhone.name}
+        </h4>
+        <div className="flex items-center gap-2 mt-1">
+          {targetPhone.price_usd ? (
+            <span className="text-[11px] font-black text-cyan-600">${targetPhone.price_usd}</span>
+          ) : (
+            <span className="text-[10px] font-semibold text-slate-400">TBA</span>
+          )}
+        </div>
       </div>
     </Link>
   );

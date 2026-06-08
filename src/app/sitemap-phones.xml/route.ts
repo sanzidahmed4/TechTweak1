@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb/mongoose';
-import Post from '@/lib/models/Post';
+import Phone from '@/lib/models/Phone';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,19 +8,20 @@ export async function GET() {
   await connectToDatabase();
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
 
-  const posts = await Post.find({ is_published: true })
-    .select('slug published_at')
-    .sort({ published_at: -1 })
+  const phones = await Phone.find({ is_published: true })
+    .select('slug updated_at brand_id')
+    .populate('brand_id', 'slug')
+    .sort({ created_at: -1 })
     .lean();
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${posts.map((post: any) => `
+  ${phones.map((phone: any) => `
   <url>
-    <loc>${baseUrl}/news/${post.slug}</loc>
-    <lastmod>${new Date(post.published_at || new Date()).toISOString()}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
+    <loc>${baseUrl}/phones/${phone.brand_id?.slug || 'brand'}/${phone.slug}</loc>
+    <lastmod>${new Date(phone.updated_at || new Date()).toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>`).join('')}
 </urlset>`;
 

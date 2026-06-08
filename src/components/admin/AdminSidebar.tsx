@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Smartphone, Building2, FileText, Image as ImageIcon, Settings, FolderTree, Sparkles } from "lucide-react";
+import { LayoutDashboard, Smartphone, Building2, FileText, Image as ImageIcon, Settings, FolderTree, Sparkles, LineChart, Share2 } from "lucide-react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -15,6 +15,14 @@ export default function AdminSidebar() {
     { name: "Categories", href: "/admin/categories", icon: FolderTree },
     { name: "Blogs", href: "/admin/blogs", icon: FileText },
     { name: "Media", href: "/admin/media", icon: ImageIcon },
+    { name: "SEO Hub", href: "/admin/seo", icon: LineChart },
+    { name: "— Keywords", href: "/admin/seo/keywords", icon: FileText, isSubItem: true },
+    { name: "— OG Manager", href: "/admin/seo/og-manager", icon: ImageIcon, isSubItem: true },
+    { name: "— Content", href: "/admin/seo/content", icon: FileText, isSubItem: true },
+    { name: "— Internal Links", href: "/admin/seo/internal-links", icon: FileText, isSubItem: true },
+    { name: "— Technical", href: "/admin/seo/technical", icon: FileText, isSubItem: true },
+    { name: "— Search Performance", href: "/admin/seo/performance", icon: LineChart, isSubItem: true },
+    { name: "— Authority & Links", href: "/admin/seo/authority", icon: Share2, isSubItem: true },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
 
@@ -40,13 +48,15 @@ export default function AdminSidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-sm font-medium ${
+              className={`flex items-center gap-3 py-3 rounded-xl transition-colors font-medium ${
+                item.isSubItem ? "px-8 text-[13px]" : "px-4 text-sm"
+              } ${
                 isActive 
-                  ? "bg-primary text-white shadow-md shadow-primary/20" 
+                  ? (item.isSubItem ? "text-primary font-bold" : "bg-primary text-white shadow-md shadow-primary/20") 
                   : "hover:bg-slate-800 hover:text-white"
               }`}
             >
-              <item.icon size={18} />
+              {!item.isSubItem && <item.icon size={18} />}
               {item.name}
             </Link>
           );
