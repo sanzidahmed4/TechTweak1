@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { UploadCloud, X, FolderSync } from "lucide-react";
 import { CldUploadWidget } from 'next-cloudinary';
 
@@ -105,8 +106,13 @@ export default function ImageUploader({
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
             {images.map((img, idx) => (
               <div key={idx} className="aspect-[3/4] bg-slate-100 rounded-xl border border-slate-200 relative group overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img} alt={`Preview ${idx}`} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = '/placeholder.png')} />
+                <Image
+                  src={img}
+                  alt={`Preview ${idx}`}
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                  className="object-cover"
+                />
                 
                 <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <button 

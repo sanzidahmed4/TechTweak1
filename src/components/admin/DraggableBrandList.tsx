@@ -19,6 +19,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Loader2 } from "lucide-react";
+import Image from "next/image";
 import BrandActions from "./BrandActions";
 import { updateBrandsOrder } from "@/app/admin/brands/actions";
 import { useRouter } from "next/navigation";
@@ -70,8 +71,9 @@ function SortableBrandRow({ brand }: { brand: BrandItem }) {
         {/* Brand Info */}
         <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 border border-slate-200 overflow-hidden shrink-0">
           {brand.logo_url ? (
-             // eslint-disable-next-line @next/next/no-img-element
-            <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
+            <div className="w-full h-full relative">
+              <Image src={brand.logo_url} alt={brand.name} fill className="object-cover" sizes="48px" />
+            </div>
           ) : (
             <span className="font-bold text-lg text-slate-400">{brand.name.charAt(0)}</span>
           )}
@@ -152,8 +154,9 @@ export default function DraggableBrandList({ initialBrands }: { initialBrands: B
               </div>
               <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 border border-slate-200 overflow-hidden shrink-0">
                 {brand.logo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-cover" />
+                  <div className="w-full h-full relative">
+                    <Image src={brand.logo_url} alt={brand.name} fill className="object-cover" sizes="48px" />
+                  </div>
                 ) : (
                   <span className="font-bold text-lg text-slate-400">{brand.name.charAt(0)}</span>
                 )}

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb/mongoose';
 import Phone from '@/lib/models/Phone';
-import { MockGSCService } from '@/lib/seo/MockGSCService';
+import { GSCService } from '@/lib/seo/GSCService';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,8 +9,8 @@ export async function POST() {
   try {
     await connectToDatabase();
 
-    // 1. Fetch data from Mock GSC
-    const gscData = await MockGSCService.fetchPerformanceData();
+    // 1. Fetch data from Google Search Console
+    const gscData = await GSCService.fetchPerformanceData();
 
     // 2. Synchronize with Database
     let updatedCount = 0;

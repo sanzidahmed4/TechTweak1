@@ -3,11 +3,13 @@
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronRight, Smartphone } from 'lucide-react';
 import { useCallback } from 'react';
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 
 export default function TrendingCarousel({ phones }: { phones: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' }, [Autoplay({ delay: 4000 })]);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' }, [Autoplay({ delay: 4000, stopOnMouseEnter: true, stopOnInteraction: false })]);
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev()
@@ -19,7 +21,7 @@ export default function TrendingCarousel({ phones }: { phones: any /* eslint-dis
 
   return (
     <div className="relative">
-      <div className="overflow-hidden" ref={emblaRef}>
+      <div className="overflow-hidden py-4 -my-4" ref={emblaRef}>
         <div className="flex -ml-4">
           {phones.map((phone, idx) => (
             <div key={idx} className="flex-[0_0_65%] min-w-0 sm:flex-[0_0_40%] md:flex-[0_0_33.33%] lg:flex-[0_0_25%] pl-3 sm:pl-4">
@@ -27,10 +29,18 @@ export default function TrendingCarousel({ phones }: { phones: any /* eslint-dis
                 <div className="absolute top-3 right-3 bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full z-10">
                   Trending
                 </div>
-                <div className="w-full aspect-[4/5] bg-slate-50 rounded-2xl mb-4 relative overflow-hidden flex items-center justify-center group-hover:scale-105 smooth-transition p-2">
+                <div className="w-full aspect-[4/5] bg-slate-50 rounded-2xl mb-4 relative overflow-hidden flex items-center justify-center group-hover:scale-105 smooth-transition">
                   {phone.images && phone.images.length > 0 ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-contain" />
+                    <Image 
+                      src={phone.images[0] || FALLBACK_IMAGE} 
+                      alt={`${phone.name} Trending Official Image`}
+                      fill
+                      className="object-cover group-hover:scale-105 smooth-transition"
+                      sizes="(max-width: 640px) 65vw, (max-width: 768px) 40vw, (max-width: 1024px) 33vw, 25vw"
+                      priority={idx < 4}
+                      placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+                      blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
+                    />
                   ) : (
                     <Smartphone size={32} className="text-slate-300" />
                   )}
@@ -41,7 +51,7 @@ export default function TrendingCarousel({ phones }: { phones: any /* eslint-dis
                   <div className="pt-3 flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-base font-bold text-slate-900">
-                        {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'TBA'}
+                        {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'Not Announced Yet')}
                       </span>
                     </div>
                     <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 group-hover:bg-primary group-hover:text-white smooth-transition">

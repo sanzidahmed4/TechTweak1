@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect } from "react";
 import { Smartphone, Maximize2, X, ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL, getDynamicAltText } from "@/lib/utils/image";
 
 export default function PhoneGallery({ images, name }: { images: string[], name: string }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -86,13 +88,15 @@ export default function PhoneGallery({ images, name }: { images: string[], name:
             <div className="flex touch-pan-y">
               {images.map((img, i) => (
                 <div key={i} className="flex-[0_0_100%] min-w-0 aspect-square sm:aspect-[4/5] relative flex items-center justify-center bg-slate-50">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
-                    src={img} 
-                    alt={`${name} - View ${i + 1}`} 
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
-                    loading={i === 0 ? "eager" : "lazy"}
-                    fetchPriority={i === 0 ? "high" : "auto"}
+                  <Image 
+                    src={img || FALLBACK_IMAGE} 
+                    alt={getDynamicAltText(name, i)} 
+                    fill
+                    sizes="(max-width: 640px) 100vw, 400px"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
+                    priority={i === 0}
+                    placeholder={getCloudinaryBlurUrl(img) ? "blur" : "empty"}
+                    blurDataURL={getCloudinaryBlurUrl(img) || defaultBlurDataURL}
                   />
                 </div>
               ))}
@@ -142,8 +146,17 @@ export default function PhoneGallery({ images, name }: { images: string[], name:
                       selectedIndex === i ? "border-primary scale-105 shadow-md shadow-primary/20" : "border-transparent opacity-60 hover:opacity-100 border-slate-200"
                     }`}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img} alt={`Thumbnail ${i}`} className="w-full h-full object-cover drop-shadow-sm" />
+                    <div className="relative w-full h-full">
+                      <Image 
+                        src={img || FALLBACK_IMAGE} 
+                        alt={`${name} thumbnail ${i + 1}`} 
+                        fill 
+                        sizes="96px"
+                        className="object-cover drop-shadow-sm" 
+                        placeholder={getCloudinaryBlurUrl(img) ? "blur" : "empty"}
+                        blurDataURL={getCloudinaryBlurUrl(img) || defaultBlurDataURL}
+                      />
+                    </div>
                   </button>
                 ))}
               </div>
@@ -185,8 +198,14 @@ export default function PhoneGallery({ images, name }: { images: string[], name:
                 <div className="flex h-full items-center">
                   {images.map((img, idx) => (
                     <div key={idx} className="flex-[0_0_100%] min-w-0 h-full flex items-center justify-center relative p-4">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={img} alt={`Fullscreen ${idx}`} className="max-w-full max-h-[85vh] object-contain drop-shadow-2xl" />
+                      <Image 
+                        src={img || FALLBACK_IMAGE} 
+                        alt={`${name} fullscreen view ${idx + 1}`} 
+                        fill 
+                        sizes="100vw"
+                        className="object-contain drop-shadow-2xl" 
+                        priority={idx === selectedIndex}
+                      />
                     </div>
                   ))}
                 </div>

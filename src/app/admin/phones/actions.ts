@@ -3,7 +3,7 @@
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import ActivityLog from "@/lib/models/ActivityLog";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import slugify from "slugify";
 import { redirect } from "next/navigation";
 
@@ -98,7 +98,17 @@ export async function addPhone(formData: FormData) {
     brand_id,
     is_published: formData.get("is_published") === "on",
     is_featured: formData.get("is_featured") === "on",
-    upcoming: formData.get("upcoming") === "on",
+    upcoming: formData.get("upcoming") === "on", // legacy
+    phone_status: formData.get("phone_status") as string || "released",
+    
+    // New Ecosystem Fields
+    price_display_text: formData.get("price_display_text") as string,
+    price_status: formData.get("price_status") as string || "official",
+    expected_launch_date: formData.get("expected_launch_date") as string,
+    launch_quarter: formData.get("launch_quarter") as string,
+    launch_year: parseSafeNumber(formData.get("launch_year")),
+    leak_confidence: formData.get("leak_confidence") as string,
+
     is_official: formData.get("is_official") === "on",
     release_date: formData.get("release_date") || null,
     release_date_parsed: parseReleaseDate(formData.get("release_date") as string),
@@ -289,6 +299,9 @@ export async function addPhone(formData: FormData) {
   revalidatePath("/phones");
   revalidatePath("/compare");
   revalidatePath("/phones/[brand]", "page");
+  revalidateTag("phones", "max");
+  revalidateTag("featured-phones", "max");
+  revalidateTag("upcoming-phones", "max");
 
   redirect("/admin/phones");
 }
@@ -348,7 +361,17 @@ export async function editPhone(id: string, formData: FormData) {
     brand_id,
     is_published: formData.get("is_published") === "on",
     is_featured: formData.get("is_featured") === "on",
-    upcoming: formData.get("upcoming") === "on",
+    upcoming: formData.get("upcoming") === "on", // legacy
+    phone_status: formData.get("phone_status") as string || "released",
+    
+    // New Ecosystem Fields
+    price_display_text: formData.get("price_display_text") as string,
+    price_status: formData.get("price_status") as string || "official",
+    expected_launch_date: formData.get("expected_launch_date") as string,
+    launch_quarter: formData.get("launch_quarter") as string,
+    launch_year: parseSafeNumber(formData.get("launch_year")),
+    leak_confidence: formData.get("leak_confidence") as string,
+
     is_official: formData.get("is_official") === "on",
     release_date: formData.get("release_date") || null,
     release_date_parsed: parseReleaseDate(formData.get("release_date") as string),
@@ -541,6 +564,9 @@ export async function editPhone(id: string, formData: FormData) {
   revalidatePath("/compare");
   revalidatePath("/phones/[brand]", "page");
   revalidatePath("/phones/[brand]/[model]", "page");
+  revalidateTag("phones", "max");
+  revalidateTag("featured-phones", "max");
+  revalidateTag("upcoming-phones", "max");
 
   const returnUrl = formData.get("returnUrl") as string;
   if (returnUrl) {

@@ -22,12 +22,12 @@ export default async function PhonesPage() {
 
   try {
     // Fetch phones with brand info
-    const rawPhones = await Phone.find({ is_published: true })
+    const rawPhones = await Phone.find({ is_published: true, phone_status: 'released' })
       .populate('brand_id', 'name slug')
       .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .lean();
 
-    totalCount = await Phone.countDocuments({ is_published: true });
+    totalCount = await Phone.countDocuments({ is_published: true, phone_status: 'released' });
 
     phones = rawPhones.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),
@@ -51,7 +51,7 @@ export default async function PhonesPage() {
     // Fetch brands with phone count
     const rawBrands = await Brand.find().sort({ order: 1 }).lean();
     const brandCounts = await Phone.aggregate([
-      { $match: { is_published: true } },
+      { $match: { is_published: true, phone_status: 'released' } },
       { $group: { _id: "$brand_id", count: { $sum: 1 } } },
     ]);
     const countMap: Record<string, number> = {};

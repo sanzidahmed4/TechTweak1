@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -102,19 +102,34 @@ export default function CategoriesDropdown({
                   {/* Category grid */}
                   <div className="flex-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-1">
                     {categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        href={`/phones?category=${cat.slug}`}
-                        onClick={() => setIsOpen(false)}
-                        className="group flex flex-col py-3 border-b border-slate-100 hover:border-transparent transition-all"
-                      >
-                        <span className="text-[15px] font-medium text-slate-800 group-hover:text-primary transition-colors">
-                          {cat.name}
-                        </span>
-                        <span className="text-[12px] text-slate-400 mt-0.5 group-hover:text-primary/60 transition-colors">
-                          Explore phones →
-                        </span>
-                      </Link>
+                      <React.Fragment key={cat.id}>
+                        <Link
+                          href={`/phones?category=${cat.slug}`}
+                          onClick={() => setIsOpen(false)}
+                          className="group flex flex-col py-3 border-b border-slate-100 hover:border-transparent transition-all"
+                        >
+                          <span className="text-[15px] font-medium text-slate-800 group-hover:text-primary transition-colors">
+                            {cat.name}
+                          </span>
+                          <span className="text-[12px] text-slate-400 mt-0.5 group-hover:text-primary/60 transition-colors">
+                            Explore phones →
+                          </span>
+                        </Link>
+                        {cat.slug === "announcements" && (
+                          <Link
+                            href="/upcoming-phones"
+                            onClick={() => setIsOpen(false)}
+                            className="group flex flex-col py-3 border-b border-slate-100 hover:border-transparent transition-all"
+                          >
+                            <span className="text-[15px] font-medium text-slate-800 group-hover:text-primary transition-colors">
+                              Upcoming Phones
+                            </span>
+                            <span className="text-[12px] text-slate-400 mt-0.5 group-hover:text-primary/60 transition-colors">
+                              Explore phones →
+                            </span>
+                          </Link>
+                        )}
+                      </React.Fragment>
                     ))}
                     {categories.length === 0 && (
                       <p className="text-sm text-slate-400 col-span-4">Loading…</p>

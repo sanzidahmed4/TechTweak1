@@ -1,18 +1,23 @@
 import Hero from "@/components/home/Hero";
-import TrendingCarousel from "@/components/home/TrendingCarousel";
 import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
+import Image from "next/image";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 import { ArrowRight, Cpu, Battery, Camera, Zap, CheckCircle2, Smartphone, FileText } from "lucide-react";
 import connectToDatabase from "@/lib/mongodb/mongoose";
-import Phone from "@/lib/models/Phone";
 import Post from "@/lib/models/Post";
 import "@/lib/models/Category";
+import dynamic from 'next/dynamic';
 
 import AIRecommendation from "@/components/phones/AIRecommendation";
 import type { PhoneData } from "@/components/phones/PhonesClientPage";
-import UpcomingCarousel from "@/components/home/UpcomingCarousel";
+import { getFeaturedPhones, getUpcomingPhones } from "@/lib/services/phoneService";
 
-export const revalidate = 3600; // Enable ISR (1 hour caching), invalidated instantly on admin actions
+// Dynamic imports for heavy components
+const TrendingCarousel = dynamic(() => import('@/components/home/TrendingCarousel'), { ssr: true });
+const UpcomingCarousel = dynamic(() => import('@/components/home/UpcomingCarousel'), { ssr: true });
+
+export const revalidate = 1800; // ISR (30 minutes)
 
 // --- DTO Interfaces ---
 interface IBrandSummary {
@@ -27,6 +32,10 @@ export interface IPhoneSummary {
   brands: IBrandSummary;
   price_usd: number;
   images: string[];
+  price_display_text?: string;
+  phone_status?: string;
+  expected_launch_date?: string;
+  leak_confidence?: string;
 }
 
 interface ICategorySummary {
@@ -49,7 +58,22 @@ type RawPhone = {
   slug: string;
   brand_id?: IBrandSummary;
   price_usd: number;
+  price_bdt?: number;
   images: string[];
+  price_display_text?: string;
+  phone_status?: string;
+  expected_launch_date?: string;
+  leak_confidence?: string;
+  display?: string;
+  processor?: string;
+  ram?: string;
+  storage?: string;
+  camera_main?: string;
+  battery?: string;
+  network?: string;
+  is_featured?: boolean;
+  release_date?: string;
+  antutu_score?: number;
 };
 
 type RawPost = {
@@ -70,11 +94,7 @@ export default async function Home() {
   let aiPhones: PhoneData[] = [];
   
   try {
-    const rawPhones = (await Phone.find({ is_published: true, upcoming: { $ne: true } })
-      .populate('brand_id', 'name slug')
-      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
-      .limit(50)
-      .lean()) as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as RawPhone[];
+    const rawPhones = await getFeaturedPhones(50) as RawPhone[];
       
     featuredPhones = rawPhones.slice(0, 10).map((p: any) => ({
       id: p._id.toString(),
@@ -82,10 +102,16 @@ export default async function Home() {
       slug: p.slug,
       brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
       price_usd: p.price_usd || 0,
-      images: p.images || []
+      images: p.images || [],
+      price_display_text: p.price_display_text,
+      phone_status: p.phone_status,
+      expected_launch_date: p.expected_launch_date,
+      leak_confidence: p.leak_confidence
     }));
 
-    aiPhones = rawPhones.map((p: any) => ({
+    const rawUpcoming = await getUpcomingPhones(10) as RawPhone[];
+      
+    aiPhones = [...rawPhones, ...rawUpcoming].map((p: any) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,
@@ -103,21 +129,20 @@ export default async function Home() {
       is_featured: p.is_featured || false,
       release_date: p.release_date || null,
       antutu_score: p.antutu_score || null,
+      phone_status: p.phone_status || 'released'
     }));
-
-    const rawUpcoming = (await Phone.find({ is_published: true, upcoming: true })
-      .populate('brand_id', 'name slug')
-      .sort({ release_date_parsed: -1, name: 1 })
-      .limit(10)
-      .lean()) as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as RawPhone[];
       
-    upcomingPhones = rawUpcoming.map((p) => ({
+    upcomingPhones = rawUpcoming.map((p: any) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,
       brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
       price_usd: p.price_usd || 0,
-      images: p.images || []
+      images: p.images || [],
+      price_display_text: p.price_display_text,
+      phone_status: p.phone_status,
+      expected_launch_date: p.expected_launch_date,
+      leak_confidence: p.leak_confidence
     }));
 
     const rawPosts = (await Post.find({ is_published: true })
@@ -324,8 +349,15 @@ export default async function Home() {
                 <Link href={`/news/${article.slug}`} key={article.id} className="group block">
                   <div className="w-full aspect-video bg-slate-200 rounded-3xl mb-6 overflow-hidden relative">
                     {article.featured_image ? (
-                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={article.featured_image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 smooth-transition" />
+                      <Image 
+                        src={article.featured_image || FALLBACK_IMAGE} 
+                        alt={article.title} 
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover group-hover:scale-105 smooth-transition" 
+                        placeholder={getCloudinaryBlurUrl(article.featured_image) ? "blur" : "empty"}
+                        blurDataURL={getCloudinaryBlurUrl(article.featured_image) || defaultBlurDataURL}
+                      />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-slate-400">Image</div>
                     )}

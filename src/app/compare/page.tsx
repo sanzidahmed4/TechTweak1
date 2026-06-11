@@ -1,6 +1,8 @@
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import Link from "next/link";
+import Image from "next/image";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Search, Plus, X, Smartphone, Check, Zap } from "lucide-react";
 import CompareAddButton from "@/components/compare/CompareAddButton";
@@ -76,7 +78,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   ];
 
   return (
-    <div className="bg-slate-50 min-h-screen pt-24 pb-20">
+    <div className="bg-slate-50 min-h-screen pt-20 pb-20">
       {/* =========================================
           EMPTY STATE HEADER (When 0 phones selected)
           ========================================= */}
@@ -129,8 +131,15 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                   </Link>
                   <div className="w-12 h-16 mx-auto bg-slate-50 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-slate-100">
                     {phone.images && phone.images[0] ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-cover" />
+                      <Image 
+                        src={phone.images[0] || FALLBACK_IMAGE} 
+                        alt={phone.name} 
+                        fill
+                        sizes="48px"
+                        className="object-cover" 
+                        placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+                        blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
+                      />
                     ) : (
                       <Smartphone size={20} className="text-slate-300" />
                     )}
@@ -172,8 +181,15 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                   </Link>
                   <div className="w-10 h-10 shrink-0 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-slate-100 p-1">
                     {phone.images && phone.images[0] ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-contain" />
+                      <Image 
+                        src={phone.images[0] || FALLBACK_IMAGE} 
+                        alt={phone.name} 
+                        fill
+                        sizes="40px"
+                        className="object-contain" 
+                        placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+                        blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
+                      />
                     ) : (
                       <Smartphone size={16} className="text-slate-300" />
                     )}
@@ -213,8 +229,17 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                       <th key={idx} className={`p-3 text-center align-bottom border-slate-100 ${idx < comparedPhones.length - 1 ? 'border-r' : ''}`}>
                         <div className="w-16 h-20 mx-auto bg-white rounded-xl mb-3 flex items-center justify-center overflow-hidden border border-slate-100 p-1 shadow-sm">
                           {phone.images && phone.images[0] ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-contain" />
+                            <div className="relative w-full h-full">
+                              <Image 
+                                src={phone.images[0] || FALLBACK_IMAGE} 
+                                alt={phone.name} 
+                                fill
+                                sizes="64px"
+                                className="object-contain" 
+                                placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+                                blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
+                              />
+                            </div>
                           ) : (
                             <Smartphone size={24} className="text-slate-300" />
                           )}

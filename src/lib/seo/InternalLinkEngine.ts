@@ -2,13 +2,19 @@ import Phone from "@/lib/models/Phone";
 import Brand from "@/lib/models/Brand";
 import Post from "@/lib/models/Post";
 
+export interface InternalLinkPhoneDoc {
+  _id: unknown;
+  brand_id?: unknown;
+  price_bdt?: number;
+}
+
 export class InternalLinkEngine {
   /**
    * Dynamically fetch related phones based on context to maximize internal linking.
    * Prioritizes same brand, then similar price, then similar performance tier.
    */
-  static async getRelatedPhones(currentPhone: any, limit: number = 4) {
-    const query: any = { _id: { $ne: currentPhone._id } };
+  static async getRelatedPhones(currentPhone: InternalLinkPhoneDoc, limit: number = 4) {
+    const query: Record<string, unknown> = { _id: { $ne: currentPhone._id } };
 
     // Find phones from the same brand
     if (currentPhone.brand_id) {
@@ -46,7 +52,7 @@ export class InternalLinkEngine {
    * Suggests competitor phones for comparison pages (e.g. VS pages).
    * Finds phones from DIFFERENT brands with similar specs/price.
    */
-  static async getCompareSuggestions(currentPhone: any, limit: number = 4) {
+  static async getCompareSuggestions(currentPhone: InternalLinkPhoneDoc, limit: number = 4) {
     if (!currentPhone.price_bdt) return [];
 
     const minPrice = currentPhone.price_bdt * 0.8;
@@ -71,7 +77,7 @@ export class InternalLinkEngine {
   static async getBrandNews(brandId: string | undefined, limit: number = 3) {
     if (!brandId) return [];
 
-    const brand = await Brand.findById(brandId).lean() as any;
+    const brand = await Brand.findById(brandId).lean() as { name: string } | null;
     if (!brand) return [];
 
     // Search for posts mentioning the brand in the title or tags

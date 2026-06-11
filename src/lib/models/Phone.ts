@@ -20,7 +20,16 @@ export interface IPhone extends Document {
   release_date_parsed?: Date | null;
   is_published: boolean;
   is_featured: boolean;
-  upcoming?: boolean;
+  upcoming?: boolean; // legacy, keeping for backward compatibility temporarily
+  phone_status?: string;
+  
+  // New Ecosystem Fields
+  price_display_text?: string;
+  price_status?: string;
+  expected_launch_date?: string;
+  launch_quarter?: string;
+  launch_year?: number;
+  leak_confidence?: string;
   colors?: string[];
   model_number?: string;
   made_in?: string;
@@ -200,7 +209,16 @@ const PhoneSchema: Schema = new Schema({
   release_date_parsed: { type: Date, default: null },
   is_published: { type: Boolean, default: false },
   is_featured: { type: Boolean, default: false },
-  upcoming: { type: Boolean, default: false },
+  upcoming: { type: Boolean, default: false }, // legacy
+  phone_status: { type: String, enum: ['released', 'upcoming', 'rumored', 'draft', 'cancelled'], default: 'released' },
+  
+  // New Ecosystem Fields
+  price_display_text: { type: String },
+  price_status: { type: String, enum: ['official', 'expected', 'rumored', 'unannounced', 'discontinued'], default: 'official' },
+  expected_launch_date: { type: String },
+  launch_quarter: { type: String },
+  launch_year: { type: Number },
+  leak_confidence: { type: String, enum: ['low', 'moderate', 'high', 'officially_confirmed'] },
   colors: { type: [String], default: [] },
   model_number: { type: String },
   made_in: { type: String },
@@ -357,5 +375,12 @@ const PhoneSchema: Schema = new Schema({
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });
+
+// --- Enterprise MongoDB Indexes for Performance & Search ---
+PhoneSchema.index({ is_published: 1, phone_status: 1, release_date_parsed: -1 });
+PhoneSchema.index({ brand_id: 1, phone_status: 1 });
+PhoneSchema.index({ phone_status: 1, launch_year: 1, launch_quarter: 1 }); // For upcoming filtering
+PhoneSchema.index({ brand_id: 1, name: 1 }); // For autocomplete & suggestions
+PhoneSchema.index({ name: 'text' }); // Primary text search
 
 export default mongoose.models.Phone || mongoose.model<IPhone>('Phone', PhoneSchema);

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Smartphone, Globe, Mail, MessageCircle, Share2 } from "lucide-react";
+import { Globe, Mail, MessageCircle, Share2 } from "lucide-react";
 
 export default function Footer() {
   return (

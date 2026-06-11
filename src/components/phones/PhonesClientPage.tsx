@@ -38,6 +38,10 @@ export interface PhoneData {
   is_featured: boolean;
   release_date: string | null;
   antutu_score: number | null;
+  price_display_text?: string;
+  phone_status?: string;
+  expected_launch_date?: string;
+  leak_confidence?: string;
 }
 
 export interface FilterState {
@@ -236,7 +240,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
   return (
     <div className="min-h-screen bg-[#f8faff]">
       {/* ── Page Header — Clean, compact, no dark bg ── */}
-      <div className="bg-white border-b border-slate-100 pt-24 pb-6">
+      <div className="bg-white border-b border-slate-100 pt-20 pb-6">
         <div className="container mx-auto px-4 lg:px-8">
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-slate-400 text-xs mb-4">

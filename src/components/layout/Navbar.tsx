@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, X, Smartphone, Home, Scale, Search } from "lucide-react";
+import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import NavbarSearch from "./NavbarSearch";
@@ -29,7 +29,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
 
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function Navbar() {
         }`}
       >
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-20 gap-4 lg:gap-8">
+          <div className="flex items-center justify-between h-14 sm:h-16 gap-4 lg:gap-8">
             <Link href="/" className="flex items-center gap-3 group" onClick={() => setMobileMenuOpen(false)}>
               <div className="relative w-8 h-8 md:w-10 md:h-10">
                 <Image src="/sitelogo.svg" alt="TechTweak Logo" fill className="object-contain" />
@@ -104,43 +104,60 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Top Mobile Dropdown Menu (Overlay) */}
+        {/* Right-Side Mobile Drawer */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-slate-100 overflow-hidden bg-white/95 backdrop-blur-xl absolute top-full left-0 w-full shadow-xl"
-            >
-              <div className="p-4 flex flex-col gap-2 max-h-[calc(100vh-64px)] overflow-y-auto">
-                {mobileNavLinks.map((link) => {
-                  const active = isActive(link.href);
-                  return (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      className={`text-lg font-medium p-3 rounded-xl transition-colors ${
-                        active
-                          ? "text-primary bg-primary/5 font-semibold"
-                          : "text-slate-700 hover:text-primary hover:bg-slate-50"
-                      }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {link.name}
-                    </Link>
-                  );
-                })}
-                <div className="h-px bg-slate-100 my-2" />
-                <Link
-                  href="/compare"
-                  className="bg-primary text-white font-medium text-center py-4 rounded-xl mt-2 shadow-md shadow-primary/20 min-h-[44px]"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Compare Phones
-                </Link>
-              </div>
-            </motion.div>
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMobileMenuOpen(false)}
+                className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-[60] md:hidden"
+              />
+              
+              {/* Drawer */}
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="fixed top-0 right-0 h-[100dvh] w-4/5 max-w-[320px] bg-white z-[70] shadow-2xl flex flex-col md:hidden"
+              >
+                {/* Drawer Header */}
+                <div className="p-4 flex items-center justify-between border-b border-slate-100">
+                  <span className="font-bold text-lg text-slate-900">Menu</span>
+                  <button 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="p-2 -mr-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+
+                {/* Drawer Content */}
+                <div className="p-4 flex flex-col gap-2 flex-1 overflow-y-auto custom-scrollbar">
+                  {mobileNavLinks.map((link) => {
+                    const active = isActive(link.href);
+                    return (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        className={`text-lg font-medium p-3 rounded-xl transition-colors ${
+                          active
+                            ? "text-primary bg-primary/5 font-semibold"
+                            : "text-slate-700 hover:text-primary hover:bg-slate-50"
+                        }`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {link.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </header>

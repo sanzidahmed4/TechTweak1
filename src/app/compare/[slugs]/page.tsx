@@ -144,7 +144,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
                 </div>
                 <h2 className="font-bold text-lg md:text-xl text-slate-900 group-hover:text-primary transition-colors">{phone1.name}</h2>
                 <div className="text-primary font-black mt-2">
-                  {phone1.price_usd ? `$${phone1.price_usd}` : 'TBA'}
+                  {phone1.price_display_text || (phone1.price_usd ? `$${phone1.price_usd}` : 'Not Announced Yet')}
                 </div>
               </div>
 
@@ -160,7 +160,7 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
                 </div>
                 <h2 className="font-bold text-lg md:text-xl text-slate-900 group-hover:text-purple-600 transition-colors">{phone2.name}</h2>
                 <div className="text-purple-600 font-black mt-2">
-                  {phone2.price_usd ? `$${phone2.price_usd}` : 'TBA'}
+                  {phone2.price_display_text || (phone2.price_usd ? `$${phone2.price_usd}` : 'Not Announced Yet')}
                 </div>
               </div>
             </div>

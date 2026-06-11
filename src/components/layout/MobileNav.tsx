@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Smartphone, Search, Scale, Menu, X } from "lucide-react";
+import { Home, Smartphone, Scale, Menu, X } from "lucide-react";
 
 export default function MobileNav() {
   const pathname = usePathname();
@@ -32,7 +32,7 @@ export default function MobileNav() {
 
   useEffect(() => {
     // Listen for state changes from the main Navbar to sync the Menu/X icon
-    const handleMenuState = (e: any) => setIsMenuOpen(e.detail);
+    const handleMenuState = (e: Event) => setIsMenuOpen((e as CustomEvent).detail);
     window.addEventListener("mobile-menu-state-change", handleMenuState);
     return () => window.removeEventListener("mobile-menu-state-change", handleMenuState);
   }, []);

@@ -1,8 +1,29 @@
+export interface SEODoc {
+  meta_title?: string;
+  meta_description?: string;
+  canonical_url?: string;
+  primary_keyword?: string;
+  secondary_keywords?: string[];
+  question_keywords?: string[];
+  og_image?: string;
+  og_title?: string;
+  twitter_title?: string;
+  verdict?: string;
+  faqs?: unknown[];
+  logo_url?: string;
+  description?: string;
+  content?: string;
+  featured_image?: string;
+  name?: string;
+  slug?: string;
+  images?: string[];
+}
+
 export class SEOEngine {
   /**
    * Calculates a dynamic SEO score (0-100) based on populated fields.
    */
-  static calculateScore(doc: any, type: 'phone' | 'brand' | 'post'): number {
+  static calculateScore(doc: SEODoc, type: 'phone' | 'brand' | 'post'): number {
     let score = 0;
     
     // Core Metadata (Critical - 40 points)
@@ -48,8 +69,8 @@ export class SEOEngine {
    * Generates programmatic fallbacks for empty SEO fields on a Phone.
    * Does NOT overwrite existing manual data.
    */
-  static generatePhoneFallbacks(phone: any, brandName: string) {
-    const fallbacks: any = {};
+  static generatePhoneFallbacks(phone: SEODoc, brandName: string) {
+    const fallbacks: Partial<SEODoc> = {};
 
     // Generate Meta Title Fallback
     if (!phone.meta_title) {

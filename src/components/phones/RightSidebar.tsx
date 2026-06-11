@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { TrendingUp, GitCompare, Newspaper, Trophy, Smartphone } from "lucide-react";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 import type { PhoneData } from "./PhonesClientPage";
 
 interface Props {
@@ -129,10 +131,17 @@ export default function RightSidebar({ latestNews, trendingPhones }: Props) {
           <div className="p-4 space-y-3">
             {latestNews.slice(0, 3).map((post) => (
               <Link key={post.slug} href={`/news/${post.slug}`} className="flex gap-3 group">
-                <div className="w-14 h-14 rounded-xl bg-slate-100 shrink-0 overflow-hidden flex items-center justify-center">
+                <div className="w-14 h-14 rounded-xl bg-slate-100 shrink-0 overflow-hidden flex items-center justify-center relative">
                   {post.featured_image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover" />
+                    <Image
+                      src={post.featured_image || FALLBACK_IMAGE}
+                      alt={post.title}
+                      fill
+                      className="object-cover"
+                      sizes="56px"
+                      placeholder={getCloudinaryBlurUrl(post.featured_image) ? "blur" : "empty"}
+                      blurDataURL={getCloudinaryBlurUrl(post.featured_image) || defaultBlurDataURL}
+                    />
                   ) : (
                     <Smartphone size={20} className="text-slate-400" />
                   )}

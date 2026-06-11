@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X, Image as ImageIcon } from "lucide-react";
 import { CldUploadWidget } from 'next-cloudinary';
 
@@ -33,8 +34,13 @@ export default function SingleImageUploader({
       
       {image ? (
         <div className="relative w-full aspect-video sm:aspect-auto sm:h-32 bg-slate-100 rounded-xl border border-slate-200 overflow-hidden group">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt="Preview" className="w-full h-full object-contain" />
+          <Image
+            src={image}
+            alt="Preview"
+            fill
+            sizes="128px"
+            className="object-contain"
+          />
           <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             <button 
               type="button"

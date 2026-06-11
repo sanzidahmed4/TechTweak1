@@ -2,6 +2,8 @@ import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import Brand from "@/lib/models/Brand";
 import Link from "next/link";
+import Image from "next/image";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 import { Search as SearchIcon, Smartphone } from "lucide-react";
 
 export const metadata = {
@@ -12,11 +14,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const { q = "", brand = "", sort = "newest", year = "", chipset = "" } = await searchParams;
   await connectToDatabase();
   
-  const mongoQuery: any /* eslint-disable-line @typescript-eslint/no-explicit-any */ = { is_published: true };
-  
-  if (q) {
-    mongoQuery.name = { $regex: q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
-  }
+  const mongoQuery: any /* eslint-disable-line @typescript-eslint/no-explicit-any */ = { is_published: true, phone_status: 'released' };
   
   if (year) {
     mongoQuery.release_date = { 
@@ -42,7 +40,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   const allBrands = await Brand.find({}).sort({ name: 1 }).lean();
   
-  const dates = await Phone.find({ is_published: true, release_date: { $exists: true, $ne: "" } }).select("release_date").lean();
+  const dates = await Phone.find({ is_published: true, phone_status: 'released', release_date: { $exists: true, $ne: "" } }).select("release_date").lean();
   const uniqueYears = Array.from(new Set(dates.map((d: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => {
     const dateStr = d.release_date;
     if (!dateStr) return null;
@@ -57,10 +55,34 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   let phones: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
-    const rawPhones = await Phone.find(mongoQuery)
-      .populate('brand_id', 'name slug')
-      .sort(sortQuery)
-      .lean();
+    let rawPhones: any[] = [];
+    
+    // If search query is provided, use Hybrid Search
+    if (q) {
+      // 1. Try $text search first
+      rawPhones = await Phone.find({ ...mongoQuery, $text: { $search: q } }, { score: { $meta: "textScore" } })
+        .populate('brand_id', 'name slug')
+        .sort({ score: { $meta: "textScore" } })
+        .select('name slug images price_usd price_display_text brand_id phone_status')
+        .lean();
+        
+      // 2. If no results, fallback to regex prefix search
+      if (rawPhones.length === 0) {
+        const regexQuery = { ...mongoQuery, name: { $regex: new RegExp('^' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } };
+        rawPhones = await Phone.find(regexQuery)
+          .populate('brand_id', 'name slug')
+          .sort(sortQuery)
+          .select('name slug images price_usd price_display_text brand_id phone_status')
+          .lean();
+      }
+    } else {
+      // Normal filtering
+      rawPhones = await Phone.find(mongoQuery)
+        .populate('brand_id', 'name slug')
+        .sort(sortQuery)
+        .select('name slug images price_usd price_display_text brand_id phone_status')
+        .lean();
+    }
       
     phones = rawPhones.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),
@@ -68,7 +90,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       slug: p.slug,
       brands: { name: p.brand_id?.name, slug: p.brand_id?.slug },
       price_usd: p.price_usd,
-      images: p.images
+      images: p.images,
+      price_display_text: p.price_display_text
     }));
   } catch (error) {
     console.error(error);
@@ -153,9 +176,16 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             {phones.map((phone: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
               <Link href={`/phones/${phone.brands?.slug || 'unknown'}/${phone.slug}`} key={phone.id} className="glass-card rounded-[1.25rem] p-3 sm:p-4 hover:shadow-lg transition-all block bg-white border border-slate-100 flex flex-col group">
                 <div className="w-full aspect-square sm:aspect-[4/5] bg-slate-50 rounded-xl mb-3 relative overflow-hidden flex items-center justify-center p-4">
-                  {phone.images && phone.images.length > 0 ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
+                  {phone.images && phone.images[0] ? (
+                    <Image 
+                      src={phone.images[0] || FALLBACK_IMAGE} 
+                      alt={phone.name} 
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-contain p-2 group-hover:scale-105 transition-transform duration-500" 
+                      placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+                      blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
+                    />
                   ) : (
                     <Smartphone size={32} className="text-slate-300" />
                   )}
@@ -165,7 +195,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   <h3 className="text-[13px] sm:text-sm font-bold text-slate-900 leading-snug line-clamp-2 flex-1 group-hover:text-blue-700 transition-colors" title={phone.name}>{phone.name}</h3>
                   <div className="mt-3 pt-3 border-t border-slate-100">
                     <span className="text-sm sm:text-base font-black text-slate-900 truncate max-w-full block">
-                      {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'Price TBA'}
+                      {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'Not Announced Yet')}
                     </span>
                   </div>
                 </div>

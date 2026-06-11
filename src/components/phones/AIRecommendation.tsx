@@ -65,11 +65,13 @@ interface Props {
 export default function AIRecommendation({ phones }: Props) {
   const [activeCategory, setActiveCategory] = useState("gaming");
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [includeUpcoming, setIncludeUpcoming] = useState(false);
 
   const cat = CATEGORIES.find((c) => c.key === activeCategory)!;
 
   // Filter real phones or fall back to demo
   const filtered = phones
+    .filter(p => includeUpcoming ? true : p.phone_status === 'released')
     .filter(cat.filter)
     .slice(0, 3)
     .map((p) => ({
@@ -119,9 +121,20 @@ export default function AIRecommendation({ phones }: Props) {
                   </h2>
                 </div>
               </div>
-              <p className="text-blue-300/60 text-sm ml-[52px]">
-                Smart picks based on your usage profile
-              </p>
+              <div className="flex items-center gap-4 ml-[52px]">
+                <p className="text-blue-300/60 text-sm">
+                  Smart picks based on your usage profile
+                </p>
+                <div className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded-lg border border-white/10">
+                  <span className="text-[10px] text-blue-300 uppercase tracking-wider font-bold">Upcoming</span>
+                  <button 
+                    onClick={() => setIncludeUpcoming(!includeUpcoming)}
+                    className={`w-7 h-3.5 rounded-full relative transition-colors ${includeUpcoming ? 'bg-blue-500' : 'bg-slate-700'}`}
+                  >
+                    <span className={`absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-transform ${includeUpcoming ? 'left-[16px]' : 'left-0.5'}`} />
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Trigger Button for Quiz */}

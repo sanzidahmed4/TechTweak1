@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 import { useRouter } from "next/navigation";
 import { Heart, GitCompare, Zap, Eye } from "lucide-react";
 import type { PhoneData } from "./PhonesClientPage";
@@ -42,12 +44,15 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
         {/* Image */}
         <div className="relative w-32 sm:w-40 shrink-0 bg-slate-50 overflow-hidden">
           {phone.images[0] && !imageError ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={phone.images[0]}
-              alt={phone.name}
+            <Image
+              src={phone.images[0] || FALLBACK_IMAGE}
+              alt={`${phone.name} smartphone details`}
+              fill
               onError={() => setImageError(true)}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 640px) 30vw, 20vw"
+              placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+              blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center min-h-[120px]">
@@ -76,7 +81,7 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
           <div className="flex items-center justify-between mt-3">
             <div className="flex flex-col">
               <span className="text-base font-black text-slate-900">
-                {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA"}
+                {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Not Announced Yet")}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -116,12 +121,15 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
       {/* ── Image Area — full bleed, no padding ── */}
       <div className="relative w-full aspect-[4/3] bg-slate-50 overflow-hidden">
         {phone.images[0] && !imageError ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={phone.images[0]}
-            alt={phone.name}
+          <Image
+            src={phone.images[0] || FALLBACK_IMAGE}
+            alt={`${phone.name} grid view image`}
+            fill
             onError={() => setImageError(true)}
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+            blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
@@ -136,6 +144,11 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
             {discount && (
               <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">
                 -{discount}%
+              </span>
+            )}
+            {phone.phone_status && ['upcoming', 'rumored'].includes(phone.phone_status) && (
+              <span className="bg-purple-100 text-purple-600 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm capitalize">
+                {phone.phone_status}
               </span>
             )}
             {phone.is_featured && (
@@ -181,8 +194,8 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
         {/* Price + CTA */}
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
           <div className="flex flex-col">
-            <span className="text-sm sm:text-base font-black text-slate-900 truncate max-w-[80px] sm:max-w-full">
-              {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA"}
+            <span className="text-sm sm:text-base font-black text-slate-900 truncate max-w-[120px] sm:max-w-full">
+              {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA")}
             </span>
           </div>
           <Link

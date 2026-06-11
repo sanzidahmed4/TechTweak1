@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getAdvisorRecommendations, QuizAnswers, RecommendedPhone, getAdvisorBrands } from "@/app/actions/advisor";
 import Link from "next/link";
+import Image from "next/image";
 import { X, ChevronRight, Search, Zap, CheckCircle2, RefreshCw, ArrowLeft } from "lucide-react"; // Keeping minimal functional icons
 
 interface Props {
@@ -53,14 +54,17 @@ export default function PhoneAdvisorModal({ isOpen, onClose }: Props) {
   const [brands, setBrands] = useState<{name: string, slug: string}[]>([]);
   const [showAllBrands, setShowAllBrands] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const savedSearches = localStorage.getItem("techtweak_recent_searches");
+      if (savedSearches) return JSON.parse(savedSearches);
+    }
+    return [];
+  });
 
   // Load state and brands
   useEffect(() => {
     if (isOpen) {
-      // Load recent searches
-      const savedSearches = localStorage.getItem("techtweak_recent_searches");
-      if (savedSearches) setRecentSearches(JSON.parse(savedSearches));
 
       // Fetch dynamic brands
       getAdvisorBrands().then(data => {
@@ -362,9 +366,9 @@ export default function PhoneAdvisorModal({ isOpen, onClose }: Props) {
                           
                           <div className="flex flex-col sm:flex-row gap-6">
                             {/* Image Placeholder/Container */}
-                            <div className="w-24 h-32 relative bg-slate-50 rounded-xl shrink-0 p-2 flex items-center justify-center border border-slate-100">
+                            <div className="w-24 h-32 relative bg-slate-50 rounded-xl shrink-0 p-2 flex items-center justify-center border border-slate-100 overflow-hidden">
                               {res.image ? (
-                                <img src={res.image} alt={res.name} className="max-w-full max-h-full object-contain mix-blend-multiply" />
+                                <Image src={res.image || "/phone-placeholder.webp"} alt={res.name} fill sizes="96px" className="object-contain mix-blend-multiply" />
                               ) : <span className="text-slate-300">No Img</span>}
                             </div>
 
