@@ -471,7 +471,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                     { label: "Physical Dimensions", value: rawPhone.dimensions },
                     { label: "Build Material", value: rawPhone.build_material },
                     { label: "SIM Layout", value: rawPhone.sim_type },
-                    { label: "Water & Dust Rating", value: rawPhone.water_resistance },
+                    { label: "Water & Dust Rating", value: rawPhone.water_resistance || rawPhone.ip_rating },
                     { label: "Manufactured In", value: rawPhone.made_in },
                     { label: "Phone Variants", value: rawPhone.phone_variants }
                   ].map((spec, i) => (
