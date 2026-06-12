@@ -309,7 +309,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                     </div>
                     <div>
                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Main Camera</p>
-                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.camera_highlight || rawPhone.camera_main?.split("+")[0] || "N/A"}</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.camera_highlight || rawPhone.cam_main_sensor || rawPhone.camera_main?.split("+")[0] || "N/A"}</p>
                     </div>
                   </div>
                   <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
@@ -318,7 +318,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                     </div>
                     <div>
                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Display</p>
-                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.display_highlight || rawPhone.display?.split(",")[0] || "N/A"}</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.display_highlight || rawPhone.screen_size || rawPhone.display?.split(",")[0] || "N/A"}</p>
                     </div>
                   </div>
                   <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
@@ -327,7 +327,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                     </div>
                     <div>
                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Battery</p>
-                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.battery_highlight || rawPhone.battery || "N/A"}</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.battery_highlight || rawPhone.battery_capacity || rawPhone.battery || "N/A"}</p>
                     </div>
                   </div>
                 </div>
@@ -371,7 +371,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <span className="text-xs font-bold text-slate-700">Wi-Fi 6/7 Ready</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {rawPhone.water_resistance ? (
+                      {(rawPhone.water_resistance || rawPhone.ip_rating) ? (
                         <Check className="text-green-600 bg-green-50 p-0.5 rounded-full flex-shrink-0" size={16} />
                       ) : (
                         <X className="text-red-500 bg-red-50 p-0.5 rounded-full flex-shrink-0" size={16} />
@@ -399,12 +399,12 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">Water Rating</span>
                   <span className="text-xs font-semibold text-slate-700">
-                    {rawPhone.water_resistance ? (
-                      rawPhone.water_resistance.includes("IP68") ? "IP68 Certified" :
-                      rawPhone.water_resistance.includes("IP67") ? "IP67 Certified" :
-                      rawPhone.water_resistance.includes("IP54") ? "IP54 Splash-proof" :
-                      rawPhone.water_resistance.includes("IP53") ? "IP53 Splash-proof" :
-                      rawPhone.water_resistance.split(" — ")[0] || rawPhone.water_resistance.split("-")[0] || rawPhone.water_resistance
+                    {(rawPhone.water_resistance || rawPhone.ip_rating) ? (
+                      (rawPhone.water_resistance || rawPhone.ip_rating).includes("IP68") ? "IP68 Certified" :
+                      (rawPhone.water_resistance || rawPhone.ip_rating).includes("IP67") ? "IP67 Certified" :
+                      (rawPhone.water_resistance || rawPhone.ip_rating).includes("IP54") ? "IP54 Splash-proof" :
+                      (rawPhone.water_resistance || rawPhone.ip_rating).includes("IP53") ? "IP53 Splash-proof" :
+                      (rawPhone.water_resistance || rawPhone.ip_rating).split(" — ")[0] || (rawPhone.water_resistance || rawPhone.ip_rating).split("-")[0] || (rawPhone.water_resistance || rawPhone.ip_rating)
                     ) : "N/A"}
                   </span>
                 </div>
