@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 require('dotenv').config({path: '.env.local'});
 mongoose.connect(process.env.MONGODB_URI).then(async () => {
     const Phone = mongoose.model('Phone', new mongoose.Schema({},{strict:false}));
-    const phones = await Phone.find({slug: /^samsung-/i});
+    const Brand = mongoose.model('Brand', new mongoose.Schema({},{strict:false}));
+    const brands = await Brand.find({name: {$in: ['Xiaomi', 'Redmi', 'POCO']}});
+    const brandIds = brands.map(b => b._id);
+    const phones = await Phone.find({brand_id: {$in: brandIds}});
     
     let totalEmpty = 0;
     for (const rawPhone of phones) {

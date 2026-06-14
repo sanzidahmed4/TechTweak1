@@ -10,7 +10,9 @@ import { signToken } from "@/lib/auth/jwt";
 export async function login(formData: FormData) {
   try {
     const email = (formData.get("email") as string || "").trim().toLowerCase();
-    const password = formData.get("password") as string;
+    const password = (formData.get("password") as string || "").trim();
+
+    console.log(`[LOGIN ATTEMPT] Email: "${email}", Password Length: ${password.length}`);
 
     if (!email || !password) {
       return { error: "Email and password are required" };
@@ -32,7 +34,7 @@ export async function login(formData: FormData) {
     }
 
     if (!user) {
-      return { error: "Invalid credentials" };
+      return { error: `Invalid credentials. (Debug: Email="${email}", PassLen=${password.length})` };
     }
 
     let isPasswordValid = await bcrypt.compare(password, user.password_hash);
@@ -46,7 +48,7 @@ export async function login(formData: FormData) {
     }
 
     if (!isPasswordValid) {
-      return { error: "Invalid credentials" };
+      return { error: `Invalid credentials. (Debug: Email="${email}", PassLen=${password.length})` };
     }
 
     // Generate JWT token
