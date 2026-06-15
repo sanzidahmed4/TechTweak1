@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 const NAV_ITEMS = [
   { id: "overview", label: "Overview" },
   { id: "display", label: "Display" },
-  { id: "performance", label: "Performance" },
+  { id: "performance", label: "Hardware" },
   { id: "camera", label: "Camera" },
   { id: "battery", label: "Battery & Storage" },
   { id: "connectivity", label: "Connectivity" },

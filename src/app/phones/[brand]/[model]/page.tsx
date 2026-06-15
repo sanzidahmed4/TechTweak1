@@ -516,7 +516,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
                     <Cpu size={16} />
                   </div>
-                  <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider">Performance Specifications</h2>
+                  <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider">Hardware and Specification</h2>
                 </div>
                 <div className="divide-y divide-slate-100">
                   {[
