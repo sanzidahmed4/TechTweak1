@@ -75,7 +75,7 @@ export default function Navbar() {
               </span>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-8 px-4 flex-1 justify-center max-w-2xl">
+            <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8 px-2 lg:px-4 flex-1 justify-center max-w-2xl">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
                 return (
