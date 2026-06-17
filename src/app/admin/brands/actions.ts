@@ -88,7 +88,8 @@ export async function deleteBrand(id: string) {
 
 export async function updateBrandsOrder(orderedIds: string[]) {
   await requireAdmin();
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
     
     const updatePromises = orderedIds.map((id, index) => 
       Brand.findByIdAndUpdate(id, { order: index }).exec()
