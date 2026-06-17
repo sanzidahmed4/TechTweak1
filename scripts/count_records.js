@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 async function run() {
   try {
-    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/techtweak';
+    const uri = process.env.MONGODB_URI || process.env.MONGODB_URI;
     console.log("Connecting to:", uri.replace(/:[^:]*@/, ':***@'));
     await mongoose.connect(uri);
     

@@ -1,6 +1,7 @@
+require('dotenv').config({ path: '.env.local' });
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://sanzid_admin:sanzid4%40@ac-olfahzz-shard-00-00.fhnlrss.mongodb.net:27017,ac-olfahzz-shard-00-01.fhnlrss.mongodb.net:27017,ac-olfahzz-shard-00-02.fhnlrss.mongodb.net:27017/techtweak?ssl=true&authSource=admin&replicaSet=atlas-109zzp-shard-0&appName=TechTweak')
+mongoose.connect(process.env.MONGODB_URI)
 .then(async () => {
   const db = mongoose.connection.db;
   const phones = await db.collection('phones').find({ name: /17 Pro/i }).toArray();

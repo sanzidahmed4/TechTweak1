@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 import mongoose from 'mongoose';
 import fs from 'fs';
 
-const MONGODB_URI = "mongodb://sanzid_admin:sanzid4%40@ac-olfahzz-shard-00-00.fhnlrss.mongodb.net:27017,ac-olfahzz-shard-00-01.fhnlrss.mongodb.net:27017,ac-olfahzz-shard-00-02.fhnlrss.mongodb.net:27017/techtweak?ssl=true&authSource=admin&replicaSet=atlas-109zzp-shard-0&appName=TechTweak";
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const phoneSchema = new mongoose.Schema({}, { strict: false });
 const Phone = mongoose.models.Phone || mongoose.model('Phone', phoneSchema, 'phones');
