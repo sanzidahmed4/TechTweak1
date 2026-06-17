@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Brand from "@/lib/models/Brand";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -7,6 +8,7 @@ import { redirect } from "next/navigation";
 import slugify from "slugify";
 
 export async function addBrand(formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const name = formData.get("name") as string;
@@ -37,6 +39,7 @@ export async function addBrand(formData: FormData) {
 }
 
 export async function editBrand(id: string, formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const name = formData.get("name") as string;
@@ -68,6 +71,7 @@ export async function editBrand(id: string, formData: FormData) {
 }
 
 export async function deleteBrand(id: string) {
+  await requireAdmin();
   await connectToDatabase();
 
   try {
@@ -83,8 +87,8 @@ export async function deleteBrand(id: string) {
 }
 
 export async function updateBrandsOrder(orderedIds: string[]) {
-  try {
-    await connectToDatabase();
+  await requireAdmin();
+  await connectToDatabase();
     
     const updatePromises = orderedIds.map((id, index) => 
       Brand.findByIdAndUpdate(id, { order: index }).exec()

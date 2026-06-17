@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Setting from "@/lib/models/Setting";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
@@ -56,6 +57,7 @@ export const getSiteSettings = unstable_cache(
 );
 
 export async function updateSiteSettings(formData: any) {
+  await requireAdmin();
   await connectToDatabase();
   try {
     const settings = await Setting.findOne();

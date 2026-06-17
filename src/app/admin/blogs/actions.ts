@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Post from "@/lib/models/Post";
 import ActivityLog from "@/lib/models/ActivityLog";
@@ -8,6 +9,7 @@ import slugify from "slugify";
 import { redirect } from "next/navigation";
 
 export async function addBlogPost(formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const title = formData.get("title") as string;
@@ -61,6 +63,7 @@ export async function addBlogPost(formData: FormData) {
   redirect("/admin/blogs");
 }
 export async function updateBlogPost(id: string, formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const title = formData.get("title") as string;
@@ -119,6 +122,7 @@ export async function updateBlogPost(id: string, formData: FormData) {
 }
 
 export async function deleteBlogPost(id: string) {
+  await requireAdmin();
   await connectToDatabase();
   
   try {
@@ -144,6 +148,7 @@ export async function deleteBlogPost(id: string) {
 }
 
 export async function createInlineCategory(name: string) {
+  await requireAdmin();
   await connectToDatabase();
   // We need to import Category. Let's make sure it's imported at the top.
   // Wait, I will just require it here to avoid import issues if not present.

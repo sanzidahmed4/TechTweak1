@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import { revalidatePath } from "next/cache";
@@ -14,6 +15,7 @@ export async function updateBulkKeywords(updates: Array<{
   og_image?: string;
   content_status?: string;
 }>) {
+  await requireAdmin();
   try {
     await connectToDatabase();
     

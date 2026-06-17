@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import ActivityLog from "@/lib/models/ActivityLog";
@@ -40,6 +41,7 @@ function parseReleaseDate(dateStr: string | null | undefined): Date | null {
 }
 
 export async function addPhone(formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const name = formData.get("name") as string;
@@ -307,6 +309,7 @@ export async function addPhone(formData: FormData) {
 }
 
 export async function editPhone(id: string, formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const name = formData.get("name") as string;
