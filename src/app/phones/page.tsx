@@ -55,7 +55,11 @@ export default async function PhonesPage() {
       { $group: { _id: "$brand_id", count: { $sum: 1 } } },
     ]);
     const countMap: Record<string, number> = {};
-    brandCounts.forEach((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => { countMap[b._id.toString()] = b.count; });
+    brandCounts.forEach((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => { 
+      if (b._id) {
+        countMap[b._id.toString()] = b.count; 
+      }
+    });
 
     brands = rawBrands.map((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: b._id.toString(),
