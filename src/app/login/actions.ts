@@ -12,8 +12,6 @@ export async function login(formData: FormData) {
     const email = (formData.get("email") as string || "").trim().toLowerCase();
     const password = (formData.get("password") as string || "").trim();
 
-    console.log(`[LOGIN ATTEMPT] Email: "${email}", Password Length: ${password.length}`);
-
     if (!email || !password) {
       return { error: "Email and password are required" };
     }
@@ -21,34 +19,17 @@ export async function login(formData: FormData) {
     await connectToDatabase();
 
     let user = await User.findOne({ email });
-
-    // Auto-heal or Auto-create default admin if missing in production DB
-    if (!user && email === "admin@techtweak.com" && password === "password123") {
-      const salt = await bcrypt.genSalt(10);
-      const password_hash = await bcrypt.hash(password, salt);
-      user = await User.create({
-        email,
-        password_hash,
-        role: "admin"
-      });
-    }
+    // Removed hardcoded admin auto-creation block for security.
 
     if (!user) {
-      return { error: `Invalid credentials. (Debug: Email="${email}", PassLen=${password.length})` };
+      return { error: "Invalid credentials." };
     }
 
     let isPasswordValid = await bcrypt.compare(password, user.password_hash);
-
-    // Auto-heal password if it somehow mismatches for the default admin
-    if (!isPasswordValid && email === "admin@techtweak.com" && password === "password123") {
-      const salt = await bcrypt.genSalt(10);
-      user.password_hash = await bcrypt.hash(password, salt);
-      await user.save();
-      isPasswordValid = true;
-    }
+    // Removed hardcoded admin auto-heal block for security.
 
     if (!isPasswordValid) {
-      return { error: `Invalid credentials. (Debug: Email="${email}", PassLen=${password.length})` };
+      return { error: "Invalid credentials." };
     }
 
     // Generate JWT token
