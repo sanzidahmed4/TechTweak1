@@ -5,7 +5,7 @@ import { ArrowRight, Zap, Trophy, ShieldCheck } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative pt-20 pb-8 lg:pt-28 lg:pb-16 overflow-hidden">
+    <section className="relative pt-20 pb-2 lg:pt-28 lg:pb-4 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50"></div>
@@ -23,7 +23,7 @@ export default function Hero() {
             transition={{ duration: 0.5 }}
             className="max-w-2xl"
           >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 mb-3 leading-[1.1]">
               Find Your Perfect <br className="hidden lg:block" />
               <span className="text-gradient">Smartphone.</span>
             </h1>
