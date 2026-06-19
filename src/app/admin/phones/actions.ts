@@ -578,3 +578,30 @@ export async function editPhone(id: string, formData: FormData) {
     redirect("/admin/phones");
   }
 }
+
+export async function deletePhone(id: string) {
+  try {
+    const session = await getServerSession();
+    if (!session || session.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
+
+    await connectToDatabase();
+
+    const phone = await Phone.findById(id);
+    if (!phone) {
+      throw new Error("Phone not found");
+    }
+
+    await Phone.findByIdAndDelete(id);
+
+    revalidateTag("phones", "max");
+    revalidateTag("featured-phones", "max");
+    revalidateTag("upcoming-phones", "max");
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting phone:", error);
+    throw new Error(error.message || "Failed to delete phone");
+  }
+}

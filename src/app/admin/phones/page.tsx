@@ -2,7 +2,8 @@ import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import Brand from "@/lib/models/Brand";
 import Link from "next/link";
-import { Plus, Search, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Search, Edit, Eye, EyeOff } from "lucide-react";
+import DeletePhoneButton from "./DeletePhoneButton";
 
 export default async function AdminPhonesPage(props: {
   searchParams: Promise<{ q?: string; brand?: string; status?: string }>;
@@ -192,12 +193,7 @@ export default async function AdminPhonesPage(props: {
                       >
                         <Edit size={16} />
                       </Link>
-                      <button 
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all shadow-sm"
-                        title="Delete Phone"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <DeletePhoneButton id={phone.id} />
                     </div>
                   </td>
                 </tr>
