@@ -191,19 +191,11 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
           {phone.name}
         </h3>
 
-        {/* Price + CTA */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-          <div className="flex flex-col">
-            <span className="text-sm sm:text-base font-black text-slate-900 truncate max-w-[120px] sm:max-w-full">
-              {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA")}
-            </span>
-          </div>
-          <Link
-            href={`/phones/${phone.brand.slug}/${phone.slug}`}
-            className="hidden sm:flex px-4 py-2 min-h-[44px] items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-[11px] sm:text-xs font-bold rounded-xl transition-colors"
-          >
-            Details
-          </Link>
+        {/* Price */}
+        <div className="flex items-center mt-3 pt-3 border-t border-slate-100">
+          <span className="text-sm sm:text-base font-black text-slate-900 truncate">
+            {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA")}
+          </span>
         </div>
       </div>
     </div>
