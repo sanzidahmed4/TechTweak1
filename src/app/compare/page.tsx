@@ -129,14 +129,14 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                   >
                     <X size={14} />
                   </Link>
-                  <div className="w-12 h-16 mx-auto bg-slate-50 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-slate-100">
+                  <div className="w-12 h-16 mx-auto bg-slate-50 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-slate-100 relative">
                     {phone.images && phone.images[0] ? (
                       <Image 
                         src={phone.images[0] || FALLBACK_IMAGE} 
                         alt={phone.name} 
                         fill
                         sizes="48px"
-                        className="object-cover" 
+                        className="object-contain" 
                         placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
                         blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
                       />
@@ -179,7 +179,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                   >
                     <X size={12} />
                   </Link>
-                  <div className="w-10 h-10 shrink-0 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-slate-100 p-1">
+                  <div className="w-10 h-10 shrink-0 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-slate-100 p-1 relative">
                     {phone.images && phone.images[0] ? (
                       <Image 
                         src={phone.images[0] || FALLBACK_IMAGE} 
