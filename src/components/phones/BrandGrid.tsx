@@ -81,25 +81,53 @@ export default function BrandGrid({ brands, activeBrands = [], onBrandClick, bas
     );
   };
 
+  const renderResponsiveBlock = (initialCount: number, breakpointClass: string, gridColsClass: string) => (
+    <div className={breakpointClass}>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">{title}</h2>
+        {brands.length > initialCount && (
+          <button 
+            onClick={() => setIsExpanded(!isExpanded)} 
+            className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap"
+          >
+            {isExpanded ? "Show Less ↑" : "View All →"}
+          </button>
+        )}
+      </div>
+
+      <div className={`grid ${gridColsClass} gap-2 sm:gap-4`}>
+        {brands.slice(0, initialCount).map(renderBrand)}
+      </div>
+
+      <AnimatePresence>
+        {isExpanded && brands.length > initialCount && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className={`grid ${gridColsClass} gap-2 sm:gap-4 pt-2 sm:pt-4`}>
+              {brands.slice(initialCount).map(renderBrand)}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
   return (
     <section className="bg-white border-b border-slate-100 py-6">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">{title}</h2>
-          {brands.length > 16 && (
-            <button 
-              onClick={() => setIsExpanded(!isExpanded)} 
-              className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap"
-            >
-              {isExpanded ? "Show Less ↑" : "View All →"}
-            </button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 xl:grid-cols-[repeat(16,minmax(0,1fr))] gap-2 sm:gap-4 transition-all duration-300">
-          {brands.slice(0, isExpanded ? brands.length : 16).map(renderBrand)}
-        </div>
-
+        {/* Mobile: < 640px. Show 5 items, 5 cols */}
+        {renderResponsiveBlock(5, "block sm:hidden", "grid-cols-5")}
+        
+        {/* Tablet: 640px to 1024px. Show 8 items, 8 cols */}
+        {renderResponsiveBlock(8, "hidden sm:block lg:hidden", "grid-cols-8")}
+        
+        {/* Desktop: > 1024px. Show 16 items, 16 cols */}
+        {renderResponsiveBlock(16, "hidden lg:block", "grid-cols-[repeat(16,minmax(0,1fr))]")}
       </div>
     </section>
   );
