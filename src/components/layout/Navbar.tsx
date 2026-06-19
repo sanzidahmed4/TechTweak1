@@ -70,6 +70,9 @@ export default function Navbar() {
               <div className="relative w-8 h-8 md:w-10 md:h-10">
                 <Image src="/sitelogo.svg" alt="TechTweak Logo" fill className="object-contain" />
               </div>
+              <span className="font-bold text-xl md:text-2xl tracking-tight text-slate-900 hidden sm:block md:hidden lg:block">
+                Tech<span className="text-primary">Tweak</span>
+              </span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8 px-2 lg:px-4 flex-1 justify-center max-w-2xl">
