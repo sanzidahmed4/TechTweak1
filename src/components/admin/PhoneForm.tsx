@@ -121,7 +121,7 @@ export default function PhoneForm({ initialData, brands, action, title, descript
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Colors (Comma separated)</label>
-            <input type="text" name="colors" defaultValue={initialData?.colors?.join(", ")} placeholder="Titanium Gray, Titanium Black" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+            <input type="text" name="colors" defaultValue={Array.isArray(initialData?.colors) ? initialData.colors.join(", ") : initialData?.colors || ""} placeholder="Titanium Gray, Titanium Black" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Model Number</label>
@@ -495,7 +495,7 @@ export default function PhoneForm({ initialData, brands, action, title, descript
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">AI Capabilities (Comma separated)</label>
-            <input type="text" name="ai_features" defaultValue={initialData?.ai_features?.join(", ")} placeholder="Circle to Search, Live Translate, Photo Assist" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+            <input type="text" name="ai_features" defaultValue={Array.isArray(initialData?.ai_features) ? initialData.ai_features.join(", ") : initialData?.ai_features || ""} placeholder="Circle to Search, Live Translate, Photo Assist" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
           </div>
           <div className="flex flex-wrap gap-6 pt-4 md:col-span-2">
             <label className="flex items-center gap-2 cursor-pointer">
