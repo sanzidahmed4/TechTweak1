@@ -24,7 +24,7 @@ export default function UpcomingCarousel({ phones }: { phones: any /* eslint-dis
       <div className="overflow-hidden py-4 -my-4" ref={emblaRef}>
         <div className="flex -ml-4">
           {phones.map((phone, idx) => (
-            <div key={idx} className="flex-[0_0_65%] min-w-0 sm:flex-[0_0_40%] md:flex-[0_0_33.33%] lg:flex-[0_0_25%] pl-3 sm:pl-4">
+            <div key={idx} className="flex-[0_0_50%] min-w-0 sm:flex-[0_0_33.33%] md:flex-[0_0_25%] lg:flex-[0_0_20%] pl-3 sm:pl-4">
               <Link href={`/phones/${phone.brands?.slug || 'brand'}/${phone.slug}`} className="glass-card rounded-3xl p-4 hover-card block bg-white h-full relative overflow-hidden group">
                 <div className="absolute top-3 right-3 bg-purple-100 text-purple-600 text-[10px] font-bold px-2 py-1 rounded-full z-10 capitalize">
                   {phone.phone_status || 'Upcoming'}
