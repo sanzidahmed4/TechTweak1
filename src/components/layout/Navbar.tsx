@@ -75,7 +75,7 @@ export default function Navbar() {
               </span>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8 px-2 lg:px-4 flex-1 justify-center max-w-2xl">
+            <nav className="hidden lg:flex items-center gap-4 lg:gap-6 xl:gap-8 px-2 lg:px-4 flex-1 justify-center max-w-2xl">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
                 return (
@@ -102,7 +102,7 @@ export default function Navbar() {
               <NavbarSearch />
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden p-2 -mr-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+                className="lg:hidden p-2 -mr-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
                 aria-label="Toggle menu"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
