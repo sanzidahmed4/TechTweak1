@@ -581,10 +581,7 @@ export async function editPhone(id: string, formData: FormData) {
 
 export async function deletePhone(id: string) {
   try {
-    const session = await getServerSession();
-    if (!session || session.role !== "admin") {
-      throw new Error("Unauthorized");
-    }
+    await requireAdmin();
 
     await connectToDatabase();
 
