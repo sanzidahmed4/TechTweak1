@@ -248,14 +248,14 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
             <ChevronRight size={12} />
             <span className="text-slate-700 font-semibold">Phones</span>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Explore Smartphones</h1>
-              <p className="text-slate-500 text-sm mt-1">Browse by brand, price, specs, and features.</p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0 pr-2">
+              <h1 className="text-[18px] sm:text-xl md:text-3xl font-black text-slate-900 tracking-tight truncate">Explore Smartphones</h1>
+              <p className="text-[11px] sm:text-xs md:text-sm text-slate-500 mt-0.5 md:mt-1 truncate">Browse by brand, price, specs, and features.</p>
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold">
+            <div className="shrink-0 inline-flex items-center gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-[10px] md:text-xs font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-              {totalCount.toLocaleString()} Smartphones
+              <span>{totalCount.toLocaleString()} <span className="hidden sm:inline">Smartphones</span></span>
             </div>
           </div>
         </div>
