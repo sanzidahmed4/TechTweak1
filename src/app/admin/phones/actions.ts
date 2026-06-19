@@ -223,6 +223,12 @@ export async function addPhone(formData: FormData) {
     has_live_translation: formData.get("has_live_translation") === "on",
     has_ai_assistant: formData.get("has_ai_assistant") === "on",
 
+    // SEO Settings
+    meta_title: formData.get("meta_title") as string,
+    meta_description: formData.get("meta_description") as string,
+    meta_keywords: formData.get("meta_keywords") as string,
+    og_image: formData.get("og_image") as string,
+
     // Removed manual related IDs reading, left empty to let frontend auto-suggest
     related_similar_ids: [],
     related_compare_ids: [],
@@ -486,6 +492,12 @@ export async function editPhone(id: string, formData: FormData) {
     has_ai_editing: formData.get("has_ai_editing") === "on",
     has_live_translation: formData.get("has_live_translation") === "on",
     has_ai_assistant: formData.get("has_ai_assistant") === "on",
+
+    // SEO Settings
+    meta_title: formData.get("meta_title") as string,
+    meta_description: formData.get("meta_description") as string,
+    meta_keywords: formData.get("meta_keywords") as string,
+    og_image: formData.get("og_image") as string,
 
     // Removed manual related IDs reading, left empty to let frontend auto-suggest
     related_similar_ids: [],
