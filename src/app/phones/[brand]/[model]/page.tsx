@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   const { brand, model } = await params;
   await connectToDatabase();
 
-  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description images og_image updated_at").lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
+  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description meta_keywords images og_image updated_at").lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
 
   if (!data) return { title: "Phone Not Found" };
 
@@ -41,6 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   return {
     title: data.meta_title || `${data.name} Specs, Review, and Price | TechTweak`,
     description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
+    keywords: data.meta_keywords || `${data.name}, ${data.name} price, specs, review`,
     alternates: {
       canonical: url,
       languages: {
