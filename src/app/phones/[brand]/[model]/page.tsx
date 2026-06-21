@@ -124,6 +124,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       _id: { $ne: rawPhone._id },
       is_published: true
     })
+      .select("name slug price_usd price_bdt images brand_id")
       .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .populate("brand_id", "name slug")
       .limit(4)
@@ -139,6 +140,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
         _id: { $ne: rawPhone._id },
         is_published: true
       })
+        .select("name slug price_usd price_bdt images brand_id")
         .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
         .populate("brand_id", "name slug")
         .limit(4)
@@ -151,6 +153,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       _id: { $ne: rawPhone._id },
       is_published: true
     })
+      .select("name slug price_usd price_bdt images brand_id")
       .populate("brand_id", "name slug")
       .limit(6)
       .lean();

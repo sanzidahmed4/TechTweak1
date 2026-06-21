@@ -23,6 +23,7 @@ export default async function PhonesPage() {
   try {
     // Fetch phones with brand info
     const rawPhones = await Phone.find({ is_published: true, phone_status: 'released' })
+      .select('name slug brand_id display processor ram storage camera_main battery network price_usd images is_featured release_date antutu_score')
       .populate('brand_id', 'name slug')
       .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
       .lean();

@@ -35,7 +35,10 @@ export default async function BrandUpcomingPhonesPage({ params }: { params: Prom
   const allUpcoming = await Phone.find({
     is_published: true,
     phone_status: { $in: ['upcoming', 'rumored'] }
-  }).populate('brand_id', 'name slug').lean();
+  })
+    .select('brand_id')
+    .populate('brand_id', 'name slug')
+    .lean();
 
   const brandCounts = allUpcoming.reduce((acc: any, phone: any) => {
     const slug = phone.brand_id?.slug;
@@ -55,6 +58,7 @@ export default async function BrandUpcomingPhonesPage({ params }: { params: Prom
     phone_status: { $in: ['upcoming', 'rumored'] },
     brand_id: brandDoc._id
   })
+    .select('name slug brand_id price_usd images price_display_text phone_status expected_launch_date leak_confidence display processor ram storage camera_main battery network is_featured release_date antutu_score')
     .populate('brand_id', 'name slug')
     .sort({ expected_launch_date: 1, name: 1 })
     .lean();
