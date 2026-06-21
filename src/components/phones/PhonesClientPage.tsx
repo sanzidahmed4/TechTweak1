@@ -25,6 +25,7 @@ export interface PhoneData {
   name: string;
   slug: string;
   brand: { name: string; slug: string };
+  category: { name: string; slug: string };
   display: string | null;
   processor: string | null;
   ram: string | null;
@@ -47,6 +48,7 @@ export interface PhoneData {
 export interface FilterState {
   search: string;
   brands: string[];
+  category: string;
   priceMin: number;
   priceMax: number;
   ram: string[];
@@ -78,6 +80,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 const DEFAULT_FILTERS: FilterState = {
   search: "",
   brands: [],
+  category: "",
   priceMin: 0,
   priceMax: 300000,
   ram: [],
@@ -99,6 +102,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
     return {
       ...DEFAULT_FILTERS,
       brands: brandParams ? brandParams.split(",").filter(Boolean) : [],
+      category: searchParams.get("category") || "",
     };
   });
   
@@ -122,6 +126,12 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
       params.delete("brands");
     }
 
+    if (filters.category) {
+      params.set("category", filters.category);
+    } else {
+      params.delete("category");
+    }
+
     if (currentPage > 1) {
       params.set("page", currentPage.toString());
     } else {
@@ -134,7 +144,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
     if (newQuery !== currentQuery) {
       router.replace(`?${newQuery}`, { scroll: false });
     }
-  }, [filters.brands, currentPage, searchParams, router]);
+  }, [filters.brands, filters.category, currentPage, searchParams, router]);
 
   const updateFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -150,6 +160,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
     let count = 0;
     if (filters.search) count++;
     if (filters.brands.length) count++;
+    if (filters.category) count++;
     if (filters.priceMin > 0 || filters.priceMax < 300000) count++;
     if (filters.ram.length) count++;
     if (filters.storage.length) count++;
@@ -173,6 +184,9 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
     }
     if (filters.brands.length) {
       result = result.filter((p) => filters.brands.includes(p.brand.slug));
+    }
+    if (filters.category) {
+      result = result.filter((p) => p.category?.slug === filters.category);
     }
     if (filters.priceMin > 0 || filters.priceMax < 300000) {
       result = result.filter(
@@ -276,6 +290,14 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
             <p className="text-slate-500 text-sm">
               Showing <span className="font-bold text-slate-900">{filteredPhones.length}</span> of {totalCount.toLocaleString()} smartphones
             </p>
+            {filters.category && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-100">
+                <span className="capitalize">{filters.category.replace("-", " ")}</span>
+                <button onClick={() => updateFilter("category", "")} className="hover:bg-blue-200 rounded-full p-0.5 transition-colors">
+                  <X size={12} />
+                </button>
+              </div>
+            )}
             {activeFilterCount > 0 && (
               <button onClick={resetFilters} className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition-colors">
                 <X size={12} /> Clear {activeFilterCount} filter{activeFilterCount !== 1 ? "s" : ""}
