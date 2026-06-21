@@ -125,7 +125,7 @@ export default async function BrandPage({ params, searchParams }: { params: Prom
       <div className="container mx-auto px-4 lg:px-8">
         
         {/* Header */}
-        <div className="mb-8 lg:mb-10 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
+        <div className="mb-8 lg:mb-10 pb-8 border-b border-slate-200 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
           <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center relative overflow-hidden shrink-0">
             {brandData.logo_url ? (
               <Image 
