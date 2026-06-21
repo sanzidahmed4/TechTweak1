@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Globe, Mail, MessageCircle, Share2 } from "lucide-react";
+import { Facebook, Mail, MessageCircle, Share2 } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -22,8 +22,13 @@ export default function Footer() {
               Your ultimate destination for premium smartphone reviews, detailed specifications, and the latest technology news. We help you make the right choice.
             </p>
             <div className="flex gap-4 pt-2">
-              {[Globe, Mail, MessageCircle, Share2].map((Icon, i) => (
-                <a key={i} href="#" className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary/30 hover:shadow-md transition-all">
+              {[
+                { Icon: Facebook, href: "https://www.facebook.com/profile.php?id=61590823097198", target: "_blank", rel: "noopener noreferrer" },
+                { Icon: Mail, href: "mailto:contact@techtweak.tech" },
+                { Icon: MessageCircle, href: "#" },
+                { Icon: Share2, href: "#" }
+              ].map(({ Icon, href, target, rel }, i) => (
+                <a key={i} href={href} target={target} rel={rel} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1877F2] hover:border-[#1877F2]/30 hover:shadow-md transition-all">
                   <Icon size={18} />
                 </a>
               ))}
