@@ -116,6 +116,7 @@ export default async function Home() {
       name: p.name,
       slug: p.slug,
       brand: { name: p.brand_id?.name || "Unknown", slug: p.brand_id?.slug || "" },
+      category: { name: p.category_id?.name || "", slug: p.category_id?.slug || "" },
       display: p.display || null,
       processor: p.processor || null,
       ram: p.ram || null,
