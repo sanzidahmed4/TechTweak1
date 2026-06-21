@@ -104,7 +104,7 @@ export default function CategoriesDropdown({
                     {categories.map((cat) => (
                       <React.Fragment key={cat.id}>
                         <Link
-                          href={`/phones?category=${cat.slug}`}
+                          href={cat.slug === "news" ? "/news" : `/phones?category=${cat.slug}`}
                           onClick={() => setIsOpen(false)}
                           className="group flex flex-col py-3 border-b border-slate-100 hover:border-transparent transition-all"
                         >
@@ -112,7 +112,7 @@ export default function CategoriesDropdown({
                             {cat.name}
                           </span>
                           <span className="text-[12px] text-slate-400 mt-0.5 group-hover:text-primary/60 transition-colors">
-                            Explore phones →
+                            {cat.slug === "news" ? "Explore latest tech news →" : "Explore phones →"}
                           </span>
                         </Link>
                         {cat.slug === "announcements" && (
