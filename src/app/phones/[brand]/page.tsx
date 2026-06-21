@@ -125,25 +125,25 @@ export default async function BrandPage({ params, searchParams }: { params: Prom
       <div className="container mx-auto px-4 lg:px-8">
         
         {/* Header */}
-        <div className="bg-white p-8 lg:p-12 rounded-3xl shadow-sm border border-slate-200 mb-12 flex flex-col-reverse md:flex-row items-center justify-between gap-8 max-w-5xl mx-auto">
-          <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 capitalize">{brandData.name} Phones</h1>
-            <p className="text-slate-500 text-base lg:text-lg max-w-2xl mx-auto md:mx-0 leading-relaxed">
-              {brandData.description || `Explore our comprehensive catalog of ${brandData.name} smartphones. Compare specifications, features, and find the perfect device for your needs.`}
-            </p>
-          </div>
-          <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 bg-slate-50/50 rounded-2xl sm:rounded-3xl border border-slate-100 flex items-center justify-center relative overflow-hidden shrink-0">
+        <div className="mb-8 lg:mb-10 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center relative overflow-hidden shrink-0">
             {brandData.logo_url ? (
               <Image 
                 src={brandData.logo_url} 
                 alt={`${brandData.name} logo`} 
                 fill
-                sizes="(max-width: 768px) 96px, 160px"
-                className="object-contain p-4 lg:p-6 drop-shadow-sm" 
+                sizes="96px"
+                className="object-contain p-3" 
               />
             ) : (
-              <Smartphone size={48} className="text-slate-300" />
+              <Smartphone size={32} className="text-slate-300" />
             )}
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 capitalize">{brandData.name} Phones</h1>
+            <p className="text-slate-500 text-sm md:text-base max-w-2xl leading-relaxed">
+              {brandData.description || `Explore our comprehensive catalog of ${brandData.name} smartphones. Compare specifications, features, and find the perfect device for your needs.`}
+            </p>
           </div>
         </div>
 
