@@ -187,7 +187,7 @@ export default async function Home() {
                   "url": "https://www.techtweak.tech/icon.png"
                 },
                 "sameAs": [
-                  "https://facebook.com/techtweak",
+                  "https://www.facebook.com/profile.php?id=61590823097198",
                   "https://twitter.com/techtweak",
                   "https://youtube.com/techtweak"
                 ]
