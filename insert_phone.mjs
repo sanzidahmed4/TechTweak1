@@ -16,16 +16,19 @@ async function run() {
     
     const data = JSON.parse(fs.readFileSync('phone_data.json', 'utf8'));
     
+    const brandSlug = data.brand_slug || 'samsung';
+    let brandName = brandSlug.charAt(0).toUpperCase() + brandSlug.slice(1);
+    
     // Find or create brand
-    let brand = await Brand.findOne({ slug: 'iqoo' });
+    let brand = await Brand.findOne({ slug: brandSlug });
     if (!brand) {
       const result = await Brand.create({
-        name: 'iQOO',
-        slug: 'iqoo',
-        description: 'iQOO is a Chinese consumer electronics manufacturer.',
+        name: brandName,
+        slug: brandSlug,
+        description: `${brandName} is a consumer electronics manufacturer.`,
       });
       brand = result;
-      console.log("Created brand iQOO");
+      console.log(`Created brand ${brandName}`);
     }
     
     data.brand_id = brand._id;
@@ -38,6 +41,21 @@ async function run() {
     );
     
     console.log(`Successfully inserted/updated: ${result.name}`);
+    
+    // Trigger automatic cache revalidation
+    try {
+      console.log('Triggering website cache revalidation...');
+      const res = await fetch('http://localhost:3000/api/revalidate');
+      const json = await res.json();
+      if (json.success) {
+        console.log('Cache revalidated successfully!');
+      } else {
+        console.log('Failed to revalidate cache:', json.error);
+      }
+    } catch (err) {
+      console.log('Could not reach the revalidation API. If the Next.js server is not running on localhost:3000, you can ignore this or update the script with your live domain.');
+    }
+    
     process.exit(0);
   } catch (error) {
     console.error("Error:", error);
