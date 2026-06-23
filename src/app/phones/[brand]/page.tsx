@@ -83,7 +83,7 @@ export default async function BrandPage({ params, searchParams }: { params: Prom
       // Fetch Phones for this brand
       const rawPhones = await Phone.find({ brand_id: bData._id, is_published: true })
         .select('name slug images price_usd release_date_parsed phone_status processor')
-        .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
+        .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
         .skip(skip)
         .limit(limit)
         .lean();

@@ -11,7 +11,7 @@ export const getFeaturedPhones = unstable_cache(
     const phones = await Phone.find({ is_published: true, phone_status: 'released' })
       .select('name slug brand_id price_usd images price_display_text phone_status display processor ram storage camera_main battery network is_featured release_date antutu_score')
       .populate('brand_id', 'name slug')
-      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
+      .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
       .limit(limit)
       .lean();
       

@@ -26,7 +26,7 @@ export default async function PhonesPage() {
       .select('name slug brand_id category_id display processor ram storage camera_main battery network price_usd images is_featured release_date antutu_score')
       .populate('brand_id', 'name slug')
       .populate('category_id', 'name slug')
-      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
+      .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
       .lean();
 
     totalCount = await Phone.countDocuments({ is_published: true, phone_status: 'released' });

@@ -32,7 +32,7 @@ export async function GET(request: Request) {
       })
       .select('name slug images release_date brand_id')
       .populate('brand_id', 'name slug')
-      .sort({ release_date_parsed: -1, price_usd: -1, name: 1 })
+      .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
       .limit(5)
       .lean();
     }
