@@ -82,7 +82,7 @@ export default async function BrandPage({ params, searchParams }: { params: Prom
       brandData = bData;
       // Fetch Phones for this brand
       const rawPhones = await Phone.find({ brand_id: bData._id, is_published: true })
-        .select('name slug images price_usd release_date_parsed phone_status processor')
+        .select('name slug images price_usd price_display_text release_date_parsed phone_status processor chipset_highlight')
         .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
         .skip(skip)
         .limit(limit)
@@ -93,8 +93,10 @@ export default async function BrandPage({ params, searchParams }: { params: Prom
         name: p.name,
         slug: p.slug,
         price_usd: p.price_usd,
+        price_display_text: p.price_display_text,
         images: p.images,
-        processor: p.processor
+        processor: p.processor,
+        chipset_highlight: p.chipset_highlight
       }));
     }
   } catch (err) {
