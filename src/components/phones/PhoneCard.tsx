@@ -81,7 +81,7 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
           <div className="flex items-center justify-between mt-3">
             <div className="flex flex-col">
               <span className="text-base font-black text-slate-900">
-                {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Not Announced Yet")}
+                {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA"}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -194,7 +194,7 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
         {/* Price */}
         <div className="flex items-center mt-3 pt-3 border-t border-slate-100">
           <span className="text-sm sm:text-base font-black text-slate-900 truncate">
-            {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA")}
+            {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA"}
           </span>
         </div>
       </div>
