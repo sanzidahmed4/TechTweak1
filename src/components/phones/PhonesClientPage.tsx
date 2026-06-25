@@ -34,12 +34,10 @@ export interface PhoneData {
   battery: string | null;
   network: string | null;
   price_usd: number | null;
-  price_bdt: number | null;
   images: string[];
   is_featured: boolean;
   release_date: string | null;
   antutu_score: number | null;
-  price_display_text?: string;
   phone_status?: string;
   expected_launch_date?: string;
   leak_confidence?: string;

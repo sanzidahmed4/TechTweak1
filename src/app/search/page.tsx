@@ -63,7 +63,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       rawPhones = await Phone.find({ ...mongoQuery, $text: { $search: q } }, { score: { $meta: "textScore" } })
         .populate('brand_id', 'name slug')
         .sort({ score: { $meta: "textScore" } })
-        .select('name slug images price_usd price_display_text brand_id phone_status')
+        .select('name slug images price_usd brand_id phone_status')
         .lean();
         
       // 2. If no results, fallback to regex prefix search
@@ -72,7 +72,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         rawPhones = await Phone.find(regexQuery)
           .populate('brand_id', 'name slug')
           .sort(sortQuery)
-          .select('name slug images price_usd price_display_text brand_id phone_status')
+          .select('name slug images price_usd brand_id phone_status')
           .lean();
       }
     } else {
@@ -80,7 +80,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       rawPhones = await Phone.find(mongoQuery)
         .populate('brand_id', 'name slug')
         .sort(sortQuery)
-        .select('name slug images price_usd price_display_text brand_id phone_status')
+        .select('name slug images price_usd brand_id phone_status')
         .lean();
     }
       
@@ -90,8 +90,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       slug: p.slug,
       brands: { name: p.brand_id?.name, slug: p.brand_id?.slug },
       price_usd: p.price_usd,
-      images: p.images,
-      price_display_text: p.price_display_text
+      images: p.images
     }));
   } catch (error) {
     console.error(error);
@@ -195,7 +194,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   <h3 className="text-[13px] sm:text-sm font-bold text-slate-900 leading-snug line-clamp-2 flex-1 group-hover:text-blue-700 transition-colors" title={phone.name}>{phone.name}</h3>
                   <div className="mt-3 pt-3 border-t border-slate-100">
                     <span className="text-sm sm:text-base font-black text-slate-900 truncate max-w-full block">
-                      {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'Not Announced Yet')}
+                      {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'Not Announced Yet'}
                     </span>
                   </div>
                 </div>

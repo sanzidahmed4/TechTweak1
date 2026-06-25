@@ -5,7 +5,7 @@ import Post from "@/lib/models/Post";
 export interface InternalLinkPhoneDoc {
   _id: unknown;
   brand_id?: unknown;
-  price_bdt?: number;
+  price_usd?: number;
 }
 
 export class InternalLinkEngine {
@@ -19,7 +19,7 @@ export class InternalLinkEngine {
     // Find phones from the same brand
     if (currentPhone.brand_id) {
       const sameBrand = await Phone.find({ ...query, brand_id: currentPhone.brand_id })
-        .select("name slug images price_bdt")
+        .select("name slug images price_usd")
         .sort({ release_date_parsed: -1 })
         .limit(limit)
         .lean();
@@ -27,16 +27,16 @@ export class InternalLinkEngine {
       if (sameBrand.length >= limit) return sameBrand;
 
       // If we need more, find phones in similar price range (+/- 20%)
-      const price = currentPhone.price_bdt;
+      const price = currentPhone.price_usd;
       if (price && price > 0) {
         const minPrice = price * 0.8;
         const maxPrice = price * 1.2;
         const samePrice = await Phone.find({
           ...query,
           _id: { $nin: sameBrand.map(p => p._id) },
-          price_bdt: { $gte: minPrice, $lte: maxPrice }
+          price_usd: { $gte: minPrice, $lte: maxPrice }
         })
-          .select("name slug images price_bdt")
+          .select("name slug images price_usd")
           .limit(limit - sameBrand.length)
           .lean();
         
@@ -53,15 +53,15 @@ export class InternalLinkEngine {
    * Finds phones from DIFFERENT brands with similar specs/price.
    */
   static async getCompareSuggestions(currentPhone: InternalLinkPhoneDoc, limit: number = 4) {
-    if (!currentPhone.price_bdt) return [];
+    if (!currentPhone.price_usd) return [];
 
-    const minPrice = currentPhone.price_bdt * 0.8;
-    const maxPrice = currentPhone.price_bdt * 1.2;
+    const minPrice = currentPhone.price_usd * 0.8;
+    const maxPrice = currentPhone.price_usd * 1.2;
 
     const competitors = await Phone.find({
       _id: { $ne: currentPhone._id },
       brand_id: { $ne: currentPhone.brand_id },
-      price_bdt: { $gte: minPrice, $lte: maxPrice }
+      price_usd: { $gte: minPrice, $lte: maxPrice }
     })
       .select("name slug images")
       .sort({ views: -1 }) // Prioritize popular competitors

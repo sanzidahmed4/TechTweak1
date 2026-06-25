@@ -32,7 +32,6 @@ export interface IPhoneSummary {
   brands: IBrandSummary;
   price_usd: number;
   images: string[];
-  price_display_text?: string;
   phone_status?: string;
   expected_launch_date?: string;
   leak_confidence?: string;
@@ -58,9 +57,7 @@ type RawPhone = {
   slug: string;
   brand_id?: IBrandSummary;
   price_usd: number;
-  price_bdt?: number;
   images: string[];
-  price_display_text?: string;
   phone_status?: string;
   expected_launch_date?: string;
   leak_confidence?: string;
@@ -103,7 +100,6 @@ export default async function Home() {
       brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
       price_usd: p.price_usd || 0,
       images: p.images || [],
-      price_display_text: p.price_display_text,
       phone_status: p.phone_status,
       expected_launch_date: p.expected_launch_date,
       leak_confidence: p.leak_confidence
@@ -125,7 +121,6 @@ export default async function Home() {
       battery: p.battery || null,
       network: p.network || null,
       price_usd: p.price_usd || null,
-      price_bdt: p.price_bdt || null,
       images: p.images || [],
       is_featured: p.is_featured || false,
       release_date: p.release_date || null,
@@ -140,7 +135,6 @@ export default async function Home() {
       brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
       price_usd: p.price_usd || 0,
       images: p.images || [],
-      price_display_text: p.price_display_text,
       phone_status: p.phone_status,
       expected_launch_date: p.expected_launch_date,
       leak_confidence: p.leak_confidence

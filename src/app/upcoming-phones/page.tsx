@@ -17,7 +17,7 @@ export default async function UpcomingPhonesPage() {
     is_published: true,
     phone_status: { $in: ['upcoming', 'rumored'] }
   })
-    .select('name slug brand_id price_usd images price_display_text phone_status expected_launch_date leak_confidence display processor ram storage camera_main battery network is_featured release_date antutu_score')
+    .select('name slug brand_id price_usd images phone_status expected_launch_date leak_confidence display processor ram storage camera_main battery network is_featured release_date antutu_score')
     .populate('brand_id', 'name slug logo_url')
     .sort({ expected_launch_date: 1, name: 1 })
     .lean();

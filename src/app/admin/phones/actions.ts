@@ -104,7 +104,6 @@ export async function addPhone(formData: FormData) {
     phone_status: formData.get("phone_status") as string || "released",
     
     // New Ecosystem Fields
-    price_display_text: formData.get("price_display_text") as string,
     price_status: formData.get("price_status") as string || "official",
     expected_launch_date: formData.get("expected_launch_date") as string,
     launch_quarter: formData.get("launch_quarter") as string,
@@ -374,7 +373,6 @@ export async function editPhone(id: string, formData: FormData) {
     phone_status: formData.get("phone_status") as string || "released",
     
     // New Ecosystem Fields
-    price_display_text: formData.get("price_display_text") as string,
     price_status: formData.get("price_status") as string || "official",
     expected_launch_date: formData.get("expected_launch_date") as string,
     launch_quarter: formData.get("launch_quarter") as string,

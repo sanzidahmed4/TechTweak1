@@ -85,10 +85,6 @@ export default function PhoneForm({ initialData, brands, action, title, descript
             <p className="text-xs text-slate-500">Official / authorized dealer price in USD.</p>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700">Price Display Text (For unreleased)</label>
-            <input type="text" name="price_display_text" defaultValue={initialData?.price_display_text} placeholder="e.g. Not Announced Yet" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
-          </div>
-          <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Price Status</label>
             <select name="price_status" defaultValue={initialData?.price_status || "official"} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
               <option value="official">Official</option>

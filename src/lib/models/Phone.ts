@@ -9,7 +9,6 @@ export interface IPhone extends Document {
   
   // Basic Info (Expanded)
   price_usd?: number;
-  price_bdt?: number;
   price_inr?: number;
   price_eur?: number;
   price_gbp?: number;
@@ -24,7 +23,6 @@ export interface IPhone extends Document {
   phone_status?: string;
   
   // New Ecosystem Fields
-  price_display_text?: string;
   price_status?: string;
   expected_launch_date?: string;
   launch_quarter?: string;
@@ -198,7 +196,6 @@ const PhoneSchema: Schema = new Schema({
   
   // Basic Info
   price_usd: { type: Number },
-  price_bdt: { type: Number },
   price_inr: { type: Number },
   price_eur: { type: Number },
   price_gbp: { type: Number },
@@ -213,7 +210,6 @@ const PhoneSchema: Schema = new Schema({
   phone_status: { type: String, enum: ['released', 'upcoming', 'rumored', 'draft', 'cancelled'], default: 'released' },
   
   // New Ecosystem Fields
-  price_display_text: { type: String },
   price_status: { type: String, enum: ['official', 'expected', 'rumored', 'unannounced', 'discontinued'], default: 'official' },
   expected_launch_date: { type: String },
   launch_quarter: { type: String },

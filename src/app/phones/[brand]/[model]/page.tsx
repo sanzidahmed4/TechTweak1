@@ -69,15 +69,13 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
 export default async function PhoneDetailsPage({ params }: { params: Promise<{ brand: string, model: string }> }) {
   const { brand, model } = await params;
   await connectToDatabase();
-
-  // Fetch real phone data
   let rawPhone = null;
   try {
     rawPhone = await Phone.findOne({ slug: model })
       .populate("brand_id", "name slug")
-      .populate("related_similar_ids", "name slug price_usd price_bdt images brand_id")
-      .populate("related_compare_ids", "name slug price_usd price_bdt images brand_id")
-      .populate("related_better_ids", "name slug price_usd price_bdt images brand_id")
+      .populate("related_similar_ids", "name slug price_usd images brand_id")
+      .populate("related_compare_ids", "name slug price_usd images brand_id")
+      .populate("related_better_ids", "name slug price_usd images brand_id")
       .lean();
   } catch (err) {
     console.error(err);
@@ -124,7 +122,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       _id: { $ne: rawPhone._id },
       is_published: true
     })
-      .select("name slug price_usd price_bdt images brand_id")
+      .select("name slug price_usd images brand_id")
       .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
       .populate("brand_id", "name slug")
       .limit(4)
@@ -140,7 +138,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
         _id: { $ne: rawPhone._id },
         is_published: true
       })
-        .select("name slug price_usd price_bdt images brand_id")
+        .select("name slug price_usd images brand_id")
         .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
         .populate("brand_id", "name slug")
         .limit(4)
@@ -153,7 +151,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       _id: { $ne: rawPhone._id },
       is_published: true
     })
-      .select("name slug price_usd price_bdt images brand_id")
+      .select("name slug price_usd images brand_id")
       .populate("brand_id", "name slug")
       .limit(6)
       .lean();
@@ -279,7 +277,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   {rawPhone.phone_status && ['upcoming', 'rumored'].includes(rawPhone.phone_status) ? (
                     <div className="flex-1 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
                       <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Pricing</p>
-                      <p className="text-xl font-black text-amber-800">{rawPhone.price_display_text || (rawPhone.price_usd ? `$${rawPhone.price_usd.toLocaleString()}` : "Upcoming")}</p>
+                      <p className="text-xl font-black text-amber-800">{rawPhone.price_usd ? `$${rawPhone.price_usd.toLocaleString()}` : "Upcoming"}</p>
                       <p className="text-xs text-amber-600 mt-1">Disclaimer: This is an unofficial preliminary specification. Information may not be 100% accurate. Leak Confidence: {rawPhone.leak_confidence ? rawPhone.leak_confidence.replace('_', ' ').toUpperCase() : 'N/A'}</p>
                     </div>
                   ) : rawPhone.price_usd ? (
@@ -857,7 +855,7 @@ function SidebarPhoneRow({ phone }: { phone: any   /* eslint-disable-line @types
           {phone.name}
         </h4>
         <span className="text-xs font-black text-slate-900 mt-1 block">
-          {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Not Announced Yet")}
+          {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Not Announced Yet"}
         </span>
       </div>
     </Link>

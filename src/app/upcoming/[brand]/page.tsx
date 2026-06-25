@@ -58,7 +58,7 @@ export default async function BrandUpcomingPhonesPage({ params }: { params: Prom
     phone_status: { $in: ['upcoming', 'rumored'] },
     brand_id: brandDoc._id
   })
-    .select('name slug brand_id price_usd images price_display_text phone_status expected_launch_date leak_confidence display processor ram storage camera_main battery network is_featured release_date antutu_score')
+    .select('name slug brand_id price_usd images phone_status expected_launch_date leak_confidence display processor ram storage camera_main battery network is_featured release_date antutu_score')
     .populate('brand_id', 'name slug')
     .sort({ expected_launch_date: 1, name: 1 })
     .lean();
@@ -124,7 +124,7 @@ export default async function BrandUpcomingPhonesPage({ params }: { params: Prom
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm sm:text-base font-black text-slate-900 truncate pr-2">
-                      {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Not Announced Yet")}
+                      {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Not Announced Yet"}
                     </span>
                     <div className="w-6 h-6 sm:w-8 sm:h-8 shrink-0 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
                       <ChevronRight size={14} />

@@ -9,7 +9,7 @@ export const getFeaturedPhones = unstable_cache(
     
     // Select only required fields
     const phones = await Phone.find({ is_published: true, phone_status: 'released' })
-      .select('name slug brand_id price_usd images price_display_text phone_status display processor ram storage camera_main battery network is_featured release_date antutu_score')
+      .select('name slug brand_id price_usd images phone_status display processor ram storage camera_main battery network is_featured release_date antutu_score')
       .populate('brand_id', 'name slug')
       .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
       .limit(limit)
@@ -27,7 +27,7 @@ export const getUpcomingPhones = unstable_cache(
     await connectToDatabase();
     
     const phones = await Phone.find({ is_published: true, phone_status: { $in: ['upcoming', 'rumored'] } })
-      .select('name slug brand_id price_usd images price_display_text phone_status expected_launch_date leak_confidence display processor ram storage camera_main battery network is_featured release_date antutu_score')
+      .select('name slug brand_id price_usd images phone_status expected_launch_date leak_confidence display processor ram storage camera_main battery network is_featured release_date antutu_score')
       .populate('brand_id', 'name slug')
       .sort({ expected_launch_date: 1, name: 1 })
       .limit(limit)

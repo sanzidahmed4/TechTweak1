@@ -51,7 +51,7 @@ export default function UpcomingCarousel({ phones }: { phones: any /* eslint-dis
                   <div className="pt-3 flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-base font-bold text-slate-900">
-                        {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'Not Announced Yet')}
+                        {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'Not Announced Yet'}
                       </span>
                       {phone.expected_launch_date && (
                         <span className="text-xs text-slate-500 font-medium mt-1">

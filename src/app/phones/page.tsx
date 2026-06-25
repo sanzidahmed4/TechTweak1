@@ -23,7 +23,7 @@ export default async function PhonesPage() {
   try {
     // Fetch phones with brand info
     const rawPhones = await Phone.find({ is_published: true, phone_status: 'released' })
-      .select('name slug brand_id category_id display processor chipset_highlight ram storage camera_main camera_highlight battery battery_highlight display_highlight network price_usd price_bdt price_display_text images is_featured release_date antutu_score')
+      .select('name slug brand_id category_id display processor chipset_highlight ram storage camera_main camera_highlight battery battery_highlight display_highlight network price_usd images is_featured release_date antutu_score')
       .populate('brand_id', 'name slug')
       .populate('category_id', 'name slug')
       .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
@@ -49,8 +49,6 @@ export default async function PhonesPage() {
       battery_highlight: p.battery_highlight || null,
       network: p.network || null,
       price_usd: p.price_usd || null,
-      price_bdt: p.price_bdt || null,
-      price_display_text: p.price_display_text || null,
       images: p.images || [],
       is_featured: p.is_featured || false,
       release_date: p.release_date || null,

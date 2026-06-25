@@ -82,7 +82,7 @@ export default function UpcomingPhonesClient({ initialPhones, topBrands }: { ini
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs sm:text-sm font-black text-slate-900 truncate pr-2">
-                      {phone.price_display_text || (phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Not Announced Yet")}
+                      {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Not Announced Yet"}
                     </span>
                     <div className="w-6 h-6 sm:w-8 sm:h-8 shrink-0 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
                       <ChevronRight size={14} />
