@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Edit, Eye, EyeOff, Folder, FolderOpen, Smartphone } from "lucide-react";
 import DeletePhoneButton from "./DeletePhoneButton";
+import DeleteSeriesButton from "./DeleteSeriesButton";
 import { getSeriesName } from "@/lib/utils/series";
 
 export default function AdminPhoneList({ phones, returnUrl }: { phones: any[], returnUrl: string }) {
@@ -51,6 +52,9 @@ export default function AdminPhoneList({ phones, returnUrl }: { phones: any[], r
                   <h3 className="font-bold text-slate-800 text-base">{series}</h3>
                   <p className="text-xs text-slate-500">{seriesPhones.length} device{seriesPhones.length !== 1 ? 's' : ''}</p>
                 </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <DeleteSeriesButton series={series} phoneIds={seriesPhones.map(p => p.id)} />
               </div>
             </div>
 

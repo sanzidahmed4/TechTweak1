@@ -612,3 +612,28 @@ export async function deletePhone(id: string) {
     throw new Error(error.message || "Failed to delete phone");
   }
 }
+
+export async function deletePhones(ids: string[]) {
+  try {
+    await requireAdmin();
+    await connectToDatabase();
+
+    if (!ids || ids.length === 0) {
+      throw new Error("No phones provided for deletion");
+    }
+
+    await Phone.deleteMany({ _id: { $in: ids } });
+
+    revalidateTag("phones", "max");
+    revalidateTag("featured-phones", "max");
+    revalidateTag("upcoming-phones", "max");
+    revalidatePath("/");
+    revalidatePath("/phones");
+    revalidatePath("/compare");
+    
+    return { success: true, count: ids.length };
+  } catch (error: any) {
+    console.error("Error deleting multiple phones:", error);
+    throw new Error(error.message || "Failed to delete phones");
+  }
+}
