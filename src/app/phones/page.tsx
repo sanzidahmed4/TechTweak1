@@ -3,6 +3,7 @@ import Phone from "@/lib/models/Phone";
 import Brand from "@/lib/models/Brand";
 import Post from "@/lib/models/Post";
 import PhonesClientPage from "@/components/phones/PhonesClientPage";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Explore Smartphones | TechTweak",
@@ -113,11 +114,13 @@ export default async function PhonesPage() {
 
 
   return (
-    <PhonesClientPage
-      initialPhones={phones}
-      brands={brands}
-      totalCount={totalCount}
-      latestNews={latestNews}
-    />
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading smartphones...</div>}>
+      <PhonesClientPage
+        initialPhones={phones}
+        brands={brands}
+        totalCount={totalCount}
+        latestNews={latestNews}
+      />
+    </Suspense>
   );
 }
