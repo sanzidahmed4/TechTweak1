@@ -134,10 +134,10 @@ export default function PhoneGallery({ images, name }: { images: string[], name:
         
         {/* Thumbnails Section */}
         {images.length > 1 && (
-          <div className="mt-4">
-            <span className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block px-1">More Photos</span>
-            <div className="overflow-hidden cursor-grab active:cursor-grabbing" ref={thumbRef}>
-              <div className="flex gap-3 pb-2 px-1">
+          <div className="mt-6">
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 block px-1">More Photos</span>
+            <div className="overflow-hidden cursor-grab active:cursor-grabbing -mx-2 px-2" ref={thumbRef}>
+              <div className="flex gap-3 py-3 px-1">
                 {images.map((img, i) => (
                   <button 
                     key={i} 
