@@ -8,6 +8,20 @@ export const metadata = {
   title: "Explore Smartphones | TechTweak",
   description:
     "Browse smartphones by brand, price, specs, and features. Find your perfect device with TechTweak's advanced filter system.",
+  alternates: {
+    canonical: "/phones",
+  },
+  openGraph: {
+    title: "Explore Smartphones | TechTweak",
+    description: "Browse smartphones by brand, price, specs, and features. Find your perfect device with TechTweak's advanced filter system.",
+    url: "/phones",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Explore Smartphones | TechTweak",
+    description: "Browse smartphones by brand, price, specs, and features. Find your perfect device with TechTweak's advanced filter system.",
+  },
 };
 
 export const revalidate = 3600; // Enable ISR (1 hour caching)

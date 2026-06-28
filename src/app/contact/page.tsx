@@ -1,6 +1,20 @@
 export const metadata = {
-  title: 'Contact | TechTweak',
-  description: 'Explore the latest on TechTweak.',
+  title: 'Contact Us | TechTweak',
+  description: 'Get in touch with the TechTweak team for inquiries, feedback, or support regarding our smartphone reviews and comparisons.',
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact Us | TechTweak",
+    description: "Get in touch with the TechTweak team for inquiries, feedback, or support regarding our smartphone reviews and comparisons.",
+    url: "/contact",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Us | TechTweak",
+    description: "Get in touch with the TechTweak team for inquiries, feedback, or support regarding our smartphone reviews and comparisons.",
+  },
 };
 
 export default function Page() {

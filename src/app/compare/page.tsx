@@ -10,6 +10,20 @@ import CompareAddButton from "@/components/compare/CompareAddButton";
 export const metadata = {
   title: "Compare Smartphones | TechTweak",
   description: "Compare specifications, features, and prices of the latest smartphones side-by-side.",
+  alternates: {
+    canonical: "/compare",
+  },
+  openGraph: {
+    title: "Compare Smartphones | TechTweak",
+    description: "Compare specifications, features, and prices of the latest smartphones side-by-side.",
+    url: "/compare",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Compare Smartphones | TechTweak",
+    description: "Compare specifications, features, and prices of the latest smartphones side-by-side.",
+  },
 };
 
 // Helper to extract numbers for comparison

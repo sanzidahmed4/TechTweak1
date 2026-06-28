@@ -178,29 +178,25 @@ export default async function Home() {
                 "url": "https://www.techtweak.tech",
                 "logo": {
                   "@type": "ImageObject",
-                  "url": "https://www.techtweak.tech/icon.png"
+                  "url": "https://www.techtweak.tech/icon-512x512.png"
                 },
                 "sameAs": [
-                  "https://www.facebook.com/profile.php?id=61590823097198",
-                  "https://twitter.com/techtweak",
-                  "https://youtube.com/techtweak"
+                  "https://www.facebook.com/profile.php?id=61590823097198"
                 ]
               },
               {
-                "@context": "https://schema.org",
                 "@type": "WebSite",
                 "@id": "https://www.techtweak.tech/#website",
                 "url": "https://www.techtweak.tech",
                 "name": "TechTweak",
                 "publisher": {
                   "@id": "https://www.techtweak.tech/#organization"
+                },
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": "https://www.techtweak.tech/search?q={search_term_string}",
+                  "query-input": "required name=search_term_string"
                 }
-              },
-              {
-                "@context": "https://schema.org",
-                "@type": "SearchAction",
-                "target": "https://www.techtweak.tech/search?q={search_term_string}",
-                "query-input": "required name=search_term_string"
               }
             ]
           })

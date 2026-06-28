@@ -8,6 +8,20 @@ import { Clock, Eye } from "lucide-react";
 export const metadata = {
   title: 'News & Articles | TechTweak',
   description: 'Explore the latest smartphone news, reviews, and tech guides on TechTweak.',
+  alternates: {
+    canonical: "/news",
+  },
+  openGraph: {
+    title: "News & Articles | TechTweak",
+    description: "Explore the latest smartphone news, reviews, and tech guides on TechTweak.",
+    url: "/news",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "News & Articles | TechTweak",
+    description: "Explore the latest smartphone news, reviews, and tech guides on TechTweak.",
+  },
 };
 
 export const revalidate = 3600; // Enable ISR (1 hour caching)

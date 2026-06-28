@@ -1,6 +1,20 @@
 export const metadata = {
   title: 'About | TechTweak',
-  description: 'Explore the latest on TechTweak.',
+  description: 'Learn more about TechTweak, your trusted source for premium smartphone reviews, specifications, and side-by-side comparisons.',
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About | TechTweak",
+    description: "Learn more about TechTweak, your trusted source for premium smartphone reviews, specifications, and side-by-side comparisons.",
+    url: "/about",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About | TechTweak",
+    description: "Learn more about TechTweak, your trusted source for premium smartphone reviews, specifications, and side-by-side comparisons.",
+  },
 };
 
 export default function Page() {

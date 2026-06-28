@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     siteName: "TechTweak",
     images: [
       {
-        url: "/sitelogo.svg",
-        width: 1200,
-        height: 630,
+        url: "/icon-512x512.png",
+        width: 512,
+        height: 512,
         alt: "TechTweak Logo",
       }
     ],
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "TechTweak | Premium Smartphone Reviews",
     description: "Discover the ultimate tech resource for smartphone reviews and side-by-side comparisons.",
-    images: ["/sitelogo.svg"],
+    images: ["/icon-512x512.png"],
   },
   appleWebApp: {
     capable: true,
