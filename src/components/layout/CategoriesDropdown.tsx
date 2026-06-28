@@ -42,8 +42,8 @@ export default function CategoriesDropdown({
     }, 150);
   }, [onOpenChange]);
 
-  // navbar height: scrolled = ~52px, default = ~68px
-  const menuTop = isScrolled ? "52px" : "68px";
+  // navbar height on desktop is h-16 (64px) + 1px bottom border = 65px
+  const menuTop = "65px";
 
   return (
     <>
