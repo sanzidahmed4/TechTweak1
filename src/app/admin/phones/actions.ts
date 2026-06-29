@@ -232,6 +232,8 @@ export async function addPhone(formData: FormData) {
     related_similar_ids: [],
     related_compare_ids: [],
     related_better_ids: [],
+    
+    custom_specs: formData.get("custom_specs") ? JSON.parse(formData.get("custom_specs") as string) : [],
   };
 
   // Auto-generate Pros, Cons, FAQs based on specs
@@ -501,6 +503,8 @@ export async function editPhone(id: string, formData: FormData) {
     related_similar_ids: [],
     related_compare_ids: [],
     related_better_ids: [],
+    
+    custom_specs: formData.get("custom_specs") ? JSON.parse(formData.get("custom_specs") as string) : [],
     
     updated_at: new Date(),
   };

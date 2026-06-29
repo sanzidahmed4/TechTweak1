@@ -147,6 +147,9 @@ export interface IPhone extends Document {
   // FAQ System
   faqs?: { question: string; answer: string }[];
 
+  // Dynamic Custom Specs
+  custom_specs?: { category: string; label: string; value: string }[];
+
   // Programmatic SEO Section
   primary_keyword?: string;
   secondary_keywords?: string[];
@@ -330,6 +333,9 @@ const PhoneSchema: Schema = new Schema({
 
   // FAQ System
   faqs: [{ question: String, answer: String }],
+
+  // Dynamic Custom Specs
+  custom_specs: [{ category: String, label: String, value: String }],
 
   // Programmatic SEO Section
   primary_keyword: { type: String },

@@ -2,7 +2,7 @@ import { editPhone } from "../../actions";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Brand from "@/lib/models/Brand";
 import Phone from "@/lib/models/Phone";
-import PhoneForm from "@/components/admin/PhoneForm";
+import InlinePhoneEditor from "@/components/admin/InlinePhoneEditor";
 import { notFound } from "next/navigation";
 
 export default async function EditPhonePage(props: { params: Promise<{ id: string }>, searchParams: Promise<{ returnUrl?: string }> }) {
@@ -45,12 +45,10 @@ export default async function EditPhonePage(props: { params: Promise<{ id: strin
   const updatePhoneWithId = editPhone.bind(null, phone._id);
 
   return (
-    <PhoneForm 
+    <InlinePhoneEditor 
       initialData={phone}
       brands={brands}
       action={updatePhoneWithId}
-      title="Edit Phone Specs"
-      description={`Update specifications, highlights, media, pros & cons, FAQs and SEO attributes for ${phone.name}.`}
       returnUrl={returnUrl}
     />
   );

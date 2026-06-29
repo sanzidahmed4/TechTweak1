@@ -223,6 +223,17 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       }))
     });
   }
+
+  const renderCustomSpecs = (category: string) => {
+    if (!rawPhone.custom_specs || rawPhone.custom_specs.length === 0) return null;
+    return rawPhone.custom_specs.filter((s: any) => s.category === category).map((spec: any, index: number) => (
+      <div key={`custom-${category}-${index}`} className="flex flex-col sm:flex-row p-5 text-sm bg-blue-50/20 border-l-2 border-blue-200 hover:bg-slate-50/50 transition-colors">
+        <div className="w-full sm:w-1/3 font-bold text-slate-800 uppercase tracking-wider text-[11px] self-center pr-2">{spec.label}</div>
+        <div className="w-full sm:w-2/3 mt-1.5 sm:mt-0 text-slate-600 font-semibold">{spec.value}</div>
+      </div>
+    ));
+  };
+
   return (
     <>
       {/* Inject SEO Schema */}
@@ -482,6 +493,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("General")}
                 </div>
               </div>
 
@@ -509,6 +521,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("Display")}
                 </div>
               </div>
 
@@ -537,6 +550,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("Hardware")}
                 </div>
               </div>
 
@@ -568,6 +582,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                           <span className="text-slate-700 font-semibold leading-relaxed">{spec.value || "N/A"}</span>
                         </div>
                       ))}
+                      {renderCustomSpecs("Camera")}
                     </div>
                   </div>
                 </div>
@@ -593,6 +608,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                           <span className="text-slate-700 font-semibold leading-relaxed">{spec.value || "N/A"}</span>
                         </div>
                       ))}
+                      {renderCustomSpecs("Selfie")}
                     </div>
                   </div>
                 </div>
@@ -621,6 +637,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("Battery")}
                 </div>
               </div>
 
@@ -648,6 +665,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("Connectivity")}
                 </div>
               </div>
 
