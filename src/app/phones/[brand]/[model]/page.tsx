@@ -4,27 +4,44 @@ import Brand from "@/lib/models/Brand";
 import { notFound } from "next/navigation";
 import {
   Check, X, Battery, Cpu, Smartphone, Wifi, Camera, ShieldCheck,
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
   ChevronDown, Layers, Zap, Info, ShieldAlert, HelpCircle,
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
   Sparkles, Award, Eye, GitCompare, HardDrive
 } from "lucide-react";
 import PhoneGallery from "@/components/phones/PhoneGallery";
 import SpecNavigation from "@/components/phones/SpecNavigation";
 import Link from "next/link";
+import Image from "next/image";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
+
+export const revalidate = 86400; // 24 hours ISR
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string, model: string }> }) {
   const { brand, model } = await params;
   await connectToDatabase();
 
-  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description images updated_at").lean() as any;
+  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description meta_keywords images og_image updated_at").lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
 
   if (!data) return { title: "Phone Not Found" };
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
   const url = `${baseUrl}/phones/${brand}/${model}`;
 
+  const getOgImageUrl = (imgUrl: string) => {
+    if (!imgUrl) return undefined;
+    if (imgUrl.includes('res.cloudinary.com') && imgUrl.includes('/upload/')) {
+      return imgUrl.replace('/upload/', '/upload/w_1200,h_630,c_pad,b_white/');
+    }
+    return imgUrl;
+  };
+
+  const finalOgImage = getOgImageUrl(data.og_image) || getOgImageUrl(data.images?.[0]);
+
   return {
     title: data.meta_title || `${data.name} Specs, Review, and Price | TechTweak`,
     description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
+    keywords: data.meta_keywords || `${data.name}, ${data.name} price, specs, review`,
     alternates: {
       canonical: url,
       languages: {
@@ -36,7 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
       title: data.name,
       description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
       url,
-      images: data.images && data.images.length > 0 ? [{ url: data.images[0] }] : [],
+      images: finalOgImage ? [{ url: finalOgImage }] : [],
       type: 'article',
       modifiedTime: data.updated_at ? new Date(data.updated_at).toISOString() : new Date().toISOString(),
     },
@@ -44,7 +61,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
       card: 'summary_large_image',
       title: data.name,
       description: data.meta_description || `Full specifications, features, and price for the ${data.name}.`,
-      images: data.images && data.images.length > 0 ? [data.images[0]] : [],
+      images: finalOgImage ? [finalOgImage] : [],
     }
   };
 }
@@ -52,130 +69,20 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
 export default async function PhoneDetailsPage({ params }: { params: Promise<{ brand: string, model: string }> }) {
   const { brand, model } = await params;
   await connectToDatabase();
-
-  // Fetch real phone data
   let rawPhone = null;
   try {
     rawPhone = await Phone.findOne({ slug: model })
       .populate("brand_id", "name slug")
-      .populate("related_similar_ids", "name slug price_usd price_bdt images brand_id")
-      .populate("related_compare_ids", "name slug price_usd price_bdt images brand_id")
-      .populate("related_better_ids", "name slug price_usd price_bdt images brand_id")
+      .populate("related_similar_ids", "name slug price_usd images brand_id")
+      .populate("related_compare_ids", "name slug price_usd images brand_id")
+      .populate("related_better_ids", "name slug price_usd images brand_id")
       .lean();
   } catch (err) {
     console.error(err);
   }
 
-  // Fallback demo object if not found in db
   if (!rawPhone) {
-    rawPhone = {
-      _id: "demo",
-      name: "Galaxy S26 Ultra (Demo)",
-      slug: model,
-      brand_id: { name: "Samsung", slug: "samsung" },
-      processor: "Snapdragon 8 Gen 4",
-      ram: "12GB / 16GB LPDDR5X",
-      storage: "256GB / 512GB / 1TB UFS 4.0",
-      display: "6.8 inch Dynamic AMOLED 2X, 144Hz",
-      battery: "5000 mAh",
-      charging: "45W Wired, 15W Wireless",
-      camera_main: "200MP + 50MP + 12MP + 10MP",
-      camera_front: "12MP",
-      os: "Android 16, One UI 8",
-      price_usd: 1250,
-      antutu_score: 2450000,
-      images: ["https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=1000"],
-      is_published: true,
-      is_official: true,
-      upcoming: false,
-      colors: ["Titanium Gray", "Titanium Black", "Titanium Yellow"],
-      model_number: "SM-S928B",
-
-      // Structured specs fallback
-      weight: "232 g (8.18 oz)",
-      dimensions: "162.3 x 79 x 8.6 mm",
-      build_material: "Glass front, titanium frame, glass back",
-      sim_type: "Nano-SIM and eSIM",
-      water_resistance: "IP68 dust/water resistant (up to 1.5m for 30 min)",
-
-      display_type: "Dynamic LTPO AMOLED 2X, 120Hz, HDR10+",
-      screen_size: "6.8 inches",
-      resolution: "1440 x 3120 pixels",
-      refresh_rate: "120Hz",
-      brightness: "2600 nits (peak)",
-      hdr: "HDR10+",
-      protection: "Corning Gorilla Armor",
-      pixel_density: "505 ppi",
-
-      cpu: "Octa-core (1x3.39GHz + 3x3.1GHz + 2x2.9GHz + 2x2.2GHz)",
-      gpu: "Adreno 750",
-      fabrication: "4 nm",
-      ram_variants: "12GB, 16GB LPDDR5X",
-      storage_variants: "256GB, 512GB, 1TB",
-      storage_type: "UFS 4.0",
-      geekbench_score: "2300 / 7200",
-      cooling_system: "Vapor chamber liquid cooling",
-
-      cam_main_sensor: "200 MP, f/1.7, 24mm (wide), Multi-directional PDAF, Laser AF, OIS",
-      cam_ultrawide: "12 MP, f/2.2, 13mm, 120˚ (ultrawide)",
-      cam_telephoto: "50 MP, f/3.4, 111mm (periscope telephoto), 5x optical zoom, OIS",
-      cam_macro: "10 MP, f/2.4, 67mm (telephoto), 3x optical zoom, OIS",
-      cam_ois: "Dual OIS Support",
-      cam_flash: "LED flash, auto-HDR, panorama",
-      cam_video: "8K@24/30fps, 4K@30/60/120fps, 1080p@30/60/240fps, HDR10+",
-
-      cam_front_resolution: "12 MP, f/2.2, 26mm (wide), Dual Pixel PDAF",
-      cam_front_hdr: "Auto-HDR, HDR10+",
-      cam_front_portrait: "Smart HDR, Portrait lighting",
-      cam_front_video: "4K@30/60fps, 1080p@30fps",
-
-      battery_capacity: "5000 mAh",
-      charging_wired: "45W wired, PD3.0, 65% in 30 min",
-      charging_wireless: "15W wireless (Qi/PMA)",
-      charging_reverse: "4.5W reverse wireless",
-      charger_included: false,
-      usb_type: "USB Type-C 3.2, OTG",
-
-      has_5g: true,
-      wifi_version: "Wi-Fi 802.11 a/b/g/n/ac/6e/7, tri-band",
-      bluetooth_version: "5.3, A2DP, LE",
-      has_nfc: true,
-      gps_specs: "GPS, GLONASS, BDS, GALILEO, QZSS",
-      has_ir_blaster: false,
-      has_audio_jack: false,
-      usb_version: "USB Type-C 3.2 Gen 2",
-
-      sensor_fingerprint: "Under-display (ultrasonic)",
-      has_gyroscope: true,
-      has_compass: true,
-      has_accelerometer: true,
-      has_face_unlock: true,
-
-      android_version: "Android 15",
-      ui_version: "One UI 7.1",
-      update_policy: "7 Years of Major OS Updates",
-      ai_features: ["Circle to Search", "Live Translate", "Generative Edit", "Note Assist", "Chat Assist"],
-      has_circle_to_search: true,
-      has_ai_editing: true,
-      has_live_translation: true,
-      has_ai_assistant: true,
-
-      pros: [
-        "Incredible Snapdragon 8 Gen 4 peak performance",
-        "Corning Gorilla Armor highly reduces reflections",
-        "Exceptional battery life and 5x optical telephoto camera",
-        "7 full years of Android software updates"
-      ],
-      cons: [
-        "Expensive launch price tag",
-        "No dedicated wall charging brick in the retail box",
-        "Heavy weight in hand during extended usage"
-      ],
-      faqs: [
-        { question: "Is the charger included in the box?", answer: "No, the retail box only contains the phone and a USB-C to USB-C cable. You need to purchase a 45W PPS charger separately." },
-        { question: "Does it support eSIM technology?", answer: "Yes, it supports dual eSIM or one physical nano-SIM card along with an eSIM." }
-      ]
-    };
+    notFound();
   }
 
   // Brand and model resolution
@@ -186,11 +93,12 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
 
   if (!brandName) {
     try {
-      const brandDoc = await Brand.findOne({ slug: brand }).select("name slug").lean() as any;
+      const brandDoc = await Brand.findOne({ slug: brand }).select("name slug").lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
       if (brandDoc) {
         brandName = brandDoc.name;
         brandSlug = brandDoc.slug;
       }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_) { /* ignore */ }
   }
 
@@ -203,9 +111,9 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
   }
 
   // Load suggested items from database
-  let dbSimilarPhones: any[] = [];
-  let dbSamePricePhones: any[] = [];
-  let dbComparePhones: any[] = [];
+  let dbSimilarPhones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+  let dbSamePricePhones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+  let dbComparePhones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
 
   try {
     // 1. Similar Phones query
@@ -214,17 +122,24 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       _id: { $ne: rawPhone._id },
       is_published: true
     })
+      .select("name slug price_usd images brand_id")
+      .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
       .populate("brand_id", "name slug")
       .limit(4)
       .lean();
 
     // 2. Price Match query
     if (rawPhone.price_usd) {
+      const minPrice = rawPhone.price_usd * 0.8;
+      const maxPrice = rawPhone.price_usd * 1.2;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
       dbSamePricePhones = await Phone.find({
-        price_usd: { $gte: rawPhone.price_usd * 0.8, $lte: rawPhone.price_usd * 1.2 },
+        price_usd: { $gte: minPrice, $lte: maxPrice },
         _id: { $ne: rawPhone._id },
         is_published: true
       })
+        .select("name slug price_usd images brand_id")
+        .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
         .populate("brand_id", "name slug")
         .limit(4)
         .lean();
@@ -236,6 +151,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       _id: { $ne: rawPhone._id },
       is_published: true
     })
+      .select("name slug price_usd images brand_id")
       .populate("brand_id", "name slug")
       .limit(6)
       .lean();
@@ -252,12 +168,22 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.techtweak.tech";
   const currentUrl = `${baseUrl}/phones/${brand}/${model}`;
 
-  const jsonLd: any[] = [
+  const getOgImageUrl = (imgUrl: string) => {
+    if (!imgUrl) return undefined;
+    if (imgUrl.includes('res.cloudinary.com') && imgUrl.includes('/upload/')) {
+      return imgUrl.replace('/upload/', '/upload/w_1200,h_630,c_pad,b_white/');
+    }
+    return imgUrl;
+  };
+
+  const finalSchemaImage = getOgImageUrl(rawPhone.og_image) || getOgImageUrl(rawPhone.images?.[0]);
+
+  const jsonLd: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [
     {
       "@context": "https://schema.org",
       "@type": "Product",
       name: rawPhone.name,
-      image: rawPhone.images && rawPhone.images.length > 0 ? rawPhone.images[0] : undefined,
+      image: finalSchemaImage,
       description: rawPhone.meta_description || `Full specifications, features, and price for the ${rawPhone.name}.`,
       brand: {
         "@type": "Brand",
@@ -287,7 +213,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
     jsonLd.push({
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      mainEntity: rawPhone.faqs.map((faq: any) => ({
+      mainEntity: rawPhone.faqs.map((faq: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
         "@type": "Question",
         name: faq.question,
         acceptedAnswer: {
@@ -297,27 +223,38 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       }))
     });
   }
+
+  const renderCustomSpecs = (category: string) => {
+    if (!rawPhone.custom_specs || rawPhone.custom_specs.length === 0) return null;
+    return rawPhone.custom_specs.filter((s: any) => s.category === category).map((spec: any, index: number) => (
+      <div key={`custom-${category}-${index}`} className="flex flex-col sm:flex-row p-5 text-sm bg-blue-50/20 border-l-2 border-blue-200 hover:bg-slate-50/50 transition-colors">
+        <div className="w-full sm:w-1/3 font-bold text-slate-800 uppercase tracking-wider text-[11px] self-center pr-2">{spec.label}</div>
+        <div className="w-full sm:w-2/3 mt-1.5 sm:mt-0 text-slate-600 font-semibold">{spec.value}</div>
+      </div>
+    ));
+  };
+
   return (
     <>
       {/* Inject SEO Schema */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div className="bg-slate-50 min-h-screen pt-[86px] pb-8 lg:pt-[102px] lg:pb-16">
+      <div className="bg-slate-50 min-h-screen pt-[78px] pb-8 lg:pt-[86px] lg:pb-16">
         <div className="container mx-auto px-4 lg:px-8">
 
           {/* Breadcrumb Navigation */}
-          <nav className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-8 overflow-x-auto whitespace-nowrap pb-2">
+          <nav className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm font-medium text-slate-500 mb-4 sm:mb-8 overflow-x-auto whitespace-nowrap pb-2 custom-scrollbar">
             <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <span>/</span>
+            <span className="text-slate-300">/</span>
             <Link href="/phones" className="hover:text-primary transition-colors">Phones</Link>
-            <span>/</span>
+            <span className="text-slate-300">/</span>
             <Link href={`/phones?brand=${brandSlug}`} className="hover:text-primary transition-colors uppercase tracking-wider">{brandName}</Link>
-            <span>/</span>
-            <span className="text-slate-900 font-bold">{rawPhone.name}</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-900 font-bold truncate max-w-[150px] sm:max-w-none">{rawPhone.name}</span>
           </nav>
 
           {/* Overview top header */}
-          <div id="overview" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-10">
+          <div id="overview" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-5 lg:mb-10">
 
             {/* Gallery Section */}
             <div className="lg:col-span-5 relative">
@@ -331,9 +268,9 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   <span className="text-xs font-black tracking-widest text-primary uppercase bg-blue-50 px-3 py-1 rounded-full">
                     {brandName}
                   </span>
-                  {rawPhone.upcoming ? (
+                  {rawPhone.phone_status && ['upcoming', 'rumored'].includes(rawPhone.phone_status) ? (
                     <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full uppercase tracking-wider">
-                      Upcoming
+                      {rawPhone.phone_status}
                     </span>
                   ) : rawPhone.is_published ? (
                     <span className="text-xs font-bold text-green-700 bg-green-50 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
@@ -342,13 +279,19 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   ) : null}
                 </div>
 
-                <h1 className="text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-2 tracking-tight leading-tight">
                   {rawPhone.name}
                 </h1>
 
                 {/* Price Section - Official / Unofficial */}
                 <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                  {rawPhone.price_usd ? (
+                  {rawPhone.phone_status && ['upcoming', 'rumored'].includes(rawPhone.phone_status) ? (
+                    <div className="flex-1 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
+                      <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Pricing</p>
+                      <p className="text-xl font-black text-amber-800">{rawPhone.price_usd ? `$${rawPhone.price_usd.toLocaleString()}` : "Upcoming"}</p>
+                      <p className="text-xs text-amber-600 mt-1">Disclaimer: This is an unofficial preliminary specification. Information may not be 100% accurate. Leak Confidence: {rawPhone.leak_confidence ? rawPhone.leak_confidence.replace('_', ' ').toUpperCase() : 'N/A'}</p>
+                    </div>
+                  ) : rawPhone.price_usd ? (
                     <div className="flex-1 bg-green-50 border border-green-200 rounded-2xl px-4 py-3">
                       <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">✅ Official Price</p>
                       <p className="text-2xl font-black text-green-800">${rawPhone.price_usd.toLocaleString()}</p>
@@ -356,49 +299,48 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                     </div>
                   ) : (
                     <div className="flex-1 bg-slate-100 border border-slate-200 rounded-2xl px-4 py-3">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">✅ Official Price</p>
-                      <p className="text-xl font-bold text-slate-400">TBA</p>
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Pricing</p>
+                      <p className="text-xl font-bold text-slate-400">Not Announced Yet</p>
                     </div>
                   )}
-
                 </div>
 
                 {/* Quick features highlight grid */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
+                  <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
+                    <div className="hidden sm:flex w-10 h-10 rounded-xl bg-blue-50 text-blue-600 items-center justify-center flex-shrink-0">
                       <Cpu size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Processor</p>
-                      <p className="font-bold text-slate-800 text-sm leading-tight line-clamp-1">{rawPhone.chipset_highlight || rawPhone.processor || "N/A"}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Processor</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.chipset_highlight || rawPhone.processor || "N/A"}</p>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
+                    <div className="hidden sm:flex w-10 h-10 rounded-xl bg-purple-50 text-purple-600 items-center justify-center flex-shrink-0">
                       <Camera size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Main Camera</p>
-                      <p className="font-bold text-slate-800 text-sm leading-tight line-clamp-1">{rawPhone.camera_highlight || rawPhone.camera_main?.split("+")[0] || "N/A"}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Main Camera</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.camera_highlight || rawPhone.cam_main_sensor || rawPhone.camera_main?.split("+")[0] || "N/A"}</p>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
+                    <div className="hidden sm:flex w-10 h-10 rounded-xl bg-orange-50 text-orange-600 items-center justify-center flex-shrink-0">
                       <Smartphone size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Display</p>
-                      <p className="font-bold text-slate-800 text-sm leading-tight line-clamp-1">{rawPhone.display_highlight || rawPhone.display?.split(",")[0] || "N/A"}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Display</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.display_highlight || rawPhone.screen_size || rawPhone.display?.split(",")[0] || "N/A"}</p>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/60 flex items-center gap-3">
+                    <div className="hidden sm:flex w-10 h-10 rounded-xl bg-green-50 text-green-600 items-center justify-center flex-shrink-0">
                       <Battery size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Battery</p>
-                      <p className="font-bold text-slate-800 text-sm leading-tight line-clamp-1">{rawPhone.battery_highlight || rawPhone.battery || "N/A"}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Battery</p>
+                      <p className="font-bold text-slate-800 text-xs sm:text-sm leading-tight">{rawPhone.battery_highlight || rawPhone.battery_capacity || rawPhone.battery || "N/A"}</p>
                     </div>
                   </div>
                 </div>
@@ -442,7 +384,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <span className="text-xs font-bold text-slate-700">Wi-Fi 6/7 Ready</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {rawPhone.water_resistance ? (
+                      {(rawPhone.water_resistance || rawPhone.ip_rating) ? (
                         <Check className="text-green-600 bg-green-50 p-0.5 rounded-full flex-shrink-0" size={16} />
                       ) : (
                         <X className="text-red-500 bg-red-50 p-0.5 rounded-full flex-shrink-0" size={16} />
@@ -462,33 +404,44 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
               </div>
 
               {/* Quick Info Grid */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <div className={`bg-white rounded-3xl border border-slate-200 p-5 grid grid-cols-2 gap-4 text-left md:text-center ${rawPhone.made_in ? 'md:grid-cols-5' : 'md:grid-cols-4'}`}>
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">Colors</span>
-                  <span className="text-xs font-semibold text-slate-700 line-clamp-1">{rawPhone.colors?.length > 0 ? rawPhone.colors.join(", ") : "N/A"}</span>
+                  <span className="text-xs font-semibold text-slate-700">{rawPhone.colors?.length > 0 ? rawPhone.colors.join(", ") : "N/A"}</span>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">Water Rating</span>
-                  <span className="text-xs font-semibold text-slate-700 line-clamp-1">
-                    {rawPhone.water_resistance ? (
-                      rawPhone.water_resistance.includes("IP68") ? "IP68 Certified" :
-                      rawPhone.water_resistance.includes("IP67") ? "IP67 Certified" :
-                      rawPhone.water_resistance.includes("IP54") ? "IP54 Splash-proof" :
-                      rawPhone.water_resistance.includes("IP53") ? "IP53 Splash-proof" :
-                      rawPhone.water_resistance.split(" — ")[0] || rawPhone.water_resistance.split("-")[0] || rawPhone.water_resistance
+                  <span className="text-xs font-semibold text-slate-700">
+                    {(rawPhone.water_resistance || rawPhone.ip_rating) ? (
+                      (rawPhone.water_resistance || rawPhone.ip_rating).includes("IP68") ? "IP68 Certified" :
+                      (rawPhone.water_resistance || rawPhone.ip_rating).includes("IP67") ? "IP67 Certified" :
+                      (rawPhone.water_resistance || rawPhone.ip_rating).includes("IP54") ? "IP54 Splash-proof" :
+                      (rawPhone.water_resistance || rawPhone.ip_rating).includes("IP53") ? "IP53 Splash-proof" :
+                      (rawPhone.water_resistance || rawPhone.ip_rating).split(" — ")[0] || (rawPhone.water_resistance || rawPhone.ip_rating).split("-")[0] || (rawPhone.water_resistance || rawPhone.ip_rating)
                     ) : "N/A"}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">Release Date</span>
-                  <span className="text-xs font-semibold text-slate-700 block line-clamp-1">{rawPhone.release_date || "N/A"}</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">
+                    {rawPhone.phone_status && ['upcoming', 'rumored'].includes(rawPhone.phone_status) ? "Expected Launch" : "Release Date"}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-700 block">
+                    {rawPhone.phone_status && ['upcoming', 'rumored'].includes(rawPhone.phone_status) 
+                      ? (rawPhone.expected_launch_date || rawPhone.launch_quarter || rawPhone.launch_year || "N/A") 
+                      : (rawPhone.release_date || "N/A")}
+                  </span>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">OS Support</span>
-                  <span className="text-xs font-semibold text-slate-700 line-clamp-1">{rawPhone.update_policy || "Standard"}</span>
+                  <span className="text-xs font-semibold text-slate-700">{rawPhone.update_policy || "Standard"}</span>
                 </div>
+                {rawPhone.made_in && (
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider mb-0.5">Made In</span>
+                    <span className="text-xs font-semibold text-slate-700">{rawPhone.made_in}</span>
+                  </div>
+                )}
               </div>
-
             </div>
           </div>
 
@@ -496,13 +449,17 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
           <SpecNavigation />
 
           {/* 2-COLUMN MAIN CONTENT & SIDEBAR GRID */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
 
             {/* Left Main Content Column (Takes 8/12 of space) */}
-            <div className="lg:col-span-8 space-y-8">
+            <div className="lg:col-span-8 space-y-5 lg:space-y-8">
+
+              {/* SINGLE BOX FOR ALL SPECS */}
+              <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                <div className="divide-y divide-slate-200">
 
               {/* General Info */}
-              <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
+              <div className="transition-colors hover:bg-slate-50/30">
                 <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                     <Info size={16} />
@@ -527,7 +484,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                     { label: "Physical Dimensions", value: rawPhone.dimensions },
                     { label: "Build Material", value: rawPhone.build_material },
                     { label: "SIM Layout", value: rawPhone.sim_type },
-                    { label: "Water & Dust Rating", value: rawPhone.water_resistance },
+                    { label: "Water & Dust Rating", value: rawPhone.water_resistance || rawPhone.ip_rating },
                     { label: "Manufactured In", value: rawPhone.made_in },
                     { label: "Phone Variants", value: rawPhone.phone_variants }
                   ].map((spec, i) => (
@@ -536,11 +493,12 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("General")}
                 </div>
               </div>
 
               {/* Display details */}
-              <div id="display" className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
+              <div id="display" className="transition-colors hover:bg-slate-50/30">
                 <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
                     <Smartphone size={16} />
@@ -563,16 +521,17 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("Display")}
                 </div>
               </div>
 
               {/* Performance details */}
-              <div id="performance" className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
+              <div id="performance" className="transition-colors hover:bg-slate-50/30">
                 <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
                     <Cpu size={16} />
                   </div>
-                  <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider">Performance Specifications</h2>
+                  <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider">Hardware and Specification</h2>
                 </div>
                 <div className="divide-y divide-slate-100">
                   {[
@@ -591,14 +550,15 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("Hardware")}
                 </div>
               </div>
 
               {/* Side-by-side Camera Cards */}
-              <div id="camera" className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div id="camera" className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
 
                 {/* Primary camera card */}
-                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors flex flex-col justify-between">
+                <div className="transition-colors hover:bg-slate-50/30 flex flex-col justify-between">
                   <div>
                     <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
@@ -622,12 +582,13 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                           <span className="text-slate-700 font-semibold leading-relaxed">{spec.value || "N/A"}</span>
                         </div>
                       ))}
+                      {renderCustomSpecs("Camera")}
                     </div>
                   </div>
                 </div>
 
                 {/* Selfie camera card */}
-                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors flex flex-col justify-between">
+                <div className="transition-colors hover:bg-slate-50/30 flex flex-col justify-between">
                   <div>
                     <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -647,6 +608,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                           <span className="text-slate-700 font-semibold leading-relaxed">{spec.value || "N/A"}</span>
                         </div>
                       ))}
+                      {renderCustomSpecs("Selfie")}
                     </div>
                   </div>
                 </div>
@@ -654,12 +616,12 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
               </div>
 
               {/* Battery & Charging details */}
-              <div id="battery" className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
+              <div id="battery" className="transition-colors hover:bg-slate-50/30">
                 <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
                     <Battery size={16} />
                   </div>
-                  <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider">Battery & Storage System</h2>
+                  <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider">Battery & Charging System</h2>
                 </div>
                 <div className="divide-y divide-slate-100">
                   {[
@@ -675,11 +637,12 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("Battery")}
                 </div>
               </div>
 
               {/* Network & Connectivity */}
-              <div id="connectivity" className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
+              <div id="connectivity" className="transition-colors hover:bg-slate-50/30">
                 <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-cyan-50 text-cyan-600 flex items-center justify-center">
                     <Wifi size={16} />
@@ -689,24 +652,24 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                 <div className="divide-y divide-slate-100">
                   {[
                     { label: "5G Band Connectivity", value: rawPhone.has_5g ? "Supported (Full 5G compatibility)" : "4G LTE Bands only" },
-                    { label: "Wireless LAN (WiFi)", value: rawPhone.wifi_version },
-                    { label: "Bluetooth Protocol", value: rawPhone.bluetooth_version },
+                    { label: "Wireless LAN (WiFi)", value: rawPhone.wifi_version || rawPhone.wlan },
+                    { label: "Bluetooth Protocol", value: rawPhone.bluetooth_version || rawPhone.bluetooth },
                     { label: "NFC Capability", value: rawPhone.has_nfc ? "Yes (Supports contact payments)" : "No" },
-                    { label: "Satelite Navigation (GPS)", value: rawPhone.gps_specs },
+                    { label: "Satelite Navigation (GPS)", value: rawPhone.gps_specs || rawPhone.gps },
                     { label: "Infrared Blaster", value: rawPhone.has_ir_blaster ? "Yes (Built-in IR transceiver)" : "No" },
-                    { label: "3.5mm Headphone Jack", value: rawPhone.has_audio_jack ? "Yes (Supports legacy analog jacks)" : "No (Relies on USB-C or Bluetooth)" },
-                    { label: "USB Protocol Version", value: rawPhone.usb_version }
+                    { label: "3.5mm Headphone Jack", value: rawPhone.has_audio_jack ? "Yes (Supports legacy analog jacks)" : "No (Relies on USB-C or Bluetooth)" }
                   ].map((spec, i) => (
                     <div key={i} className="flex flex-col sm:flex-row p-5 text-sm">
                       <div className="w-full sm:w-1/3 font-bold text-slate-800 uppercase tracking-wider text-[11px] self-center">{spec.label}</div>
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                  {renderCustomSpecs("Connectivity")}
                 </div>
               </div>
 
               {/* Sensors */}
-              <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
+              <div className="transition-colors hover:bg-slate-50/30">
                 <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
                     <Layers size={16} />
@@ -730,7 +693,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
               </div>
 
               {/* Software & AI */}
-              <div id="features" className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
+              <div id="features" className="transition-colors hover:bg-slate-50/30">
                 <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
                     <Sparkles size={16} />
@@ -752,6 +715,9 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                       <div className="w-full sm:w-2/3 text-slate-600 font-semibold mt-1.5 sm:mt-0 leading-relaxed">{spec.value || "Not specified"}</div>
                     </div>
                   ))}
+                </div>
+              </div>
+
                 </div>
               </div>
 
@@ -797,7 +763,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-6">Frequently Asked Questions</h2>
                 <div className="space-y-4">
                   {rawPhone.faqs && rawPhone.faqs.length > 0 ? (
-                    rawPhone.faqs.map((faq: any, i: number) => (
+                    rawPhone.faqs.map((faq: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */, i: number) => (
                       <details key={i} className="group border-b border-slate-100 pb-4 last:border-none">
                         <summary className="flex justify-between items-center font-bold text-slate-900 cursor-pointer list-none text-base sm:text-lg">
                           {faq.question}
@@ -819,7 +785,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
             </div>
 
             {/* Right Sidebar Column (Takes 4/12 of space - filling the red marked empty space) */}
-            <div className="lg:col-span-4 space-y-8 lg:sticky lg:top-24">
+            <div className="lg:col-span-4 space-y-5 lg:space-y-8 lg:sticky lg:top-24">
 
               {/* 1. Suggested Smartphones */}
               {similarSection.length > 0 && (
@@ -828,7 +794,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                     <Smartphone size={16} className="text-primary" /> Suggested Phones
                   </h3>
                   <div className="space-y-4">
-                    {similarSection.map((p: any) => (
+                    {similarSection.map((p: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
                       <SidebarPhoneRow key={p._id} phone={p} />
                     ))}
                   </div>
@@ -842,7 +808,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                     <Sparkles size={16} className="text-purple-600" /> Best Flagships
                   </h3>
                   <div className="space-y-4">
-                    {betterSection.map((p: any) => (
+                    {betterSection.map((p: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
                       <SidebarPhoneRow key={p._id} phone={p} />
                     ))}
                   </div>
@@ -856,7 +822,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                     <GitCompare size={16} className="text-cyan-600" /> Compared Mobile
                   </h3>
                   <div className="space-y-4">
-                    {compareSection.map((p: any) => (
+                    {compareSection.map((p: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
                       <SidebarPhoneRow key={p._id} phone={p} />
                     ))}
                   </div>
@@ -874,7 +840,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
 }
 
 // Minimalist list item row for the sidebar
-function SidebarPhoneRow({ phone }: { phone: any }) {
+function SidebarPhoneRow({ phone }: { phone: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */ }) {
   const brandSlug = phone.brand_id?.slug || "brand";
   const brandName = phone.brand_id?.name || "Brand";
 
@@ -885,12 +851,17 @@ function SidebarPhoneRow({ phone }: { phone: any }) {
     >
       <div className="w-14 h-14 bg-white border border-slate-200/80 rounded-xl p-1 flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden">
         {phone.images && phone.images[0] ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={phone.images[0]}
-            alt={phone.name}
-            className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
-          />
+          <div className="relative w-full h-full">
+            <Image
+              src={phone.images[0] || FALLBACK_IMAGE}
+              alt={phone.name}
+              fill
+              sizes="56px"
+              className="object-contain group-hover:scale-105 transition-transform duration-300"
+              placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+              blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
+            />
+          </div>
         ) : (
           <Smartphone className="text-slate-300" size={20} />
         )}
@@ -901,7 +872,7 @@ function SidebarPhoneRow({ phone }: { phone: any }) {
           {phone.name}
         </h4>
         <span className="text-xs font-black text-slate-900 mt-1 block">
-          {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "TBA"}
+          {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Not Announced Yet"}
         </span>
       </div>
     </Link>

@@ -9,14 +9,25 @@ export interface IPhone extends Document {
   
   // Basic Info (Expanded)
   price_usd?: number;
-  price_bdt?: number;
+  price_inr?: number;
+  price_eur?: number;
+  price_gbp?: number;
   price_official?: number;
   price_unofficial?: number;
   is_official?: boolean;
   release_date?: string;
+  release_date_parsed?: Date | null;
   is_published: boolean;
   is_featured: boolean;
-  upcoming?: boolean;
+  upcoming?: boolean; // legacy, keeping for backward compatibility temporarily
+  phone_status?: string;
+  
+  // New Ecosystem Fields
+  price_status?: string;
+  expected_launch_date?: string;
+  launch_quarter?: string;
+  launch_year?: number;
+  leak_confidence?: string;
   colors?: string[];
   model_number?: string;
   made_in?: string;
@@ -104,7 +115,6 @@ export interface IPhone extends Document {
   gps_specs?: string;
   has_ir_blaster?: boolean;
   has_audio_jack?: boolean;
-  usb_version?: string;
 
   // Sensors
   sensor_fingerprint?: string;
@@ -123,18 +133,53 @@ export interface IPhone extends Document {
   has_live_translation?: boolean;
   has_ai_assistant?: boolean;
 
-  // Pros & Cons
+  // Content Optimization
+  seo_overview?: string;
+  key_highlights?: string[];
+  verdict?: string;
   pros?: string[];
   cons?: string[];
+  gaming_review?: string;
+  camera_review?: string;
+  battery_review?: string;
 
   // FAQ System
   faqs?: { question: string; answer: string }[];
 
-  // SEO Section
+  // Dynamic Custom Specs
+  custom_specs?: { category: string; label: string; value: string }[];
+
+  // Programmatic SEO Section
+  primary_keyword?: string;
+  secondary_keywords?: string[];
+  question_keywords?: string[];
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string;
+  seo_slug?: string;
+  canonical_url?: string;
+  og_title?: string;
+  og_description?: string;
   og_image?: string;
+  twitter_title?: string;
+  twitter_description?: string;
+
+  // SEO Tracking & Auditing
+  seo_status?: string;
+  seo_score?: number;
+  schema_status?: boolean;
+  index_status?: string;
+  internal_link_count?: number;
+  internal_link_score?: number;
+  last_seo_audit?: Date | null;
+  content_status?: string;
+
+  // Search Console Tracking (Future-Ready)
+  gsc_impressions?: number;
+  gsc_clicks?: number;
+  gsc_ctr?: number;
+  gsc_position?: number;
+  gsc_last_sync?: Date | null;
 
   // Related Devices
   related_similar_ids?: mongoose.Types.ObjectId[];
@@ -153,14 +198,25 @@ const PhoneSchema: Schema = new Schema({
   
   // Basic Info
   price_usd: { type: Number },
-  price_bdt: { type: Number },
+  price_inr: { type: Number },
+  price_eur: { type: Number },
+  price_gbp: { type: Number },
   price_official: { type: Number },
   price_unofficial: { type: Number },
   is_official: { type: Boolean, default: true },
   release_date: { type: String },
+  release_date_parsed: { type: Date, default: null },
   is_published: { type: Boolean, default: false },
   is_featured: { type: Boolean, default: false },
-  upcoming: { type: Boolean, default: false },
+  upcoming: { type: Boolean, default: false }, // legacy
+  phone_status: { type: String, enum: ['released', 'upcoming', 'rumored', 'draft', 'cancelled'], default: 'released' },
+  
+  // New Ecosystem Fields
+  price_status: { type: String, enum: ['official', 'expected', 'rumored', 'unannounced', 'discontinued'], default: 'official' },
+  expected_launch_date: { type: String },
+  launch_quarter: { type: String },
+  launch_year: { type: Number },
+  leak_confidence: { type: String, enum: ['low', 'moderate', 'high', 'officially_confirmed'] },
   colors: { type: [String], default: [] },
   model_number: { type: String },
   made_in: { type: String },
@@ -248,7 +304,6 @@ const PhoneSchema: Schema = new Schema({
   gps_specs: { type: String },
   has_ir_blaster: { type: Boolean, default: false },
   has_audio_jack: { type: Boolean, default: false },
-  usb_version: { type: String },
 
   // Sensors
   sensor_fingerprint: { type: String },
@@ -267,21 +322,50 @@ const PhoneSchema: Schema = new Schema({
   has_live_translation: { type: Boolean, default: false },
   has_ai_assistant: { type: Boolean, default: false },
 
-  // Pros & Cons
+  // Content Optimization
+  seo_overview: { type: String },
+  key_highlights: { type: [String], default: [] },
+  verdict: { type: String },
   pros: { type: [String], default: [] },
   cons: { type: [String], default: [] },
 
   // FAQ System
-  faqs: [{
-    question: { type: String, required: true },
-    answer: { type: String, required: true }
-  }],
+  faqs: [{ question: String, answer: String }],
 
-  // SEO Section
+  // Dynamic Custom Specs
+  custom_specs: [{ category: String, label: String, value: String }],
+
+  // Programmatic SEO Section
+  primary_keyword: { type: String },
+  secondary_keywords: { type: [String], default: [] },
+  question_keywords: { type: [String], default: [] },
   meta_title: { type: String },
   meta_description: { type: String },
   meta_keywords: { type: String },
+  seo_slug: { type: String },
+  canonical_url: { type: String },
+  og_title: { type: String },
+  og_description: { type: String },
   og_image: { type: String },
+  twitter_title: { type: String },
+  twitter_description: { type: String },
+
+  // SEO Tracking & Auditing
+  seo_status: { type: String, enum: ['Red', 'Yellow', 'Green'], default: 'Red' },
+  seo_score: { type: Number, default: 0 },
+  schema_status: { type: Boolean, default: false },
+  index_status: { type: String, enum: ['index', 'noindex'], default: 'index' },
+  internal_link_count: { type: Number, default: 0 },
+  internal_link_score: { type: Number, default: 0 },
+  last_seo_audit: { type: Date, default: null },
+  content_status: { type: String, enum: ['Missing', 'Draft', 'Published'], default: 'Missing' },
+
+  // Search Console Tracking (Future-Ready)
+  gsc_impressions: { type: Number, default: 0 },
+  gsc_clicks: { type: Number, default: 0 },
+  gsc_ctr: { type: Number, default: 0 },
+  gsc_position: { type: Number, default: 0 },
+  gsc_last_sync: { type: Date, default: null },
 
   // Related Devices
   related_similar_ids: [{ type: Schema.Types.ObjectId, ref: 'Phone' }],
@@ -291,5 +375,12 @@ const PhoneSchema: Schema = new Schema({
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });
+
+// --- Enterprise MongoDB Indexes for Performance & Search ---
+PhoneSchema.index({ is_published: 1, phone_status: 1, release_date_parsed: -1 });
+PhoneSchema.index({ brand_id: 1, phone_status: 1 });
+PhoneSchema.index({ phone_status: 1, launch_year: 1, launch_quarter: 1 }); // For upcoming filtering
+PhoneSchema.index({ brand_id: 1, name: 1 }); // For autocomplete & suggestions
+PhoneSchema.index({ name: 'text' }); // Primary text search
 
 export default mongoose.models.Phone || mongoose.model<IPhone>('Phone', PhoneSchema);

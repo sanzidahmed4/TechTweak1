@@ -14,7 +14,7 @@ interface BrandItem {
 }
 
 interface PhoneFormProps {
-  initialData?: any;
+  initialData?: any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
   brands: BrandItem[];
   action: (formData: FormData) => Promise<void>;
   title: string;
@@ -60,9 +60,39 @@ export default function PhoneForm({ initialData, brands, action, title, descript
             <p className="text-xs text-slate-500">Leave blank to auto-generate from name.</p>
           </div>
           <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700">Phone Status <span className="text-red-500">*</span></label>
+            <select required name="phone_status" defaultValue={initialData?.phone_status || "released"} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+              <option value="released">Released</option>
+              <option value="upcoming">Upcoming</option>
+              <option value="rumored">Rumored</option>
+              <option value="draft">Draft</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700">Leak Confidence (For unreleased)</label>
+            <select name="leak_confidence" defaultValue={initialData?.leak_confidence || ""} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+              <option value="">Select Confidence</option>
+              <option value="low">Low (Rumor)</option>
+              <option value="moderate">Moderate (Leaks)</option>
+              <option value="high">High (Reliable Leaks)</option>
+              <option value="officially_confirmed">Officially Confirmed</option>
+            </select>
+          </div>
+          <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Official Price (USD) <span className="text-xs font-normal text-green-600">✅ Authorized</span></label>
             <input type="number" name="price_usd" defaultValue={initialData?.price_usd ?? (initialData?.price_official ? Math.round(initialData.price_official / 120) : '')} placeholder="e.g. 1000" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
             <p className="text-xs text-slate-500">Official / authorized dealer price in USD.</p>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700">Price Status</label>
+            <select name="price_status" defaultValue={initialData?.price_status || "official"} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+              <option value="official">Official</option>
+              <option value="expected">Expected</option>
+              <option value="rumored">Rumored</option>
+              <option value="unannounced">Unannounced</option>
+              <option value="discontinued">Discontinued</option>
+            </select>
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Unofficial Price (USD) <span className="text-xs font-normal text-orange-500">⚠️ Grey Market</span></label>
@@ -70,12 +100,24 @@ export default function PhoneForm({ initialData, brands, action, title, descript
             <p className="text-xs text-slate-500">Unofficial / grey market price in USD.</p>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700">Release Date</label>
-            <input type="date" name="release_date" defaultValue={initialData?.release_date || ""} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+            <label className="text-sm font-semibold text-slate-700">Release Date (String)</label>
+            <input type="text" name="release_date" defaultValue={initialData?.release_date || ""} placeholder="e.g. May 2023" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700">Expected Launch Date</label>
+            <input type="text" name="expected_launch_date" defaultValue={initialData?.expected_launch_date || ""} placeholder="e.g. March 15, 2027" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700">Launch Quarter</label>
+            <input type="text" name="launch_quarter" defaultValue={initialData?.launch_quarter || ""} placeholder="e.g. Q1 2027" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700">Launch Year</label>
+            <input type="number" name="launch_year" defaultValue={initialData?.launch_year || ""} placeholder="e.g. 2027" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Colors (Comma separated)</label>
-            <input type="text" name="colors" defaultValue={initialData?.colors?.join(", ")} placeholder="Titanium Gray, Titanium Black" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+            <input type="text" name="colors" defaultValue={Array.isArray(initialData?.colors) ? initialData.colors.join(", ") : initialData?.colors || ""} placeholder="Titanium Gray, Titanium Black" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">Model Number</label>
@@ -375,10 +417,6 @@ export default function PhoneForm({ initialData, brands, action, title, descript
             <label className="text-sm font-semibold text-slate-700">GPS Specifications</label>
             <input type="text" name="gps_specs" defaultValue={initialData?.gps_specs} placeholder="e.g. GPS, GLONASS, BDS, GALILEO, QZSS" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700">USB Version</label>
-            <input type="text" name="usb_version" defaultValue={initialData?.usb_version} placeholder="e.g. USB Type-C 3.2 Gen 2, OTG, DisplayPort" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
-          </div>
           <div className="flex flex-wrap gap-6 pt-4 md:col-span-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" name="has_5g" defaultChecked={initialData?.has_5g} className="w-5 h-5 accent-primary rounded cursor-pointer" />
@@ -449,7 +487,7 @@ export default function PhoneForm({ initialData, brands, action, title, descript
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700">AI Capabilities (Comma separated)</label>
-            <input type="text" name="ai_features" defaultValue={initialData?.ai_features?.join(", ")} placeholder="Circle to Search, Live Translate, Photo Assist" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+            <input type="text" name="ai_features" defaultValue={Array.isArray(initialData?.ai_features) ? initialData.ai_features.join(", ") : initialData?.ai_features || ""} placeholder="Circle to Search, Live Translate, Photo Assist" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
           </div>
           <div className="flex flex-wrap gap-6 pt-4 md:col-span-2">
             <label className="flex items-center gap-2 cursor-pointer">

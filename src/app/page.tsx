@@ -1,14 +1,23 @@
 import Hero from "@/components/home/Hero";
-import TrendingCarousel from "@/components/home/TrendingCarousel";
 import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
+import Image from "next/image";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 import { ArrowRight, Cpu, Battery, Camera, Zap, CheckCircle2, Smartphone, FileText } from "lucide-react";
 import connectToDatabase from "@/lib/mongodb/mongoose";
-import Phone from "@/lib/models/Phone";
 import Post from "@/lib/models/Post";
 import "@/lib/models/Category";
+import dynamic from 'next/dynamic';
 
-export const revalidate = 3600; // Enable ISR (1 hour caching), invalidated instantly on admin actions
+import AIRecommendation from "@/components/phones/AIRecommendation";
+import type { PhoneData } from "@/components/phones/PhonesClientPage";
+import { getFeaturedPhones, getUpcomingPhones } from "@/lib/services/phoneService";
+
+// Dynamic imports for heavy components
+const TrendingCarousel = dynamic(() => import('@/components/home/TrendingCarousel'), { ssr: true });
+const UpcomingCarousel = dynamic(() => import('@/components/home/UpcomingCarousel'), { ssr: true });
+
+export const revalidate = 1800; // ISR (30 minutes)
 
 // --- DTO Interfaces ---
 interface IBrandSummary {
@@ -23,6 +32,9 @@ export interface IPhoneSummary {
   brands: IBrandSummary;
   price_usd: number;
   images: string[];
+  phone_status?: string;
+  expected_launch_date?: string;
+  leak_confidence?: string;
 }
 
 interface ICategorySummary {
@@ -46,6 +58,19 @@ type RawPhone = {
   brand_id?: IBrandSummary;
   price_usd: number;
   images: string[];
+  phone_status?: string;
+  expected_launch_date?: string;
+  leak_confidence?: string;
+  display?: string;
+  processor?: string;
+  ram?: string;
+  storage?: string;
+  camera_main?: string;
+  battery?: string;
+  network?: string;
+  is_featured?: boolean;
+  release_date?: string;
+  antutu_score?: number;
 };
 
 type RawPost = {
@@ -61,29 +86,65 @@ export default async function Home() {
   await connectToDatabase();
   
   let featuredPhones: IPhoneSummary[] = [];
+  let upcomingPhones: IPhoneSummary[] = [];
   let latestArticles: IArticleSummary[] = [];
+  let aiPhones: PhoneData[] = [];
   
   try {
-    const rawPhones = (await Phone.find({ is_published: true })
-      .populate('brand_id', 'name slug')
-      .sort({ created_at: -1 })
-      .limit(8)
-      .lean()) as unknown as RawPhone[];
+    const rawPhones = await getFeaturedPhones(50) as RawPhone[];
       
-    featuredPhones = rawPhones.map((p) => ({
+    featuredPhones = rawPhones.slice(0, 10).map((p: any) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,
       brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
       price_usd: p.price_usd || 0,
-      images: p.images || []
+      images: p.images || [],
+      phone_status: p.phone_status,
+      expected_launch_date: p.expected_launch_date,
+      leak_confidence: p.leak_confidence
+    }));
+
+    const rawUpcoming = await getUpcomingPhones(10) as RawPhone[];
+      
+    aiPhones = [...rawPhones, ...rawUpcoming].map((p: any) => ({
+      id: p._id.toString(),
+      name: p.name,
+      slug: p.slug,
+      brand: { name: p.brand_id?.name || "Unknown", slug: p.brand_id?.slug || "" },
+      category: { name: p.category_id?.name || "", slug: p.category_id?.slug || "" },
+      display: p.display || null,
+      processor: p.processor || null,
+      ram: p.ram || null,
+      storage: p.storage || null,
+      camera_main: p.camera_main || null,
+      battery: p.battery || null,
+      network: p.network || null,
+      price_usd: p.price_usd || null,
+      images: p.images || [],
+      is_featured: p.is_featured || false,
+      release_date: p.release_date || null,
+      antutu_score: p.antutu_score || null,
+      phone_status: p.phone_status || 'released'
+    }));
+      
+    upcomingPhones = rawUpcoming.map((p: any) => ({
+      id: p._id.toString(),
+      name: p.name,
+      slug: p.slug,
+      brands: { name: p.brand_id?.name || 'Unknown', slug: p.brand_id?.slug || 'unknown' },
+      price_usd: p.price_usd || 0,
+      images: p.images || [],
+      phone_status: p.phone_status,
+      expected_launch_date: p.expected_launch_date,
+      leak_confidence: p.leak_confidence
     }));
 
     const rawPosts = (await Post.find({ is_published: true })
       .populate('category_id', 'name')
       .sort({ created_at: -1 })
       .limit(3)
-      .lean()) as unknown as RawPost[];
+      .lean()) as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as RawPost[];
       
     latestArticles = rawPosts.map((p) => ({
       id: p._id.toString(),
@@ -117,54 +178,62 @@ export default async function Home() {
                 "url": "https://www.techtweak.tech",
                 "logo": {
                   "@type": "ImageObject",
-                  "url": "https://www.techtweak.tech/icon.png"
+                  "url": "https://www.techtweak.tech/icon-512x512.png"
                 },
                 "sameAs": [
-                  "https://facebook.com/techtweak",
-                  "https://twitter.com/techtweak",
-                  "https://youtube.com/techtweak"
+                  "https://www.facebook.com/profile.php?id=61590823097198"
                 ]
               },
               {
-                "@context": "https://schema.org",
                 "@type": "WebSite",
                 "@id": "https://www.techtweak.tech/#website",
                 "url": "https://www.techtweak.tech",
                 "name": "TechTweak",
                 "publisher": {
                   "@id": "https://www.techtweak.tech/#organization"
+                },
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": "https://www.techtweak.tech/search?q={search_term_string}",
+                  "query-input": "required name=search_term_string"
                 }
-              },
-              {
-                "@context": "https://schema.org",
-                "@type": "SearchAction",
-                "target": "https://www.techtweak.tech/search?q={search_term_string}",
-                "query-input": "required name=search_term_string"
               }
             ]
           })
         }}
       />
-      
-      {/* Global Leaderboard Ad Slot */}
-      <div className="bg-white py-8 border-b border-slate-100">
-        <div className="container mx-auto px-4">
-          <AdSlot type="leaderboard" />
-        </div>
-      </div>
-      
+
+      {/* Upcoming Phones Section */}
+      {upcomingPhones.length > 0 && (
+        <section className="pt-8 pb-16 bg-white border-b border-slate-200/60 overflow-hidden relative">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="mb-10 sm:mb-14">
+              <div className="flex items-center justify-between gap-4 mb-2 sm:mb-4">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Upcoming Phones</h2>
+                <Link href="/upcoming-phones" className="text-xs sm:text-sm font-semibold text-purple-600 hover:text-purple-700 transition-colors whitespace-nowrap shrink-0">
+                  View All →
+                </Link>
+              </div>
+              <p className="text-slate-500 text-sm sm:text-base lg:text-lg max-w-2xl">Get an exclusive look at the future of mobile technology before it launches.</p>
+            </div>
+            
+            <UpcomingCarousel phones={upcomingPhones} />
+          </div>
+        </section>
+      )}
+
       {/* Animated Trending Phones Carousel */}
-      <section className="py-24 bg-slate-50 border-b border-slate-200/60 overflow-hidden relative">
+      <section className="pt-12 pb-20 bg-slate-50 border-b border-slate-200/60 overflow-hidden relative">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="flex flex-col sm:flex-row justify-between items-end mb-16 gap-4">
-            <div className="max-w-2xl">
-              <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Trending Right Now</h2>
-              <p className="text-slate-500 text-lg">Discover the most sought-after devices currently dominating the market charts.</p>
+          <div className="mb-10 sm:mb-14">
+            <div className="flex items-center justify-between gap-4 mb-2 sm:mb-4">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Trending Right Now</h2>
+              <Link href="/phones" className="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap shrink-0">
+                View All →
+              </Link>
             </div>
-            <Link href="/phones" className="flex items-center gap-2 text-primary font-bold hover:text-primary/80 transition-colors bg-primary/10 px-5 py-2.5 rounded-full">
-              View All Catalog <ArrowRight size={18} />
-            </Link>
+            <p className="text-slate-500 text-sm sm:text-base lg:text-lg max-w-2xl">Discover the most sought-after devices currently dominating the market charts.</p>
           </div>
           
           {featuredPhones.length > 0 ? (
@@ -179,72 +248,86 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* AI Recommendation Section */}
+      <AIRecommendation phones={aiPhones} />
+
       {/* Premium Comparison CTA */}
-      <section className="py-24 relative overflow-hidden bg-slate-900 text-white">
+      <section className="py-12 lg:py-24 relative overflow-hidden bg-slate-900 text-white">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=2000')] bg-cover bg-center opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="text-primary font-bold tracking-widest uppercase text-sm mb-4 block">Ultimate Tech Engine</span>
-            <h2 className="text-5xl font-black mb-6 tracking-tight text-white">Torn Between Flagships?</h2>
-            <p className="text-xl text-slate-300 mb-10 leading-relaxed">
+            <span className="text-primary font-bold tracking-widest uppercase text-xs lg:text-sm mb-3 lg:mb-4 block">Ultimate Tech Engine</span>
+            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black mb-4 lg:mb-6 tracking-tight text-white">Torn Between Flagships?</h2>
+            <p className="text-sm sm:text-base lg:text-xl text-slate-300 mb-8 lg:mb-10 leading-relaxed">
               Use our advanced comparison engine to map over 50 data points side-by-side. From sensor sizes to AnTuTu benchmarks, make the right choice instantly.
             </p>
-            <Link href="/compare" className="inline-flex items-center gap-3 bg-white text-slate-900 font-bold px-8 py-4 rounded-2xl hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] smooth-transition text-lg">
-              Start Comparing <Zap size={20} className="text-primary" />
+            <Link href="/compare" className="inline-flex items-center gap-2 lg:gap-3 bg-white text-slate-900 font-bold px-6 py-3 lg:px-8 lg:py-4 rounded-xl lg:rounded-2xl hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] smooth-transition text-sm sm:text-base lg:text-lg">
+              Start Comparing <Zap size={20} className="text-primary w-4 h-4 lg:w-5 lg:h-5" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Interactive Chipset / Specs Showcase */}
-      <section className="py-24 bg-white">
+      <section className="py-12 lg:py-24 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">The Anatomy of a Flagship</h2>
-            <p className="text-slate-500 text-lg">What makes a phone truly premium? We analyze every critical component.</p>
+          <div className="text-center max-w-3xl mx-auto mb-8 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-2 lg:mb-4 tracking-tight">The Anatomy of a Flagship</h2>
+            <p className="text-slate-500 text-sm sm:text-base lg:text-lg">What makes a phone truly premium? We analyze every critical component.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group">
-              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 smooth-transition">
-                <Cpu size={32} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+            <div className="bg-slate-50 p-5 lg:p-8 rounded-2xl lg:rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 shrink-0 bg-blue-100 text-blue-600 rounded-xl lg:rounded-2xl flex items-center justify-center lg:mb-6 group-hover:scale-110 smooth-transition">
+                <Cpu className="w-6 h-6 lg:w-8 lg:h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Next-Gen Silicon</h3>
-              <p className="text-slate-500">We track the latest 3nm architectures from Snapdragon, Apple Silicon, and MediaTek.</p>
+              <div className="text-left">
+                <h3 className="text-base lg:text-xl font-bold text-slate-900 mb-1 lg:mb-3 leading-tight">Next-Gen Silicon</h3>
+                <p className="text-xs lg:text-base text-slate-500 leading-snug lg:leading-normal">We track the latest 3nm architectures from Snapdragon, Apple Silicon, and MediaTek.</p>
+              </div>
             </div>
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group">
-              <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 smooth-transition">
-                <Camera size={32} />
+            
+            <div className="bg-slate-50 p-5 lg:p-8 rounded-2xl lg:rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 shrink-0 bg-purple-100 text-purple-600 rounded-xl lg:rounded-2xl flex items-center justify-center lg:mb-6 group-hover:scale-110 smooth-transition">
+                <Camera className="w-6 h-6 lg:w-8 lg:h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Computational Photography</h3>
-              <p className="text-slate-500">In-depth sensor analysis, 1-inch optics, and periscope zoom capabilities.</p>
+              <div className="text-left">
+                <h3 className="text-base lg:text-xl font-bold text-slate-900 mb-1 lg:mb-3 leading-tight">Computational Photo</h3>
+                <p className="text-xs lg:text-base text-slate-500 leading-snug lg:leading-normal">In-depth sensor analysis, 1-inch optics, and periscope zoom capabilities.</p>
+              </div>
             </div>
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group">
-              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 smooth-transition">
-                <Battery size={32} />
+            
+            <div className="bg-slate-50 p-5 lg:p-8 rounded-2xl lg:rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 shrink-0 bg-green-100 text-green-600 rounded-xl lg:rounded-2xl flex items-center justify-center lg:mb-6 group-hover:scale-110 smooth-transition">
+                <Battery className="w-6 h-6 lg:w-8 lg:h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Endurance Metrics</h3>
-              <p className="text-slate-500">Real-world active use tests, screen-on times, and ultra-fast charging speeds.</p>
+              <div className="text-left">
+                <h3 className="text-base lg:text-xl font-bold text-slate-900 mb-1 lg:mb-3 leading-tight">Endurance Metrics</h3>
+                <p className="text-xs lg:text-base text-slate-500 leading-snug lg:leading-normal">Real-world active use tests, screen-on times, and ultra-fast charging speeds.</p>
+              </div>
             </div>
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group">
-              <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 smooth-transition">
-                <CheckCircle2 size={32} />
+            
+            <div className="bg-slate-50 p-5 lg:p-8 rounded-2xl lg:rounded-3xl border border-slate-100 hover:border-primary/30 hover:shadow-xl smooth-transition group flex flex-row lg:flex-col items-center lg:items-start gap-4 lg:gap-0">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 shrink-0 bg-orange-100 text-orange-600 rounded-xl lg:rounded-2xl flex items-center justify-center lg:mb-6 group-hover:scale-110 smooth-transition">
+                <CheckCircle2 className="w-6 h-6 lg:w-8 lg:h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Editor&apos;s Verification</h3>
-              <p className="text-slate-500">Independent expert reviews scoring UI fluidity, haptics, and daily reliability.</p>
+              <div className="text-left">
+                <h3 className="text-base lg:text-xl font-bold text-slate-900 mb-1 lg:mb-3 leading-tight">Editor&apos;s Verification</h3>
+                <p className="text-xs lg:text-base text-slate-500 leading-snug lg:leading-normal">Independent expert reviews scoring UI fluidity, haptics, and daily reliability.</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Latest Articles Grid */}
-      <section className="py-24 bg-slate-50 border-t border-slate-200">
+      <section className="py-12 lg:py-24 bg-slate-50 border-t border-slate-200">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="flex justify-between items-end mb-12">
+          <div className="flex justify-between items-end mb-8 lg:mb-12">
             <div>
-              <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Editorial Insights</h2>
-              <p className="text-slate-500 text-lg">In-depth reviews, leaks, and technology breakdowns.</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-2 lg:mb-4 tracking-tight">Editorial Insights</h2>
+              <p className="text-slate-500 text-sm sm:text-base lg:text-lg">In-depth reviews, leaks, and technology breakdowns.</p>
             </div>
             <Link href="/news" className="hidden sm:flex items-center gap-2 text-primary font-bold hover:text-primary/80 transition-colors">
               View All Articles <ArrowRight size={18} />
@@ -257,8 +340,15 @@ export default async function Home() {
                 <Link href={`/news/${article.slug}`} key={article.id} className="group block">
                   <div className="w-full aspect-video bg-slate-200 rounded-3xl mb-6 overflow-hidden relative">
                     {article.featured_image ? (
-                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={article.featured_image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 smooth-transition" />
+                      <Image 
+                        src={article.featured_image || FALLBACK_IMAGE} 
+                        alt={article.title} 
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover group-hover:scale-105 smooth-transition" 
+                        placeholder={getCloudinaryBlurUrl(article.featured_image) ? "blur" : "empty"}
+                        blurDataURL={getCloudinaryBlurUrl(article.featured_image) || defaultBlurDataURL}
+                      />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-slate-400">Image</div>
                     )}

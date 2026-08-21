@@ -4,7 +4,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback } from "react";
 import { ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 
-export default function PhoneFilters({ brands, categories }: { brands: any[], categories: any[] }) {
+export default function PhoneFilters({ brands, categories }: { brands: any  [], categories: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

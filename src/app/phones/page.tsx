@@ -3,11 +3,26 @@ import Phone from "@/lib/models/Phone";
 import Brand from "@/lib/models/Brand";
 import Post from "@/lib/models/Post";
 import PhonesClientPage from "@/components/phones/PhonesClientPage";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Explore Smartphones | TechTweak",
   description:
     "Browse smartphones by brand, price, specs, and features. Find your perfect device with TechTweak's advanced filter system.",
+  alternates: {
+    canonical: "/phones",
+  },
+  openGraph: {
+    title: "Explore Smartphones | TechTweak",
+    description: "Browse smartphones by brand, price, specs, and features. Find your perfect device with TechTweak's advanced filter system.",
+    url: "/phones",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Explore Smartphones | TechTweak",
+    description: "Browse smartphones by brand, price, specs, and features. Find your perfect device with TechTweak's advanced filter system.",
+  },
 };
 
 export const revalidate = 3600; // Enable ISR (1 hour caching)
@@ -15,31 +30,38 @@ export const revalidate = 3600; // Enable ISR (1 hour caching)
 export default async function PhonesPage() {
   await connectToDatabase();
 
-  let phones: any[] = [];
-  let brands: any[] = [];
-  let latestNews: any[] = [];
+  let phones: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+  let brands: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+  let latestNews: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   let totalCount = 0;
 
   try {
     // Fetch phones with brand info
-    const rawPhones = await Phone.find({ is_published: true })
-      .populate("brand_id", "name slug logo_url")
-      .sort({ created_at: -1 })
+    const rawPhones = await Phone.find({ is_published: true, phone_status: 'released' })
+      .select('name slug brand_id category_id display processor chipset_highlight ram storage camera_main camera_highlight battery battery_highlight display_highlight network price_usd images is_featured release_date antutu_score')
+      .populate('brand_id', 'name slug')
+      .populate('category_id', 'name slug')
+      .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
       .lean();
 
-    totalCount = await Phone.countDocuments({ is_published: true });
+    totalCount = await Phone.countDocuments({ is_published: true, phone_status: 'released' });
 
-    phones = rawPhones.map((p: any) => ({
+    phones = rawPhones.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),
       name: p.name,
       slug: p.slug,
       brand: { name: p.brand_id?.name || "Unknown", slug: p.brand_id?.slug || "" },
+      category: { name: p.category_id?.name || "", slug: p.category_id?.slug || "" },
       display: p.display || null,
+      display_highlight: p.display_highlight || null,
       processor: p.processor || null,
+      chipset_highlight: p.chipset_highlight || null,
       ram: p.ram || null,
       storage: p.storage || null,
       camera_main: p.camera_main || null,
+      camera_highlight: p.camera_highlight || null,
       battery: p.battery || null,
+      battery_highlight: p.battery_highlight || null,
       network: p.network || null,
       price_usd: p.price_usd || null,
       images: p.images || [],
@@ -51,13 +73,17 @@ export default async function PhonesPage() {
     // Fetch brands with phone count
     const rawBrands = await Brand.find().sort({ order: 1 }).lean();
     const brandCounts = await Phone.aggregate([
-      { $match: { is_published: true } },
+      { $match: { is_published: true, phone_status: 'released' } },
       { $group: { _id: "$brand_id", count: { $sum: 1 } } },
     ]);
     const countMap: Record<string, number> = {};
-    brandCounts.forEach((b: any) => { countMap[b._id.toString()] = b.count; });
+    brandCounts.forEach((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => { 
+      if (b._id) {
+        countMap[b._id.toString()] = b.count; 
+      }
+    });
 
-    brands = rawBrands.map((b: any) => ({
+    brands = rawBrands.map((b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: b._id.toString(),
       name: b.name,
       slug: b.slug,
@@ -72,7 +98,7 @@ export default async function PhonesPage() {
       .select("title slug featured_image created_at")
       .lean();
 
-    latestNews = rawPosts.map((p: any) => ({
+    latestNews = rawPosts.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       title: p.title,
       slug: p.slug,
       featured_image: p.featured_image || null,
@@ -85,42 +111,16 @@ export default async function PhonesPage() {
     console.error("Error fetching phones page data:", error);
   }
 
-  // Fallback demo data if DB is empty
-  if (phones.length === 0) {
-    const demoBrands = ["Samsung", "Apple", "Xiaomi", "Realme", "Vivo", "Oppo"];
-    phones = Array.from({ length: 24 }, (_, i) => ({
-      id: String(i + 1),
-      name: `${demoBrands[i % demoBrands.length]} Galaxy Pro ${i + 1}`,
-      slug: `demo-phone-${i + 1}`,
-      brand: { name: demoBrands[i % demoBrands.length], slug: demoBrands[i % demoBrands.length].toLowerCase() },
-      display: `6.${5 + (i % 4)}" AMOLED 120Hz`,
-      processor: i % 3 === 0 ? "Snapdragon 8 Gen 3" : i % 3 === 1 ? "Dimensity 9300" : "Apple A18 Pro",
-      ram: `${[6, 8, 12, 16][i % 4]}GB`,
-      storage: `${[128, 256, 512][i % 3]}GB`,
-      camera_main: `${[50, 64, 108, 200][i % 4]}MP`,
-      battery: `${[4500, 5000, 5500][i % 3]}mAh`,
-      network: i % 3 !== 0 ? "5G" : "4G",
-      price_usd: [250, 400, 600, 800, 1200][i % 5],
-      images: [],
-      is_featured: i < 4,
-      release_date: "2024",
-      antutu_score: i % 3 === 0 ? 1850000 : null,
-    }));
-    totalCount = 1250;
-  }
 
-  if (brands.length === 0) {
-    brands = ["Samsung", "Apple", "Xiaomi", "Redmi", "Realme", "Vivo", "Oppo", "OnePlus", "Motorola", "Tecno", "Infinix", "Google"].map(
-      (name, i) => ({ id: String(i), name, slug: name.toLowerCase().replace(" ", "-"), logo_url: null, count: Math.floor(Math.random() * 80) + 10 })
-    );
-  }
 
   return (
-    <PhonesClientPage
-      initialPhones={phones}
-      brands={brands}
-      totalCount={totalCount}
-      latestNews={latestNews}
-    />
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading smartphones...</div>}>
+      <PhonesClientPage
+        initialPhones={phones}
+        brands={brands}
+        totalCount={totalCount}
+        latestNews={latestNews}
+      />
+    </Suspense>
   );
 }

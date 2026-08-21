@@ -1,13 +1,14 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Phone from "@/lib/models/Phone";
 import ActivityLog from "@/lib/models/ActivityLog";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import slugify from "slugify";
 import { redirect } from "next/navigation";
 
-function parseSafeNumber(value: any): number | null {
+function parseSafeNumber(value: any /* eslint-disable-line @typescript-eslint/no-explicit-any */): number | null {
   if (!value) return null;
   if (typeof value === "number") return value;
   // Extract numbers, negative sign, and decimal point
@@ -16,7 +17,31 @@ function parseSafeNumber(value: any): number | null {
   return isNaN(parsed) ? null : parsed;
 }
 
+function parseReleaseDate(dateStr: string | null | undefined): Date | null {
+  if (!dateStr || dateStr.trim() === "") return null;
+  
+  const cleanStr = dateStr.replace(/exp\.|expected|announced/i, '').trim();
+
+  const parsed = new Date(cleanStr);
+  if (!isNaN(parsed.getTime())) {
+    return parsed;
+  }
+
+  const commaMatch = cleanStr.match(/^(\d{4}),\s*([a-zA-Z]+)$/);
+  if (commaMatch) {
+    const parsedComma = new Date(`${commaMatch[2]} ${commaMatch[1]}`);
+    if (!isNaN(parsedComma.getTime())) return parsedComma;
+  }
+
+  if (/^\d{4}$/.test(cleanStr)) {
+    return new Date(`${cleanStr}-01-01`);
+  }
+
+  return null;
+}
+
 export async function addPhone(formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const name = formData.get("name") as string;
@@ -75,13 +100,23 @@ export async function addPhone(formData: FormData) {
     brand_id,
     is_published: formData.get("is_published") === "on",
     is_featured: formData.get("is_featured") === "on",
-    upcoming: formData.get("upcoming") === "on",
+    upcoming: formData.get("upcoming") === "on", // legacy
+    phone_status: formData.get("phone_status") as string || "released",
+    
+    // New Ecosystem Fields
+    price_status: formData.get("price_status") as string || "official",
+    expected_launch_date: formData.get("expected_launch_date") as string,
+    launch_quarter: formData.get("launch_quarter") as string,
+    launch_year: parseSafeNumber(formData.get("launch_year")),
+    leak_confidence: formData.get("leak_confidence") as string,
+
     is_official: formData.get("is_official") === "on",
     release_date: formData.get("release_date") || null,
+    release_date_parsed: parseReleaseDate(formData.get("release_date") as string),
     colors,
     pros: [] as string[],
     cons: [] as string[],
-    faqs: [] as any[],
+    faqs: [] as any /* eslint-disable-line @typescript-eslint/no-explicit-any */[],
     model_number: formData.get("model_number") as string,
     phone_variants: formData.get("phone_variants") as string,
     made_in: formData.get("made_in") as string,
@@ -168,7 +203,6 @@ export async function addPhone(formData: FormData) {
     gps_specs: formData.get("gps_specs") as string,
     has_ir_blaster: formData.get("has_ir_blaster") === "on",
     has_audio_jack,
-    usb_version: formData.get("usb_version") as string,
 
     // Sensors
     sensor_fingerprint: formData.get("sensor_fingerprint") as string,
@@ -187,23 +221,36 @@ export async function addPhone(formData: FormData) {
     has_live_translation: formData.get("has_live_translation") === "on",
     has_ai_assistant: formData.get("has_ai_assistant") === "on",
 
+    // SEO Settings
+    meta_title: formData.get("meta_title") as string,
+    meta_description: formData.get("meta_description") as string,
+    meta_keywords: formData.get("meta_keywords") as string,
+    og_image: formData.get("og_image") as string,
+
     // Removed manual related IDs reading, left empty to let frontend auto-suggest
     related_similar_ids: [],
     related_compare_ids: [],
     related_better_ids: [],
+    
+    custom_specs: formData.get("custom_specs") ? JSON.parse(formData.get("custom_specs") as string) : [],
   };
 
   // Auto-generate Pros, Cons, FAQs based on specs
-  const autoPros = [];
-  const autoCons = [];
-  const autoFaqs = [];
+  const autoPros: string[] = [];
+  const autoCons: string[] = [];
+  const autoFaqs: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+
+  const nfc = formData.get("has_nfc") === "on";
+  const storage_type = formData.get("storage_type") as string;
 
   if (has_5g) autoPros.push("Supports Latest 5G Network");
+  if (nfc) autoPros.push("NFC support for contactless payments");
   
   const parsedBattery = battery_capacity ? parseSafeNumber(battery_capacity) : null;
   if (parsedBattery && parsedBattery >= 5000) autoPros.push(`Large ${battery_capacity} Battery for all-day use`);
   
   if (display_type && (display_type.toLowerCase().includes('amoled') || display_type.toLowerCase().includes('oled'))) autoPros.push("Vibrant and crisp AMOLED/OLED display");
+  if (display_type && display_type.toLowerCase().includes('ltpo')) autoPros.push("LTPO technology for better battery efficiency");
   
   const refreshRateRaw = formData.get("refresh_rate") as string;
   const parsedRefresh = refreshRateRaw ? parseSafeNumber(refreshRateRaw) : null;
@@ -211,21 +258,29 @@ export async function addPhone(formData: FormData) {
   
   const parsedCam = cam_main_sensor ? parseSafeNumber(cam_main_sensor) : null;
   if (parsedCam && parsedCam >= 50) autoPros.push(`High resolution ${parsedCam}MP Main Camera`);
+  if (cam_main_sensor && cam_main_sensor.toLowerCase().includes('ois')) autoPros.push("Optical Image Stabilization (OIS) for steady shots");
   
-  if (formData.get("water_resistance") && (formData.get("water_resistance") as string).includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
+  const water_res = formData.get("water_resistance") as string;
+  if (water_res && water_res.includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
   
-  if (!formData.get("charger_included") || formData.get("charger_included") !== "on") autoCons.push("Charging adapter is not included in the box");
+  if (storage_type && (storage_type.includes("UFS 4.0") || storage_type.includes("NVMe"))) autoPros.push("Ultra-fast UFS 4.0 / NVMe storage");
+  
+  const charger_included = formData.get("charger_included") === "on";
+  if (!charger_included) autoCons.push("Charging adapter is not included in the box");
   if (!has_audio_jack) autoCons.push("Lacks a 3.5mm headphone jack");
   
   const weightRaw = formData.get("weight") as string;
   const parsedWeight = weightRaw ? parseSafeNumber(weightRaw) : null;
   if (parsedWeight && parsedWeight >= 210) autoCons.push("Device is relatively heavy");
+  if (parsedWeight && parsedWeight < 170) autoPros.push("Lightweight and comfortable to hold");
 
   if (charging_wired) autoFaqs.push({ question: "Does it support fast charging?", answer: `Yes, it supports ${charging_wired}.` });
   if (has_5g) autoFaqs.push({ question: "Does this smartphone support 5G?", answer: "Yes, it is fully compatible with 5G networks for high-speed internet." });
-  autoFaqs.push({ question: "Is the charger included in the box?", answer: (formData.get("charger_included") === "on") ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
-  if (formData.get("water_resistance")) autoFaqs.push({ question: "Is this phone water-resistant?", answer: formData.get("water_resistance") as string });
-  if (formData.get("made_in")) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${formData.get("made_in") as string}.` });
+  autoFaqs.push({ question: "Is the charger included in the box?", answer: charger_included ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
+  if (water_res) autoFaqs.push({ question: "Is this phone water-resistant?", answer: water_res });
+  
+  const made_in = formData.get("made_in") as string;
+  if (made_in) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${made_in}.` });
 
   phoneData.pros = autoPros;
   phoneData.cons = autoCons;
@@ -242,7 +297,7 @@ export async function addPhone(formData: FormData) {
       icon: 'Smartphone',
       color: 'text-blue-500 bg-blue-50',
     });
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error inserting phone:", error);
     throw new Error(error.message);
   }
@@ -252,11 +307,15 @@ export async function addPhone(formData: FormData) {
   revalidatePath("/phones");
   revalidatePath("/compare");
   revalidatePath("/phones/[brand]", "page");
+  revalidateTag("phones", "max");
+  revalidateTag("featured-phones", "max");
+  revalidateTag("upcoming-phones", "max");
 
   redirect("/admin/phones");
 }
 
 export async function editPhone(id: string, formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const name = formData.get("name") as string;
@@ -311,13 +370,23 @@ export async function editPhone(id: string, formData: FormData) {
     brand_id,
     is_published: formData.get("is_published") === "on",
     is_featured: formData.get("is_featured") === "on",
-    upcoming: formData.get("upcoming") === "on",
+    upcoming: formData.get("upcoming") === "on", // legacy
+    phone_status: formData.get("phone_status") as string || "released",
+    
+    // New Ecosystem Fields
+    price_status: formData.get("price_status") as string || "official",
+    expected_launch_date: formData.get("expected_launch_date") as string,
+    launch_quarter: formData.get("launch_quarter") as string,
+    launch_year: parseSafeNumber(formData.get("launch_year")),
+    leak_confidence: formData.get("leak_confidence") as string,
+
     is_official: formData.get("is_official") === "on",
     release_date: formData.get("release_date") || null,
+    release_date_parsed: parseReleaseDate(formData.get("release_date") as string),
     colors,
     pros: [] as string[],
     cons: [] as string[],
-    faqs: [] as any[],
+    faqs: [] as any /* eslint-disable-line @typescript-eslint/no-explicit-any */[],
     model_number: formData.get("model_number") as string,
     phone_variants: formData.get("phone_variants") as string,
     made_in: formData.get("made_in") as string,
@@ -404,7 +473,6 @@ export async function editPhone(id: string, formData: FormData) {
     gps_specs: formData.get("gps_specs") as string,
     has_ir_blaster: formData.get("has_ir_blaster") === "on",
     has_audio_jack,
-    usb_version: formData.get("usb_version") as string,
 
     // Sensors
     sensor_fingerprint: formData.get("sensor_fingerprint") as string,
@@ -423,25 +491,38 @@ export async function editPhone(id: string, formData: FormData) {
     has_live_translation: formData.get("has_live_translation") === "on",
     has_ai_assistant: formData.get("has_ai_assistant") === "on",
 
+    // SEO Settings
+    meta_title: formData.get("meta_title") as string,
+    meta_description: formData.get("meta_description") as string,
+    meta_keywords: formData.get("meta_keywords") as string,
+    og_image: formData.get("og_image") as string,
+
     // Removed manual related IDs reading, left empty to let frontend auto-suggest
     related_similar_ids: [],
     related_compare_ids: [],
     related_better_ids: [],
     
+    custom_specs: formData.get("custom_specs") ? JSON.parse(formData.get("custom_specs") as string) : [],
+    
     updated_at: new Date(),
   };
 
   // Auto-generate Pros, Cons, FAQs based on specs
-  const autoPros = [];
-  const autoCons = [];
-  const autoFaqs = [];
+  const autoPros: string[] = [];
+  const autoCons: string[] = [];
+  const autoFaqs: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+
+  const nfc = formData.get("has_nfc") === "on";
+  const storage_type = formData.get("storage_type") as string;
 
   if (has_5g) autoPros.push("Supports Latest 5G Network");
+  if (nfc) autoPros.push("NFC support for contactless payments");
   
   const parsedBattery = battery_capacity ? parseSafeNumber(battery_capacity) : null;
   if (parsedBattery && parsedBattery >= 5000) autoPros.push(`Large ${battery_capacity} Battery for all-day use`);
   
   if (display_type && (display_type.toLowerCase().includes('amoled') || display_type.toLowerCase().includes('oled'))) autoPros.push("Vibrant and crisp AMOLED/OLED display");
+  if (display_type && display_type.toLowerCase().includes('ltpo')) autoPros.push("LTPO technology for better battery efficiency");
   
   const refreshRateRaw = formData.get("refresh_rate") as string;
   const parsedRefresh = refreshRateRaw ? parseSafeNumber(refreshRateRaw) : null;
@@ -449,21 +530,29 @@ export async function editPhone(id: string, formData: FormData) {
   
   const parsedCam = cam_main_sensor ? parseSafeNumber(cam_main_sensor) : null;
   if (parsedCam && parsedCam >= 50) autoPros.push(`High resolution ${parsedCam}MP Main Camera`);
+  if (cam_main_sensor && cam_main_sensor.toLowerCase().includes('ois')) autoPros.push("Optical Image Stabilization (OIS) for steady shots");
   
-  if (formData.get("water_resistance") && (formData.get("water_resistance") as string).includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
+  const water_res = formData.get("water_resistance") as string;
+  if (water_res && water_res.includes("IP68")) autoPros.push("IP68 Water and Dust Resistant");
   
-  if (!formData.get("charger_included") || formData.get("charger_included") !== "on") autoCons.push("Charging adapter is not included in the box");
+  if (storage_type && (storage_type.includes("UFS 4.0") || storage_type.includes("NVMe"))) autoPros.push("Ultra-fast UFS 4.0 / NVMe storage");
+  
+  const charger_included = formData.get("charger_included") === "on";
+  if (!charger_included) autoCons.push("Charging adapter is not included in the box");
   if (!has_audio_jack) autoCons.push("Lacks a 3.5mm headphone jack");
   
   const weightRaw = formData.get("weight") as string;
   const parsedWeight = weightRaw ? parseSafeNumber(weightRaw) : null;
   if (parsedWeight && parsedWeight >= 210) autoCons.push("Device is relatively heavy");
+  if (parsedWeight && parsedWeight < 170) autoPros.push("Lightweight and comfortable to hold");
 
   if (charging_wired) autoFaqs.push({ question: "Does it support fast charging?", answer: `Yes, it supports ${charging_wired}.` });
   if (has_5g) autoFaqs.push({ question: "Does this smartphone support 5G?", answer: "Yes, it is fully compatible with 5G networks for high-speed internet." });
-  autoFaqs.push({ question: "Is the charger included in the box?", answer: (formData.get("charger_included") === "on") ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
-  if (formData.get("water_resistance")) autoFaqs.push({ question: "Is this phone water-resistant?", answer: formData.get("water_resistance") as string });
-  if (formData.get("made_in")) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${formData.get("made_in") as string}.` });
+  autoFaqs.push({ question: "Is the charger included in the box?", answer: charger_included ? "Yes, a compatible charging adapter is included in the retail box." : "No, the retail box only contains the phone and a cable. The charging brick must be purchased separately." });
+  if (water_res) autoFaqs.push({ question: "Is this phone water-resistant?", answer: water_res });
+  
+  const made_in = formData.get("made_in") as string;
+  if (made_in) autoFaqs.push({ question: "Where is this phone manufactured?", answer: `This device is manufactured in ${made_in}.` });
 
   phoneData.pros = autoPros;
   phoneData.cons = autoCons;
@@ -480,7 +569,7 @@ export async function editPhone(id: string, formData: FormData) {
       icon: 'Smartphone',
       color: 'text-purple-500 bg-purple-50',
     });
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error updating phone:", error);
     throw new Error(error.message);
   }
@@ -490,11 +579,63 @@ export async function editPhone(id: string, formData: FormData) {
   revalidatePath("/compare");
   revalidatePath("/phones/[brand]", "page");
   revalidatePath("/phones/[brand]/[model]", "page");
+  revalidateTag("phones", "max");
+  revalidateTag("featured-phones", "max");
+  revalidateTag("upcoming-phones", "max");
 
   const returnUrl = formData.get("returnUrl") as string;
   if (returnUrl) {
     redirect(returnUrl);
   } else {
     redirect("/admin/phones");
+  }
+}
+
+export async function deletePhone(id: string) {
+  try {
+    await requireAdmin();
+
+    await connectToDatabase();
+
+    const phone = await Phone.findById(id);
+    if (!phone) {
+      throw new Error("Phone not found");
+    }
+
+    await Phone.findByIdAndDelete(id);
+
+    revalidateTag("phones", "max");
+    revalidateTag("featured-phones", "max");
+    revalidateTag("upcoming-phones", "max");
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting phone:", error);
+    throw new Error(error.message || "Failed to delete phone");
+  }
+}
+
+export async function deletePhones(ids: string[]) {
+  try {
+    await requireAdmin();
+    await connectToDatabase();
+
+    if (!ids || ids.length === 0) {
+      throw new Error("No phones provided for deletion");
+    }
+
+    await Phone.deleteMany({ _id: { $in: ids } });
+
+    revalidateTag("phones", "max");
+    revalidateTag("featured-phones", "max");
+    revalidateTag("upcoming-phones", "max");
+    revalidatePath("/");
+    revalidatePath("/phones");
+    revalidatePath("/compare");
+    
+    return { success: true, count: ids.length };
+  } catch (error: any) {
+    console.error("Error deleting multiple phones:", error);
+    throw new Error(error.message || "Failed to delete phones");
   }
 }

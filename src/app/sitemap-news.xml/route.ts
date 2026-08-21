@@ -1,6 +1,6 @@
+import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb/mongoose';
 import Post from '@/lib/models/Post';
-import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,55 +8,26 @@ export async function GET() {
   await connectToDatabase();
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
 
-  try {
-    // Google News Sitemap should only contain articles published in the last 48 hours
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setHours(twoDaysAgo.getHours() - 48);
+  const posts = await Post.find({ is_published: true })
+    .select('slug published_at')
+    .sort({ published_at: -1 })
+    .lean();
 
-    const rawPosts = await Post.find({
-      is_published: true,
-      $or: [
-        { published_at: { $gte: twoDaysAgo } },
-        { created_at: { $gte: twoDaysAgo } }
-      ]
-    })
-      .select('slug title published_at created_at')
-      .sort({ published_at: -1, created_at: -1 })
-      .lean() as any[];
-
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">`;
-
-    for (const post of rawPosts) {
-      const url = `${baseUrl}/news/${post.slug}`;
-      const pubDate = new Date(post.published_at || post.created_at || new Date()).toISOString();
-      
-      xml += `
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ${posts.map((post: any) => `
   <url>
-    <loc>${url}</loc>
-    <news:news>
-      <news:publication>
-        <news:name>TechTweak</news:name>
-        <news:language>en</news:language>
-      </news:publication>
-      <news:publication_date>${pubDate}</news:publication_date>
-      <news:title><![CDATA[${post.title}]]></news:title>
-    </news:news>
-  </url>`;
-    }
-
-    xml += `
+    <loc>${baseUrl}/news/${post.slug}</loc>
+    <lastmod>${new Date(post.published_at || new Date()).toISOString()}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>`).join('')}
 </urlset>`;
 
-    return new NextResponse(xml, {
-      headers: {
-        'Content-Type': 'application/xml; charset=utf-8',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate',
-      },
-    });
-  } catch (error) {
-    console.error('Error generating News Sitemap:', error);
-    return new NextResponse('Error generating News Sitemap', { status: 500 });
-  }
+  return new NextResponse(xml, {
+    headers: {
+      'Content-Type': 'application/xml',
+      'Cache-Control': 's-maxage=86400, stale-while-revalidate',
+    },
+  });
 }

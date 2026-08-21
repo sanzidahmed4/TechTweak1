@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Post from "@/lib/models/Post";
 import ActivityLog from "@/lib/models/ActivityLog";
@@ -8,6 +9,7 @@ import slugify from "slugify";
 import { redirect } from "next/navigation";
 
 export async function addBlogPost(formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const title = formData.get("title") as string;
@@ -22,6 +24,7 @@ export async function addBlogPost(formData: FormData) {
   let tags: string[] = [];
   const tagsJson = formData.get("tags") as string;
   if (tagsJson) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
     try { tags = JSON.parse(tagsJson); } catch (e) {}
   }
 
@@ -50,7 +53,7 @@ export async function addBlogPost(formData: FormData) {
       icon: 'FileText',
       color: 'text-amber-500 bg-amber-50',
     });
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error inserting post:", error);
     throw new Error(error.message);
   }
@@ -60,6 +63,7 @@ export async function addBlogPost(formData: FormData) {
   redirect("/admin/blogs");
 }
 export async function updateBlogPost(id: string, formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const title = formData.get("title") as string;
@@ -77,6 +81,7 @@ export async function updateBlogPost(id: string, formData: FormData) {
   let tags: string[] = [];
   const tagsJson = formData.get("tags") as string;
   if (tagsJson) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
     try { tags = JSON.parse(tagsJson); } catch (e) {}
   }
 
@@ -106,7 +111,7 @@ export async function updateBlogPost(id: string, formData: FormData) {
       icon: 'FileText',
       color: 'text-amber-500 bg-amber-50',
     });
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error updating post:", error);
     throw new Error(error.message);
   }
@@ -117,6 +122,7 @@ export async function updateBlogPost(id: string, formData: FormData) {
 }
 
 export async function deleteBlogPost(id: string) {
+  await requireAdmin();
   await connectToDatabase();
   
   try {
@@ -132,7 +138,7 @@ export async function deleteBlogPost(id: string) {
         color: 'text-red-500 bg-red-50',
       });
     }
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error deleting post:", error);
     throw new Error(error.message);
   }
@@ -142,6 +148,7 @@ export async function deleteBlogPost(id: string) {
 }
 
 export async function createInlineCategory(name: string) {
+  await requireAdmin();
   await connectToDatabase();
   // We need to import Category. Let's make sure it's imported at the top.
   // Wait, I will just require it here to avoid import issues if not present.
@@ -152,7 +159,7 @@ export async function createInlineCategory(name: string) {
   try {
     const newCat = await Category.create({ name, slug });
     return { id: newCat._id.toString(), name: newCat.name };
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error creating inline category:", error);
     throw new Error(error.message);
   }

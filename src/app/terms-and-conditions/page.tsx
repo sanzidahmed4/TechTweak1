@@ -14,7 +14,7 @@ export default function TermsOfServicePage() {
 
         <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-primary hover:prose-a:text-blue-700">
           <p>
-            Welcome to <strong>TechTweak</strong> ("we", "our", or "us"). By accessing or using <a href="https://www.techtweak.tech">https://www.techtweak.tech</a>, you agree to comply with and be bound by the following Terms of Service.
+            Welcome to <strong>TechTweak</strong> (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;). By accessing or using <a href="https://www.techtweak.tech">https://www.techtweak.tech</a>, you agree to comply with and be bound by the following Terms of Service.
           </p>
           <p>
             If you do not agree with these terms, please do not use our website.
@@ -102,7 +102,7 @@ export default function TermsOfServicePage() {
             <li>Data loss</li>
             <li>Third-party services or external websites</li>
           </ul>
-          <p>All content is provided on an "as is" basis without warranties of any kind.</p>
+          <p>All content is provided on an &quot;as is&quot; basis without warranties of any kind.</p>
 
           <hr />
 

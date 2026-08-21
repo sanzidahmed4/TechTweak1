@@ -6,7 +6,7 @@ import FilterSidebar from "./FilterSidebar";
 import PhoneCard from "./PhoneCard";
 import BrandGrid from "./BrandGrid";
 import RightSidebar from "./RightSidebar";
-import AIRecommendation from "./AIRecommendation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   SlidersHorizontal,
   ChevronDown,
@@ -25,6 +25,7 @@ export interface PhoneData {
   name: string;
   slug: string;
   brand: { name: string; slug: string };
+  category: { name: string; slug: string };
   display: string | null;
   processor: string | null;
   ram: string | null;
@@ -33,16 +34,19 @@ export interface PhoneData {
   battery: string | null;
   network: string | null;
   price_usd: number | null;
-  price_bdt: number | null;
   images: string[];
   is_featured: boolean;
   release_date: string | null;
   antutu_score: number | null;
+  phone_status?: string;
+  expected_launch_date?: string;
+  leak_confidence?: string;
 }
 
 export interface FilterState {
   search: string;
   brands: string[];
+  category: string;
   priceMin: number;
   priceMax: number;
   ram: string[];
@@ -74,6 +78,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 const DEFAULT_FILTERS: FilterState = {
   search: "",
   brands: [],
+  category: "",
   priceMin: 0,
   priceMax: 300000,
   ram: [],
@@ -95,6 +100,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
     return {
       ...DEFAULT_FILTERS,
       brands: brandParams ? brandParams.split(",").filter(Boolean) : [],
+      category: searchParams.get("category") || "",
     };
   });
   
@@ -118,6 +124,12 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
       params.delete("brands");
     }
 
+    if (filters.category) {
+      params.set("category", filters.category);
+    } else {
+      params.delete("category");
+    }
+
     if (currentPage > 1) {
       params.set("page", currentPage.toString());
     } else {
@@ -130,7 +142,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
     if (newQuery !== currentQuery) {
       router.replace(`?${newQuery}`, { scroll: false });
     }
-  }, [filters.brands, currentPage, searchParams, router]);
+  }, [filters.brands, filters.category, currentPage, searchParams, router]);
 
   const updateFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -146,6 +158,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
     let count = 0;
     if (filters.search) count++;
     if (filters.brands.length) count++;
+    if (filters.category) count++;
     if (filters.priceMin > 0 || filters.priceMax < 300000) count++;
     if (filters.ram.length) count++;
     if (filters.storage.length) count++;
@@ -170,9 +183,12 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
     if (filters.brands.length) {
       result = result.filter((p) => filters.brands.includes(p.brand.slug));
     }
+    if (filters.category) {
+      result = result.filter((p) => p.category?.slug === filters.category);
+    }
     if (filters.priceMin > 0 || filters.priceMax < 300000) {
       result = result.filter(
-        (p) => p.price_bdt !== null && p.price_bdt >= filters.priceMin && p.price_bdt <= filters.priceMax
+        (p) => p.price_usd !== null && p.price_usd >= filters.priceMin && p.price_usd <= filters.priceMax
       );
     }
     if (filters.is5G) {
@@ -198,10 +214,10 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
 
     switch (sort) {
       case "price_asc":
-        result.sort((a, b) => (a.price_bdt || 9999999) - (b.price_bdt || 9999999));
+        result.sort((a, b) => (a.price_usd || 9999999) - (b.price_usd || 9999999));
         break;
       case "price_desc":
-        result.sort((a, b) => (b.price_bdt || 0) - (a.price_bdt || 0));
+        result.sort((a, b) => (b.price_usd || 0) - (a.price_usd || 0));
         break;
       case "gaming":
         result.sort((a, b) => (b.antutu_score || 0) - (a.antutu_score || 0));
@@ -236,7 +252,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
   return (
     <div className="min-h-screen bg-[#f8faff]">
       {/* ── Page Header — Clean, compact, no dark bg ── */}
-      <div className="bg-white border-b border-slate-100 pt-24 pb-6">
+      <div className="bg-white border-b border-slate-100 pt-20 pb-6">
         <div className="container mx-auto px-4 lg:px-8">
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-slate-400 text-xs mb-4">
@@ -244,14 +260,14 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
             <ChevronRight size={12} />
             <span className="text-slate-700 font-semibold">Phones</span>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Explore Smartphones</h1>
-              <p className="text-slate-500 text-sm mt-1">Browse by brand, price, specs, and features.</p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0 pr-2">
+              <h1 className="text-[18px] sm:text-xl md:text-3xl font-black text-slate-900 tracking-tight truncate">Explore Smartphones</h1>
+              <p className="text-[11px] sm:text-xs md:text-sm text-slate-500 mt-0.5 md:mt-1 truncate">Browse by brand, price, specs, and features.</p>
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold">
+            <div className="shrink-0 inline-flex items-center gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-[10px] md:text-xs font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-              {totalCount.toLocaleString()} Smartphones
+              <span>{totalCount.toLocaleString()} <span className="hidden sm:inline">Smartphones</span></span>
             </div>
           </div>
         </div>
@@ -266,11 +282,20 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
       <div className="container mx-auto px-4 lg:px-8 py-10">
 
         {/* ── Toolbar Row ── */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative z-40">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3 flex-wrap">
             <p className="text-slate-500 text-sm">
               Showing <span className="font-bold text-slate-900">{filteredPhones.length}</span> of {totalCount.toLocaleString()} smartphones
             </p>
+            {filters.category && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-100">
+                <span className="capitalize">{filters.category.replace("-", " ")}</span>
+                <button onClick={() => updateFilter("category", "")} className="hover:bg-blue-200 rounded-full p-0.5 transition-colors">
+                  <X size={12} />
+                </button>
+              </div>
+            )}
             {activeFilterCount > 0 && (
               <button onClick={resetFilters} className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition-colors">
                 <X size={12} /> Clear {activeFilterCount} filter{activeFilterCount !== 1 ? "s" : ""}
@@ -289,7 +314,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
                 <ChevronDown size={14} className={`transition-transform ${sortOpen ? "rotate-180" : ""}`} />
               </button>
               {sortOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-30 py-2 overflow-hidden">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-30 py-2 overflow-hidden">
                   {SORT_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
@@ -315,13 +340,15 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
 
             {/* Mobile Filter Button */}
             <button
-              onClick={() => setMobileFilterOpen(true)}
+              onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
               className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold shadow-md shadow-blue-500/20"
             >
               <SlidersHorizontal size={16} />
               Filters {activeFilterCount > 0 && <span className="bg-white text-blue-600 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">{activeFilterCount}</span>}
             </button>
           </div>
+
+        </div>
         </div>
 
         {/* ── 3 Column Layout ── */}
@@ -348,7 +375,7 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
             ) : (
               <>
                 <div className={gridView === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5"
+                  ? "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5"
                   : "flex flex-col gap-4"
                 }>
                   {paginatedPhones.map((phone) => (
@@ -408,9 +435,6 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
                 )}
               </>
             )}
-
-            {/* AI Recommendation */}
-            <AIRecommendation phones={initialPhones} />
           </main>
 
           {/* Right Sidebar — Desktop */}
@@ -420,23 +444,37 @@ export default function PhonesClientPage({ initialPhones, brands, totalCount, la
         </div>
       </div>
 
-      {/* ── Mobile Filter Overlay ── */}
-      {mobileFilterOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileFilterOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-[85vw] max-w-sm bg-white shadow-2xl overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-slate-100">
-              <h3 className="font-bold text-slate-900 text-lg">Filters</h3>
-              <button onClick={() => setMobileFilterOpen(false)} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500">
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-4">
-              <FilterSidebar filters={filters} updateFilter={updateFilter} resetFilters={resetFilters} brands={brands} activeFilterCount={activeFilterCount} />
-            </div>
+      {/* ── Mobile Filter Overlay (Slide from right) ── */}
+      <AnimatePresence>
+        {mobileFilterOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden flex justify-end">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm" 
+              onClick={() => setMobileFilterOpen(false)} 
+            />
+            <motion.div 
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative h-full w-[85vw] max-w-sm bg-white shadow-2xl overflow-y-auto flex flex-col"
+            >
+              <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0 bg-white sticky top-0 z-10">
+                <h3 className="font-bold text-slate-900 text-lg">Filters</h3>
+                <button onClick={() => setMobileFilterOpen(false)} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-4 flex-1">
+                <FilterSidebar filters={filters} updateFilter={updateFilter} resetFilters={resetFilters} brands={brands} activeFilterCount={activeFilterCount} />
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* ── Compare Bar ── */}
       {compareList.length > 0 && (

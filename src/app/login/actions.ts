@@ -10,7 +10,7 @@ import { signToken } from "@/lib/auth/jwt";
 export async function login(formData: FormData) {
   try {
     const email = (formData.get("email") as string || "").trim().toLowerCase();
-    const password = formData.get("password") as string;
+    const password = (formData.get("password") as string || "").trim();
 
     if (!email || !password) {
       return { error: "Email and password are required" };
@@ -19,34 +19,17 @@ export async function login(formData: FormData) {
     await connectToDatabase();
 
     let user = await User.findOne({ email });
-
-    // Auto-heal or Auto-create default admin if missing in production DB
-    if (!user && email === "admin@techtweak.com" && password === "password123") {
-      const salt = await bcrypt.genSalt(10);
-      const password_hash = await bcrypt.hash(password, salt);
-      user = await User.create({
-        email,
-        password_hash,
-        role: "admin"
-      });
-    }
+    // Removed hardcoded admin auto-creation block for security.
 
     if (!user) {
-      return { error: "Invalid credentials" };
+      return { error: "Invalid credentials." };
     }
 
     let isPasswordValid = await bcrypt.compare(password, user.password_hash);
-
-    // Auto-heal password if it somehow mismatches for the default admin
-    if (!isPasswordValid && email === "admin@techtweak.com" && password === "password123") {
-      const salt = await bcrypt.genSalt(10);
-      user.password_hash = await bcrypt.hash(password, salt);
-      await user.save();
-      isPasswordValid = true;
-    }
+    // Removed hardcoded admin auto-heal block for security.
 
     if (!isPasswordValid) {
-      return { error: "Invalid credentials" };
+      return { error: "Invalid credentials." };
     }
 
     // Generate JWT token
@@ -66,7 +49,7 @@ export async function login(formData: FormData) {
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Login error:", error);
     return { error: "An unexpected error occurred. Please try again." };
   }

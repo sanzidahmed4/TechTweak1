@@ -1,12 +1,14 @@
 "use server";
 
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 import connectToDatabase from "@/lib/mongodb/mongoose";
 import Brand from "@/lib/models/Brand";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import slugify from "slugify";
 
 export async function addBrand(formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const name = formData.get("name") as string;
@@ -26,16 +28,18 @@ export async function addBrand(formData: FormData) {
 
   try {
     await Brand.create(brandData);
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error inserting brand:", error);
     throw new Error(error.message);
   }
 
   revalidatePath("/admin/brands");
   revalidatePath("/phones"); // Revalidate phones index to show new brand
+  revalidateTag("brands", "max");
 }
 
 export async function editBrand(id: string, formData: FormData) {
+  await requireAdmin();
   await connectToDatabase();
 
   const name = formData.get("name") as string;
@@ -55,31 +59,35 @@ export async function editBrand(id: string, formData: FormData) {
 
   try {
     await Brand.findByIdAndUpdate(id, brandData);
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error updating brand:", error);
     throw new Error(error.message);
   }
 
   revalidatePath("/admin/brands");
   revalidatePath("/phones");
+  revalidateTag("brands", "max");
   redirect("/admin/brands");
 }
 
 export async function deleteBrand(id: string) {
+  await requireAdmin();
   await connectToDatabase();
 
   try {
     await Brand.findByIdAndDelete(id);
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error deleting brand:", error);
     throw new Error(error.message);
   }
 
   revalidatePath("/admin/brands");
   revalidatePath("/phones");
+  revalidateTag("brands", "max");
 }
 
 export async function updateBrandsOrder(orderedIds: string[]) {
+  await requireAdmin();
   try {
     await connectToDatabase();
     
@@ -93,8 +101,9 @@ export async function updateBrandsOrder(orderedIds: string[]) {
     
     revalidatePath("/admin/brands");
     revalidatePath("/phones");
+    revalidateTag("brands", "max");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     console.error("Error updating brands order:", error);
     return { success: false, error: error.message || "Unknown error occurred" };
   }
