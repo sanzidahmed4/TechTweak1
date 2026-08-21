@@ -30,6 +30,7 @@ export default function AnalyticsTracker() {
       }),
       // Use keepalive so the request completes even if the user navigates away
       keepalive: true,
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
     }).catch(e => {
       // Ignore errors silently for analytics
     });

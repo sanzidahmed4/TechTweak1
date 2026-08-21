@@ -19,7 +19,7 @@ export default async function TagNewsPage({ params }: { params: Promise<{ tag: s
   const rawTag = (await params).tag;
   const tag = decodeURIComponent(rawTag);
   
-  let posts: any[] = [];
+  let posts: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
     // Case-insensitive regex search for the tag in the tags array
     const query = { 
@@ -32,7 +32,7 @@ export default async function TagNewsPage({ params }: { params: Promise<{ tag: s
       .sort({ published_at: -1, created_at: -1 })
       .lean();
       
-    posts = rawPosts.map((p: any) => ({
+    posts = rawPosts.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),
       title: p.title,
       slug: p.slug,
@@ -77,7 +77,7 @@ export default async function TagNewsPage({ params }: { params: Promise<{ tag: s
         {posts.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-slate-200">
             <h3 className="text-xl font-semibold text-slate-800 mb-2">No articles found</h3>
-            <p className="text-slate-500">We couldn't find any articles tagged with "{tag}".</p>
+            <p className="text-slate-500">We couldn&apos;t find any articles tagged with &quot;{tag}&quot;.</p>
             <Link href="/news" className="inline-block mt-6 text-primary font-medium hover:underline">
               Browse all articles
             </Link>

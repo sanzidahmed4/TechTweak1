@@ -2,25 +2,36 @@ import connectToDatabase from "@/lib/mongodb/mongoose";
 import Brand from "@/lib/models/Brand";
 import Phone from "@/lib/models/Phone";
 import { notFound } from "next/navigation";
+import Image from "next/image";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 import Link from "next/link";
-import { ArrowRight, Smartphone } from "lucide-react";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { ArrowRight, Smartphone, Layers } from "lucide-react";
+import { getSeriesName } from "@/lib/utils/series";
 
-export const revalidate = 3600; // Enable ISR (1 hour caching)
+export const revalidate = 21600; // Enable ISR (6 hour caching)
 
-export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }) {
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ brand: string }>; searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const { brand } = await params;
   await connectToDatabase();
   
-  const data = await Brand.findOne({ slug: brand }).lean() as any;
+  const data = await Brand.findOne({ slug: brand })
+    .select("name description logo_url meta_title meta_description canonical_url og_image primary_keyword")
+    .lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
   
   if (!data) return { title: "Brand Not Found" };
   
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
-  const url = `${baseUrl}/phones/${brand}`;
+  const url = data.canonical_url || `${baseUrl}/phones/${brand}`;
+  
+  const title = `${data.meta_title || `${data.name} Phones | TechTweak`}`;
+    
+  const description = data.meta_description || data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`;
+  const finalOgImage = data.og_image || data.logo_url;
 
   return {
-    title: `${data.name} Phones | TechTweak`,
-    description: data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`,
+    title: title,
+    description: description,
     alternates: {
       canonical: url,
       languages: {
@@ -29,60 +40,67 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
       },
     },
     openGraph: {
-      title: `${data.name} Phones | TechTweak`,
-      description: data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`,
+      title: title,
+      description: description,
       url,
-      images: data.logo_url ? [{ url: data.logo_url }] : [],
+      images: finalOgImage ? [{ url: finalOgImage }] : [],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${data.name} Phones | TechTweak`,
-      description: data.description || `Browse all the latest ${data.name} smartphones, specifications, and prices.`,
-      images: data.logo_url ? [data.logo_url] : [],
+      title: title,
+      description: description,
+      images: finalOgImage ? [finalOgImage] : [],
     }
   };
 }
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const { brand } = await params;
+
   await connectToDatabase();
   
   // Fetch Brand Info
-  let brandData: any = null;
-  let phones: any[] = [];
+  let brandData: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */ = null;
+  let groupedPhones: Record<string, any[]> = {};
+  let totalPhones = 0;
 
   try {
-    const bData = await Brand.findOne({ slug: brand }).lean() as any;
+    const bData = await Brand.findOne({ slug: brand }).lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
     if (bData) {
       brandData = bData;
-      // Fetch Phones for this brand
+      // Fetch ALL Phones for this brand, no pagination
       const rawPhones = await Phone.find({ brand_id: bData._id, is_published: true })
-        .sort({ release_date: -1 })
+        .select('name slug images price_usd release_date_parsed phone_status processor chipset_highlight')
+        .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
         .lean();
         
-      phones = rawPhones.map((p: any) => ({
+      totalPhones = rawPhones.length;
+
+      const phones = rawPhones.map((p: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
         id: p._id.toString(),
         name: p.name,
         slug: p.slug,
         price_usd: p.price_usd,
-        images: p.images
+        images: p.images,
+        processor: p.processor,
+        chipset_highlight: p.chipset_highlight
       }));
+
+      // Group phones by series
+      phones.forEach(phone => {
+        const series = getSeriesName(phone.name, bData.name);
+        if (!groupedPhones[series]) groupedPhones[series] = [];
+        groupedPhones[series].push(phone);
+      });
     }
   } catch (err) {
     console.error(err);
   }
 
-  // Fallback for demonstration
+  // If brand is not found, throw 404
   if (!brandData) {
-    brandData = { name: brand.charAt(0).toUpperCase() + brand.slice(1), description: `Discover the latest innovations from ${brand}.` };
-    phones = [1, 2, 3, 4, 5, 6].map(i => ({
-      id: i,
-      name: `${brandData.name} Model ${i}`,
-      slug: `${brand}-model-${i}`,
-      price_usd: 1250,
-      images: []
-    }));
+    notFound();
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.techtweak.tech';
@@ -104,46 +122,76 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
       <div className="container mx-auto px-4 lg:px-8">
         
         {/* Header */}
-        <div className="bg-white p-8 lg:p-12 rounded-3xl shadow-sm border border-slate-200 mb-12 text-center max-w-4xl mx-auto">
-          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mx-auto mb-6 overflow-hidden border border-slate-200/50 shadow-sm">
+        <div className="mb-8 lg:mb-12 pb-8 border-b border-slate-200 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center relative overflow-hidden shrink-0">
             {brandData.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={brandData.logo_url} alt={`${brandData.name} logo`} className="w-full h-full object-contain p-2" />
+              <Image 
+                src={brandData.logo_url} 
+                alt={`${brandData.name} logo`} 
+                fill
+                sizes="96px"
+                className="object-contain p-3" 
+              />
             ) : (
-              <Smartphone size={32} />
+              <Smartphone size={32} className="text-slate-300" />
             )}
           </div>
-          <h1 className="text-4xl font-bold text-slate-900 mb-4 capitalize">{brandData.name} Phones</h1>
-          <p className="text-slate-500 text-lg max-w-2xl mx-auto leading-relaxed">
-            {brandData.description || `Explore our comprehensive catalog of ${brandData.name} smartphones. Compare specifications, features, and find the perfect device for your needs.`}
-          </p>
+          <div>
+            <h1 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2 capitalize">{brandData.name} Phones</h1>
+            <p className="text-slate-500 text-sm md:text-base max-w-2xl leading-relaxed">
+              {brandData.description || `Explore our comprehensive catalog of ${brandData.name} smartphones. Browse by series and find the perfect device for your needs.`}
+            </p>
+            <div className="mt-4 inline-flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-full text-sm font-medium text-slate-600 shadow-sm">
+              <Layers size={16} className="text-primary" />
+              <span>{totalPhones} Devices Available</span>
+            </div>
+          </div>
         </div>
 
-        {/* Phones Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {phones.map((phone: any) => (
-            <Link href={`/phones/${brand}/${phone.slug}`} key={phone.id} className="glass-card rounded-3xl p-6 hover-card block bg-white">
-              <div className="w-full aspect-[3/4] bg-slate-100 rounded-2xl mb-6 relative overflow-hidden flex items-center justify-center">
-                {phone.images && phone.images.length > 0 ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={phone.images[0]} alt={phone.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-slate-400 font-medium">No Image</div>
-                )}
+        {/* Series Grouping UI */}
+        <div className="space-y-16">
+          {Object.entries(groupedPhones).map(([series, phones]) => (
+            <section key={series} className="scroll-mt-24" id={series.replace(/\s+/g, '-').toLowerCase()}>
+              <div className="flex items-center gap-4 mb-6">
+                <h2 className="text-2xl font-bold text-slate-800">{series}</h2>
+                <div className="h-px bg-slate-200 flex-1"></div>
+                <span className="text-sm font-medium text-slate-400 bg-slate-100 px-3 py-1 rounded-full">{phones.length} devices</span>
               </div>
-              <div className="space-y-2">
-                <h3 className="text-lg font-bold text-slate-900 line-clamp-1">{phone.name}</h3>
-                <p className="text-sm text-slate-500 line-clamp-1 mt-2">
-                  {phone.processor}
-                </p>
-                <div className="pt-4 flex items-center justify-between">
-                  <span className="text-lg font-bold text-slate-900">{phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'N/A'}</span>
-                  <button className="text-xs font-medium bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-colors">
-                    Details
-                  </button>
-                </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {phones.map((phone: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */) => (
+                  <Link href={`/phones/${brand}/${phone.slug}`} key={phone.id} className="glass-card rounded-3xl p-6 hover-card block bg-white">
+                    <div className="relative w-full aspect-[4/5] bg-slate-50 flex items-center justify-center p-4">
+                      {phone.images && phone.images[0] ? (
+                        <Image 
+                          src={phone.images[0] || FALLBACK_IMAGE} 
+                          alt={phone.name} 
+                          fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-500" 
+                          placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+                          blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
+                        />
+                      ) : (
+                        <div className="text-slate-400 font-medium">No Image</div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-bold text-slate-900 line-clamp-1">{phone.name}</h3>
+                      <p className="text-sm text-slate-500 line-clamp-1 mt-2">
+                        {phone.processor}
+                      </p>
+                      <div className="pt-4 flex items-center justify-between">
+                        <span className="text-lg font-bold text-slate-900">{phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : 'N/A'}</span>
+                        <button className="text-xs font-medium bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition-colors">
+                          Details
+                        </button>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
               </div>
-            </Link>
+            </section>
           ))}
         </div>
 

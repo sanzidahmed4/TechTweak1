@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 import { useRouter } from "next/navigation";
 import { Heart, GitCompare, Zap, Eye } from "lucide-react";
 import type { PhoneData } from "./PhonesClientPage";
@@ -42,12 +44,15 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
         {/* Image */}
         <div className="relative w-32 sm:w-40 shrink-0 bg-slate-50 overflow-hidden">
           {phone.images[0] && !imageError ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={phone.images[0]}
-              alt={phone.name}
+            <Image
+              src={phone.images[0] || FALLBACK_IMAGE}
+              alt={`${phone.name} smartphone details`}
+              fill
               onError={() => setImageError(true)}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 640px) 30vw, 20vw"
+              placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+              blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center min-h-[120px]">
@@ -116,12 +121,15 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
       {/* ── Image Area — full bleed, no padding ── */}
       <div className="relative w-full aspect-[4/3] bg-slate-50 overflow-hidden">
         {phone.images[0] && !imageError ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={phone.images[0]}
-            alt={phone.name}
+          <Image
+            src={phone.images[0] || FALLBACK_IMAGE}
+            alt={`${phone.name} grid view image`}
+            fill
             onError={() => setImageError(true)}
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            placeholder={getCloudinaryBlurUrl(phone.images[0]) ? "blur" : "empty"}
+            blurDataURL={getCloudinaryBlurUrl(phone.images[0]) || defaultBlurDataURL}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
@@ -138,6 +146,11 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
                 -{discount}%
               </span>
             )}
+            {phone.phone_status && ['upcoming', 'rumored'].includes(phone.phone_status) && (
+              <span className="bg-purple-100 text-purple-600 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm capitalize">
+                {phone.phone_status}
+              </span>
+            )}
             {phone.is_featured && (
               <span className="bg-amber-400 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">
                 HOT
@@ -146,19 +159,19 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
           </div>
 
           {/* Right: wishlist + compare */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <button
               onClick={() => setIsWishlisted(!isWishlisted)}
-              className="w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-red-50 transition-colors"
+              className="w-[44px] h-[44px] rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-red-50 transition-colors"
             >
-              <Heart size={12} className={isWishlisted ? "fill-red-500 text-red-500" : "text-slate-400"} />
+              <Heart size={16} className={isWishlisted ? "fill-red-500 text-red-500" : "text-slate-400"} />
             </button>
             <button
               onClick={() => onCompareToggle(phone.id)}
               disabled={!canAddToCompare}
-              className={`w-7 h-7 rounded-full backdrop-blur-sm shadow flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isComparing ? "bg-blue-600 text-white" : "bg-white/90 text-slate-400 hover:bg-blue-50 hover:text-blue-600"}`}
+              className={`w-[44px] h-[44px] rounded-full backdrop-blur-sm shadow flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isComparing ? "bg-blue-600 text-white" : "bg-white/90 text-slate-400 hover:bg-blue-50 hover:text-blue-600"}`}
             >
-              <GitCompare size={12} />
+              <GitCompare size={16} />
             </button>
           </div>
         </div>
@@ -172,25 +185,17 @@ export default function PhoneCard({ phone, isListView, isComparing, onCompareTog
       </div>
 
       {/* ── Info Area — minimal ── */}
-      <div className="p-3.5 flex flex-col flex-1">
+      <div className="p-3 flex flex-col flex-1">
         <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wide mb-0.5">{phone.brand.name}</p>
-        <h3 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2 flex-1 group-hover:text-blue-700 transition-colors">
+        <h3 className="font-bold text-slate-900 text-[13px] sm:text-sm leading-snug line-clamp-2 flex-1 group-hover:text-blue-700 transition-colors" title={phone.name}>
           {phone.name}
         </h3>
 
-        {/* Price + CTA */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-          <div className="flex flex-col">
-            <span className="text-base font-black text-slate-900">
-              {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA"}
-            </span>
-          </div>
-          <Link
-            href={`/phones/${phone.brand.slug}/${phone.slug}`}
-            className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors"
-          >
-            Details
-          </Link>
+        {/* Price */}
+        <div className="flex items-center mt-3 pt-3 border-t border-slate-100">
+          <span className="text-sm sm:text-base font-black text-slate-900 truncate">
+            {phone.price_usd ? `$${phone.price_usd.toLocaleString()}` : "Price TBA"}
+          </span>
         </div>
       </div>
     </div>

@@ -59,7 +59,7 @@ export default function LoginPage() {
                   required 
                   type="email" 
                   name="email"
-                  placeholder="admin@techtweak.com" 
+                  placeholder="Enter your email" 
                   className="w-full py-3 pl-11 pr-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
                 />
               </div>

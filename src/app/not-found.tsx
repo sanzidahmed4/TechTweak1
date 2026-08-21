@@ -10,7 +10,7 @@ export default function NotFound() {
       <h1 className="text-8xl font-black text-slate-900 tracking-tighter mb-4">404</h1>
       <h2 className="text-2xl font-bold text-slate-700 mb-4 tracking-tight">Dead End Reached</h2>
       <p className="text-slate-500 max-w-md text-center mb-10 text-lg leading-relaxed">
-        The device, article, or page you're searching for has been discontinued or moved to a different url.
+        The device, article, or page you&apos;re searching for has been discontinued or moved to a different url.
       </p>
       
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">

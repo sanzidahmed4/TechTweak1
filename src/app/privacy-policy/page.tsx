@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
 
         <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-a:text-primary hover:prose-a:text-blue-700">
             <p>
-              Welcome to <strong>TechTweak</strong> ("we", "our", or "us"). Your privacy is important to us. This Privacy Policy explains how TechTweak collects, uses, protects, and handles your information when you use our website.
+              Welcome to <strong>TechTweak</strong> (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;). Your privacy is important to us. This Privacy Policy explains how TechTweak collects, uses, protects, and handles your information when you use our website.
             </p>
             <p>
               By using <a href="https://www.techtweak.tech">https://www.techtweak.tech</a>, you agree to the practices described in this Privacy Policy.
@@ -76,7 +76,7 @@ export default function PrivacyPolicyPage() {
             </ul>
             <p>However, please be aware that no online system or data transmission over the internet can guarantee absolute security.</p>
 
-            <h2>7. Children's Privacy</h2>
+            <h2>7. Children&apos;s Privacy</h2>
             <p>TechTweak is not intended for children under the age of 13. We do not knowingly collect personal information from children.</p>
 
             <h2>8. User Rights</h2>

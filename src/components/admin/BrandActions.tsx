@@ -3,6 +3,7 @@
 import { Edit, Trash2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { deleteBrand } from "@/app/admin/brands/actions";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useState, useTransition } from "react";
 
 export default function BrandActions({ id }: { id: string }) {

@@ -8,6 +8,20 @@ import { Clock, Eye } from "lucide-react";
 export const metadata = {
   title: 'News & Articles | TechTweak',
   description: 'Explore the latest smartphone news, reviews, and tech guides on TechTweak.',
+  alternates: {
+    canonical: "/news",
+  },
+  openGraph: {
+    title: "News & Articles | TechTweak",
+    description: "Explore the latest smartphone news, reviews, and tech guides on TechTweak.",
+    url: "/news",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "News & Articles | TechTweak",
+    description: "Explore the latest smartphone news, reviews, and tech guides on TechTweak.",
+  },
 };
 
 export const revalidate = 3600; // Enable ISR (1 hour caching)
@@ -15,14 +29,14 @@ export const revalidate = 3600; // Enable ISR (1 hour caching)
 export default async function NewsPage() {
   await connectToDatabase();
   
-  let posts: any[] = [];
+  let posts: any /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
   try {
     const rawPosts = await Post.find({ is_published: true })
       .populate('category_id', 'name slug')
       .sort({ published_at: -1, created_at: -1 })
       .lean();
       
-    posts = rawPosts.map((p: any) => ({
+    posts = rawPosts.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),
       title: p.title,
       slug: p.slug,
