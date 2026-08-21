@@ -13,6 +13,12 @@ export default async function SearchPerformanceDashboard() {
     .sort({ gsc_clicks: -1 })
     .lean();
 
+  const safeIsoDate = (val: any): string | null => {
+    if (!val || val === "None" || val === "null" || val === "undefined") return null;
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
+
   const serializedPhones = phones.map(p => ({
     _id: p._id.toString(),
     name: p.name,
@@ -21,7 +27,7 @@ export default async function SearchPerformanceDashboard() {
     clicks: p.gsc_clicks || 0,
     ctr: p.gsc_ctr || 0,
     position: p.gsc_position || 0,
-    lastSync: p.gsc_last_sync ? p.gsc_last_sync.toISOString() : null,
+    lastSync: safeIsoDate(p.gsc_last_sync),
   }));
 
   const totalClicks = serializedPhones.reduce((acc, p) => acc + p.clicks, 0);

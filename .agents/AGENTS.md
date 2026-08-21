@@ -12,3 +12,13 @@
    - Never guess specs or fill blank fields with unverified rumors.
 4. **Approval Required**:
    - Only update or release data to the database when 100% verified and approved.
+
+---
+
+# Strict Rule: Explicit User Permission Required for Git Push
+
+**CRITICAL INSTRUCTION**: NEVER push code to GitHub (`git push`) automatically without the user's explicit permission.
+- Always stage and test changes locally first.
+- Clearly present the changes to the user and ask for explicit approval before running any `git push` command.
+- Only execute `git push` when the user specifically approves it (e.g. "push to github", "yes", "push it").
+

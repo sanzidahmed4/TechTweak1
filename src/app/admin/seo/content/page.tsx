@@ -13,17 +13,35 @@ export default async function ContentManagerPage() {
     .sort({ release_date_parsed: -1, name: 1 })
     .lean();
 
-  const serializedPhones = phones.map(p => ({
-    _id: p._id.toString(),
-    name: p.name,
-    slug: p.slug,
-    content_status: p.content_status || "Missing",
-    seo_score: p.seo_score || 0,
-    hasOverview: !!p.seo_overview,
-    hasVerdict: !!p.verdict,
-    hasProsCons: !!(p.pros?.length || p.cons?.length),
-    hasFaqs: !!(p.faqs && p.faqs.length > 0)
-  }));
+  const serializedPhones = phones.map(p => {
+    const hasOverview = !!p.seo_overview;
+    const hasVerdict = !!p.verdict;
+    const hasProsCons = !!(p.pros?.length || p.cons?.length);
+    const hasFaqs = !!(p.faqs && p.faqs.length > 0);
+
+    let status = p.content_status;
+    if (!status || status === "Missing") {
+      if (hasOverview && hasVerdict && hasProsCons && hasFaqs) {
+        status = "Published";
+      } else if (hasOverview || hasVerdict || hasProsCons || hasFaqs) {
+        status = "Draft";
+      } else {
+        status = "Missing";
+      }
+    }
+
+    return {
+      _id: p._id.toString(),
+      name: p.name,
+      slug: p.slug,
+      content_status: status,
+      seo_score: p.seo_score || 0,
+      hasOverview,
+      hasVerdict,
+      hasProsCons,
+      hasFaqs
+    };
+  });
 
   return (
     <div className="space-y-6">

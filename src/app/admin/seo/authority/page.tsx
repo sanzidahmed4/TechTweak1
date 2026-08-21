@@ -12,6 +12,12 @@ export default async function AuthorityDashboard() {
     .sort({ created_at: -1 })
     .lean();
 
+  const safeIsoDate = (val: any): string | null => {
+    if (!val || val === "None" || val === "null" || val === "undefined") return null;
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
+
   const serializedBacklinks = backlinks.map((b: any) => ({
     _id: b._id.toString(),
     target_url: b.target_url,
@@ -22,7 +28,7 @@ export default async function AuthorityDashboard() {
     is_dofollow: b.is_dofollow,
     status: b.status,
     price: b.price || 0,
-    date_acquired: b.date_acquired ? b.date_acquired.toISOString() : null,
+    date_acquired: safeIsoDate(b.date_acquired),
   }));
 
   const liveLinks = serializedBacklinks.filter((b) => b.status === "Live");
