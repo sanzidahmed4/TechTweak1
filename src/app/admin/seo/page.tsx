@@ -129,9 +129,9 @@ export default async function SEOHealthDashboard() {
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Content Coverage</p>
             <p className="text-2xl font-bold text-slate-900">{Math.round((phonesWithContent/Math.max(1, totalPhones))*100)}% <span className="text-sm font-medium text-slate-400">({phonesWithContent}/{totalPhones})</span></p>
           </div>
-          <div className="bg-red-50 p-5 rounded-2xl border border-red-100 shadow-sm">
-            <p className="text-xs font-bold text-red-500 uppercase tracking-wider mb-1">Orphan Pages Detected</p>
-            <p className="text-2xl font-black text-red-700">{orphanPhones}</p>
+          <div className={`${orphanPhones === 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'} p-5 rounded-2xl border shadow-sm`}>
+            <p className={`text-xs font-bold ${orphanPhones === 0 ? 'text-emerald-600' : 'text-red-500'} uppercase tracking-wider mb-1`}>Orphan Pages Detected</p>
+            <p className={`text-2xl font-black ${orphanPhones === 0 ? 'text-emerald-700' : 'text-red-700'}`}>{orphanPhones}</p>
           </div>
         </div>
       </div>
