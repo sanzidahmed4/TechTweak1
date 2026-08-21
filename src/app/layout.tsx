@@ -5,7 +5,7 @@ import ClientLayoutWrapper from "@/components/layout/ClientLayoutWrapper";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import AnalyticsTracker from "@/components/layout/AnalyticsTracker";
 import { Suspense } from "react";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
