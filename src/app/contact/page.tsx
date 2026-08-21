@@ -18,6 +18,7 @@ export const metadata = {
 };
 
 import { Mail, MapPin, MessageSquare, Phone } from "lucide-react";
+import { OpenEmailModalButton, BusinessContactButton } from "@/components/contact/ContactButtons";
 
 export default function Page() {
   return (
@@ -43,9 +44,11 @@ export default function Page() {
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Email Us</h3>
               <p className="text-slate-600 mb-4">For general inquiries, support, or editorial questions.</p>
-              <a href="mailto:contact@techtweak.tech" className="text-blue-600 font-semibold hover:underline mt-auto">
-                contact@techtweak.tech
-              </a>
+              <OpenEmailModalButton 
+                subject="General Inquiry from Contact Page" 
+                label="Send Direct Email to Team" 
+                className="mt-auto text-blue-600 font-semibold hover:underline"
+              />
             </div>
 
             <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 flex flex-col items-start hover:border-blue-200 transition-colors">
@@ -65,9 +68,9 @@ export default function Page() {
             <p className="text-slate-600 mb-4 max-w-lg mx-auto">
               Interested in advertising on TechTweak or exploring a business partnership? Contact our business team directly.
             </p>
-            <a href="mailto:business@techtweak.tech" className="inline-block bg-blue-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
-              Contact Business Team
-            </a>
+            <div className="mt-2">
+              <BusinessContactButton />
+            </div>
           </div>
         </div>
       </div>

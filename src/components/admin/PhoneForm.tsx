@@ -417,10 +417,6 @@ export default function PhoneForm({ initialData, brands, action, title, descript
             <label className="text-sm font-semibold text-slate-700">GPS Specifications</label>
             <input type="text" name="gps_specs" defaultValue={initialData?.gps_specs} placeholder="e.g. GPS, GLONASS, BDS, GALILEO, QZSS" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700">USB Version</label>
-            <input type="text" name="usb_version" defaultValue={initialData?.usb_version} placeholder="e.g. USB Type-C 3.2 Gen 2, OTG, DisplayPort" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
-          </div>
           <div className="flex flex-wrap gap-6 pt-4 md:col-span-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" name="has_5g" defaultChecked={initialData?.has_5g} className="w-5 h-5 accent-primary rounded cursor-pointer" />

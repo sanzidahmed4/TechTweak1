@@ -203,7 +203,6 @@ export async function addPhone(formData: FormData) {
     gps_specs: formData.get("gps_specs") as string,
     has_ir_blaster: formData.get("has_ir_blaster") === "on",
     has_audio_jack,
-    usb_version: formData.get("usb_version") as string,
 
     // Sensors
     sensor_fingerprint: formData.get("sensor_fingerprint") as string,
@@ -474,7 +473,6 @@ export async function editPhone(id: string, formData: FormData) {
     gps_specs: formData.get("gps_specs") as string,
     has_ir_blaster: formData.get("has_ir_blaster") === "on",
     has_audio_jack,
-    usb_version: formData.get("usb_version") as string,
 
     // Sensors
     sensor_fingerprint: formData.get("sensor_fingerprint") as string,

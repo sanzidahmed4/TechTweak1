@@ -1,10 +1,14 @@
-# Strict Rule: No Automated Bulk Data Entry
+# Strict Rule: 100% Authentic Phone Research & No Automated Bulk Entry
 
-**CRITICAL INSTRUCTION**: From this point onward, NEVER use automated scripts to insert, update, or guess bulk data (especially specifications, prices, and images) for phones. 
+**CRITICAL INSTRUCTION**: From this point onward, NEVER use automated scripts to insert, update, or guess data. All phone data must be 100% authentic and manually verified.
 
-1. **Manual Verification Only**: Any missing phone data must be researched manually using `search_web`.
-2. **Official Sources**: Compare all data with official sources (e.g., GSMArena, official brand websites) to ensure it is 100% authentic.
-3. **No AI Guessing**: Do not use AI to "guess" specifications or input random filler data.
-4. **Approval Required**: Only release or update the data in the database when you are absolutely 100% sure of its authenticity.
-
-*This rule was explicitly enforced by the user due to past data corruption issues from automated scripts.*
+### 🏆 Research Hierarchy (Strict Protocol):
+1. **Tier 1 (Always 1st Priority - Mandatory)**: **Official Brand Website**
+   - For example: `samsung.com` for Samsung, `apple.com` for Apple, `oneplus.com` for OnePlus, `mi.com` for Xiaomi, etc.
+   - Always research and pull primary specifications directly from the manufacturer's official product page first.
+2. **Tier 2 (Secondary / Supporting Verified Details)**: **Top Trusted Authorities**
+   - Use `gsmarena.com` and official chipset whitepapers (`qualcomm.com`, `mediatek.com`) for lab-tested benchmarks, exact sensor part numbers, and multi-band data when not listed on the brand site.
+3. **Zero AI Guessing & Zero Fake/Filler Data**:
+   - Never guess specs or fill blank fields with unverified rumors.
+4. **Approval Required**:
+   - Only update or release data to the database when 100% verified and approved.

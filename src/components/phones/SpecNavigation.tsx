@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { id: "display", label: "Display" },
   { id: "performance", label: "Hardware" },
   { id: "camera", label: "Camera" },
-  { id: "battery", label: "Battery & Storage" },
+  { id: "battery", label: "Battery & Charging" },
   { id: "connectivity", label: "Connectivity" },
   { id: "features", label: "Features" },
   { id: "faq", label: "FAQ" }

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import MobileNav from "./MobileNav";
+import ContactModal from "./ContactModal";
 
 export default function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -15,6 +16,7 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
       <main className="flex-grow">{children}</main>
       {!isAuthOrAdmin && <Footer />}
       {!isAuthOrAdmin && <MobileNav />}
+      <ContactModal />
     </>
   );
 }

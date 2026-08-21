@@ -621,7 +621,7 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                   <div className="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
                     <Battery size={16} />
                   </div>
-                  <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider">Battery & Storage System</h2>
+                  <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider">Battery & Charging System</h2>
                 </div>
                 <div className="divide-y divide-slate-100">
                   {[
@@ -652,13 +652,12 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
                 <div className="divide-y divide-slate-100">
                   {[
                     { label: "5G Band Connectivity", value: rawPhone.has_5g ? "Supported (Full 5G compatibility)" : "4G LTE Bands only" },
-                    { label: "Wireless LAN (WiFi)", value: rawPhone.wifi_version },
-                    { label: "Bluetooth Protocol", value: rawPhone.bluetooth_version },
+                    { label: "Wireless LAN (WiFi)", value: rawPhone.wifi_version || rawPhone.wlan },
+                    { label: "Bluetooth Protocol", value: rawPhone.bluetooth_version || rawPhone.bluetooth },
                     { label: "NFC Capability", value: rawPhone.has_nfc ? "Yes (Supports contact payments)" : "No" },
-                    { label: "Satelite Navigation (GPS)", value: rawPhone.gps_specs },
+                    { label: "Satelite Navigation (GPS)", value: rawPhone.gps_specs || rawPhone.gps },
                     { label: "Infrared Blaster", value: rawPhone.has_ir_blaster ? "Yes (Built-in IR transceiver)" : "No" },
-                    { label: "3.5mm Headphone Jack", value: rawPhone.has_audio_jack ? "Yes (Supports legacy analog jacks)" : "No (Relies on USB-C or Bluetooth)" },
-                    { label: "USB Protocol Version", value: rawPhone.usb_version }
+                    { label: "3.5mm Headphone Jack", value: rawPhone.has_audio_jack ? "Yes (Supports legacy analog jacks)" : "No (Relies on USB-C or Bluetooth)" }
                   ].map((spec, i) => (
                     <div key={i} className="flex flex-col sm:flex-row p-5 text-sm">
                       <div className="w-full sm:w-1/3 font-bold text-slate-800 uppercase tracking-wider text-[11px] self-center">{spec.label}</div>

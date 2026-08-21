@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Smartphone, Building2, FileText, Image as ImageIcon, Settings, FolderTree, Sparkles, LineChart, Share2 } from "lucide-react";
+import { LayoutDashboard, Smartphone, Building2, FileText, Image as ImageIcon, Settings, FolderTree, Sparkles, LineChart, Share2, Mail, Users, MessageSquare } from "lucide-react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -14,6 +14,8 @@ export default function AdminSidebar() {
     { name: "Brands", href: "/admin/brands", icon: Building2 },
     { name: "Categories", href: "/admin/categories", icon: FolderTree },
     { name: "Blogs", href: "/admin/blogs", icon: FileText },
+    { name: "Subscribers", href: "/admin/subscribers", icon: Users },
+    { name: "Messages", href: "/admin/messages", icon: MessageSquare },
     { name: "Media", href: "/admin/media", icon: ImageIcon },
     { name: "SEO Hub", href: "/admin/seo", icon: LineChart },
     { name: "— Keywords", href: "/admin/seo/keywords", icon: FileText, isSubItem: true },

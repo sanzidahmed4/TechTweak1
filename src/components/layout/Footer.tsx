@@ -1,6 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, MessageCircle, Share2 } from "lucide-react";
+import { openContactModal } from "./ContactModal";
+import NewsletterForm from "./NewsletterForm";
 
 const FacebookIcon = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
   <svg
@@ -39,16 +43,52 @@ export default function Footer() {
               Your ultimate destination for premium smartphone reviews, detailed specifications, and the latest technology news. We help you make the right choice.
             </p>
             <div className="flex gap-4 pt-2">
-              {[
-                { Icon: FacebookIcon, href: "https://www.facebook.com/profile.php?id=61590823097198", target: "_blank", rel: "noopener noreferrer" },
-                { Icon: Mail, href: "mailto:contact@techtweak.tech" },
-                { Icon: MessageCircle, href: "#" },
-                { Icon: Share2, href: "#" }
-              ].map(({ Icon, href, target, rel }, i) => (
-                <a key={i} href={href} target={target} rel={rel} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1877F2] hover:border-[#1877F2]/30 hover:shadow-md transition-all">
-                  <Icon size={18} />
-                </a>
-              ))}
+              <a 
+                href="https://www.facebook.com/profile.php?id=61590823097198" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1877F2] hover:border-[#1877F2]/30 hover:shadow-md transition-all"
+                title="Facebook Page"
+              >
+                <FacebookIcon size={18} />
+              </a>
+
+              <button 
+                type="button"
+                onClick={() => openContactModal()}
+                className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary/30 hover:shadow-md transition-all cursor-pointer"
+                title="Send us an Email"
+              >
+                <Mail size={18} />
+              </button>
+
+              <button 
+                type="button"
+                onClick={() => openContactModal("Quick Inquiry via TechTweak")}
+                className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:border-emerald-600/30 hover:shadow-md transition-all cursor-pointer"
+                title="Chat & Inquiry"
+              >
+                <MessageCircle size={18} />
+              </button>
+
+              <button 
+                type="button"
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: "TechTweak - Premium Smartphone Reviews",
+                      url: window.location.href,
+                    }).catch(() => {});
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert("Site link copied to clipboard!");
+                  }
+                }}
+                className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-600/30 hover:shadow-md transition-all cursor-pointer"
+                title="Share Website"
+              >
+                <Share2 size={18} />
+              </button>
             </div>
           </div>
 
@@ -92,16 +132,7 @@ export default function Footer() {
             <p className="text-slate-500 text-sm mb-4">
               Get the latest tech news and smartphone reviews delivered to your inbox.
             </p>
-            <form className="flex flex-col gap-3">
-              <input 
-                type="email" 
-                placeholder="Your email address" 
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-              />
-              <button type="button" className="w-full bg-primary text-white font-medium py-3 rounded-xl shadow-md shadow-primary/20 hover:shadow-lg hover:bg-primary/90 transition-all text-sm">
-                Subscribe Now
-              </button>
-            </form>
+            <NewsletterForm />
           </div>
         </div>
 
@@ -112,7 +143,7 @@ export default function Footer() {
           <div className="flex gap-6">
             <Link href="/privacy-policy" className="text-slate-400 hover:text-slate-600 text-sm">Privacy Policy</Link>
             <Link href="/terms-and-conditions" className="text-slate-400 hover:text-slate-600 text-sm">Terms of Service</Link>
-            <Link href="/contact" className="text-slate-400 hover:text-slate-600 text-sm">Contact Us</Link>
+            <button type="button" onClick={() => openContactModal()} className="text-slate-400 hover:text-slate-600 text-sm cursor-pointer">Contact Us</button>
           </div>
         </div>
       </div>

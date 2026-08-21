@@ -115,7 +115,6 @@ export interface IPhone extends Document {
   gps_specs?: string;
   has_ir_blaster?: boolean;
   has_audio_jack?: boolean;
-  usb_version?: string;
 
   // Sensors
   sensor_fingerprint?: string;
@@ -305,7 +304,6 @@ const PhoneSchema: Schema = new Schema({
   gps_specs: { type: String },
   has_ir_blaster: { type: Boolean, default: false },
   has_audio_jack: { type: Boolean, default: false },
-  usb_version: { type: String },
 
   // Sensors
   sensor_fingerprint: { type: String },

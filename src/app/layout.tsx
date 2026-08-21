@@ -47,6 +47,19 @@ export const metadata: Metadata = {
     title: "TechTweak",
     statusBarStyle: "default",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/sitelogo.svg", type: "image/svg+xml" },
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: ["/favicon.ico"],
+    apple: [
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
+  },
+  manifest: "/manifest.json",
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
   },
