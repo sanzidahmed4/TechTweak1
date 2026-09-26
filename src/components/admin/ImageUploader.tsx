@@ -39,17 +39,30 @@ export default function ImageUploader({
     }
   };
 
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  const isCloudinaryConfigured = Boolean(cloudName && (apiKey || uploadPreset));
+
   return (
     <div className="space-y-4">
       {/* Hidden input to pass to Server Actions */}
       <input type="hidden" name={name} value={images.join("|")} />
 
       {/* Cloudinary Upload Area */}
-      <CldUploadWidget 
-        signatureEndpoint="/api/cloudinary/sign"
-        onSuccess={handleCloudinarySuccess}
-        options={{ multiple: true, folder }}
-      >
+      {isCloudinaryConfigured ? (
+        <CldUploadWidget 
+          config={{
+            cloud: {
+              cloudName: cloudName,
+              apiKey: apiKey,
+            }
+          }}
+          signatureEndpoint={apiKey ? "/api/cloudinary/sign" : undefined}
+          uploadPreset={uploadPreset}
+          onSuccess={handleCloudinarySuccess}
+          options={{ multiple: true, folder }}
+        >
         {({ open }) => {
           return (
             <div 
@@ -70,6 +83,17 @@ export default function ImageUploader({
           );
         }}
       </CldUploadWidget>
+      ) : (
+        <div className="border border-slate-200 bg-slate-50 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-slate-400 mb-3">
+            <UploadCloud size={22} />
+          </div>
+          <h4 className="font-bold text-slate-800 text-sm mb-1">Add Images via URL / CDN Path</h4>
+          <p className="text-slate-500 text-xs max-w-md">
+            Enter external image URLs below (e.g. Cloudinary, GSMArena, CDN) or add Cloudinary API keys to enable file browsing.
+          </p>
+        </div>
+      )}
 
       <div className="flex items-center gap-4">
         <div className="h-px bg-slate-200 flex-1"></div>

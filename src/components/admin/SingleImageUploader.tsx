@@ -28,6 +28,11 @@ export default function SingleImageUploader({
     }
   };
 
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  const isCloudinaryConfigured = Boolean(cloudName && (apiKey || uploadPreset));
+
   return (
     <div className="space-y-3">
       <input type="hidden" name={name} value={image} />
@@ -51,9 +56,16 @@ export default function SingleImageUploader({
             </button>
           </div>
         </div>
-      ) : (
+      ) : isCloudinaryConfigured ? (
         <CldUploadWidget 
-          signatureEndpoint="/api/cloudinary/sign"
+          config={{
+            cloud: {
+              cloudName: cloudName,
+              apiKey: apiKey,
+            }
+          }}
+          signatureEndpoint={apiKey ? "/api/cloudinary/sign" : undefined}
+          uploadPreset={uploadPreset}
           onSuccess={handleCloudinarySuccess}
           options={{ multiple: false, maxFiles: 1, folder }}
         >
@@ -71,6 +83,16 @@ export default function SingleImageUploader({
             );
           }}
         </CldUploadWidget>
+      ) : (
+        <div className="space-y-2">
+          <input 
+            type="text"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            placeholder="Enter image URL (e.g. https://...)"
+            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
+          />
+        </div>
       )}
     </div>
   );
