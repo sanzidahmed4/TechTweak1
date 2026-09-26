@@ -44,7 +44,7 @@ export default async function PhonesPage() {
       .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
       .lean();
 
-    totalCount = await Phone.countDocuments({ is_published: true, phone_status: 'released' });
+    totalCount = rawPhones.length;
 
     phones = rawPhones.map((p: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => ({
       id: p._id.toString(),

@@ -5,10 +5,13 @@ import Phone from '@/lib/models/Phone';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q');
+    const rawQuery = searchParams.get('q') || '';
+    const query = rawQuery.trim();
 
-    if (!query || query.length < 1) {
-      return NextResponse.json({ phones: [] });
+    if (query.length < 2) {
+      return NextResponse.json({ phones: [] }, {
+        headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
+      });
     }
 
     await connectToDatabase();
@@ -37,7 +40,11 @@ export async function GET(request: Request) {
       .lean();
     }
 
-    return NextResponse.json({ phones });
+    return NextResponse.json({ phones }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      }
+    });
   } catch (error) {
     console.error('Search API error:', error);
     return NextResponse.json({ error: 'Failed to search' }, { status: 500 });

@@ -9,6 +9,18 @@ export default function AnalyticsTracker() {
 
   useEffect(() => {
     if (!pathname) return;
+    if (typeof window !== "undefined" && navigator.webdriver) return;
+
+    const fullPath = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
+
+    // Deduplicate within the current browser tab session
+    try {
+      const cacheKey = `tt_pv_${fullPath}`;
+      if (sessionStorage.getItem(cacheKey)) return;
+      sessionStorage.setItem(cacheKey, "1");
+    } catch {
+      // Ignore storage errors in private browsing
+    }
 
     // Determine type and entity ID if possible from the URL
     // e.g. /phones/samsung/galaxy-s24-ultra
@@ -25,13 +37,11 @@ export default function AnalyticsTracker() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        path: pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : ""),
+        path: fullPath,
         type,
       }),
-      // Use keepalive so the request completes even if the user navigates away
       keepalive: true,
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-    }).catch(e => {
+    }).catch(() => {
       // Ignore errors silently for analytics
     });
 

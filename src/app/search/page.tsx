@@ -6,9 +6,31 @@ import Image from "next/image";
 import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 import { Search as SearchIcon, Smartphone } from "lucide-react";
 
+import { unstable_cache } from 'next/cache';
+
 export const metadata = {
   title: "Search Smartphones | TechTweak",
 };
+
+const getSearchFilterOptions = unstable_cache(
+  async () => {
+    await connectToDatabase();
+    const allBrands = await Brand.find({}).select('name slug').sort({ name: 1 }).lean();
+    const dates = await Phone.find({ is_published: true, phone_status: 'released', release_date: { $exists: true, $ne: "" } })
+      .select("release_date")
+      .limit(500)
+      .lean();
+    const uniqueYears = Array.from(new Set(dates.map((d: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => {
+      const dateStr = d.release_date;
+      if (!dateStr) return null;
+      const yr = new Date(dateStr).getFullYear();
+      return isNaN(yr) ? null : yr;
+    }).filter(Boolean))).sort((a: any /* eslint-disable-line @typescript-eslint/no-explicit-any */, b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => b - a);
+    return { allBrands: JSON.parse(JSON.stringify(allBrands)), uniqueYears };
+  },
+  ['search-filter-options'],
+  { revalidate: 43200, tags: ['search-filter-options', 'brands', 'phones'] }
+);
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string, brand?: string, sort?: string, year?: string, chipset?: string }> }) {
   const { q = "", brand = "", sort = "newest", year = "", chipset = "" } = await searchParams;
@@ -29,24 +51,15 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   // Filter by brand slug (requires finding brand ID first if we want to query by ID)
   if (brand) {
-    const brandDoc = await Brand.findOne({ slug: brand.toLowerCase() });
+    const brandDoc = await Brand.findOne({ slug: brand.toLowerCase() }).select('_id').lean() as any;
     if (brandDoc) {
       mongoQuery.brand_id = brandDoc._id;
     } else {
-      // If brand not found, ensure no phones match
       mongoQuery.brand_id = null;
     }
   }
 
-  const allBrands = await Brand.find({}).sort({ name: 1 }).lean();
-  
-  const dates = await Phone.find({ is_published: true, phone_status: 'released', release_date: { $exists: true, $ne: "" } }).select("release_date").lean();
-  const uniqueYears = Array.from(new Set(dates.map((d: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => {
-    const dateStr = d.release_date;
-    if (!dateStr) return null;
-    const yr = new Date(dateStr).getFullYear();
-    return isNaN(yr) ? null : yr;
-  }).filter(Boolean))).sort((a: any /* eslint-disable-line @typescript-eslint/no-explicit-any */, b: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => b - a);
+  const { allBrands, uniqueYears } = await getSearchFilterOptions();
 
   let sortQuery: any /* eslint-disable-line @typescript-eslint/no-explicit-any */ = {};
   if (sort === "newest") sortQuery = { release_date: -1, price_usd: -1, name: 1 };
@@ -64,6 +77,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         .populate('brand_id', 'name slug')
         .sort({ score: { $meta: "textScore" } })
         .select('name slug images price_usd brand_id phone_status')
+        .limit(60)
         .lean();
         
       // 2. If no results, fallback to regex prefix search
@@ -73,6 +87,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           .populate('brand_id', 'name slug')
           .sort(sortQuery)
           .select('name slug images price_usd brand_id phone_status')
+          .limit(60)
           .lean();
       }
     } else {
@@ -81,6 +96,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         .populate('brand_id', 'name slug')
         .sort(sortQuery)
         .select('name slug images price_usd brand_id phone_status')
+        .limit(60)
         .lean();
     }
       

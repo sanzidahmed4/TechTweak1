@@ -4,15 +4,27 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Check, X, Smartphone, ArrowLeft } from "lucide-react";
 
+import { cache } from "react";
+
+export const revalidate = 86400; // 24 hours ISR
+
+const getComparePhone = cache(async (slug: string) => {
+  await connectToDatabase();
+  return Phone.findOne({ slug })
+    .populate("brand_id", "name slug")
+    .lean();
+});
+
 export async function generateMetadata({ params }: { params: Promise<{ slugs: string }> }) {
   const { slugs } = await params;
   if (!slugs.includes('-vs-')) return { title: "Comparison Not Found" };
 
   const [slug1, slug2] = slugs.split('-vs-');
 
-  await connectToDatabase();
-  const phone1 = await Phone.findOne({ slug: slug1 }).select("name images price_usd brand_id").populate("brand_id", "name").lean() as any;
-  const phone2 = await Phone.findOne({ slug: slug2 }).select("name images price_usd brand_id").populate("brand_id", "name").lean() as any;
+  const [phone1, phone2] = await Promise.all([
+    getComparePhone(slug1) as Promise<any>,
+    getComparePhone(slug2) as Promise<any>,
+  ]);
 
   if (!phone1 || !phone2) return { title: "Comparison Not Found" };
 
@@ -52,9 +64,10 @@ export default async function ComparisonPage({ params }: { params: Promise<{ slu
 
   const [slug1, slug2] = slugs.split('-vs-');
 
-  await connectToDatabase();
-  const phone1 = await Phone.findOne({ slug: slug1 }).populate("brand_id", "name slug").lean() as any;
-  const phone2 = await Phone.findOne({ slug: slug2 }).populate("brand_id", "name slug").lean() as any;
+  const [phone1, phone2] = await Promise.all([
+    getComparePhone(slug1) as Promise<any>,
+    getComparePhone(slug2) as Promise<any>,
+  ]);
 
   if (!phone1 || !phone2) notFound();
 

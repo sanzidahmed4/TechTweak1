@@ -2,7 +2,7 @@ import connectToDatabase from '@/lib/mongodb/mongoose';
 import Post from '@/lib/models/Post';
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // 1 hour ISR cache
 
 export async function GET() {
   await connectToDatabase();

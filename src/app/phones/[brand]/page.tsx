@@ -9,15 +9,19 @@ import Link from "next/link";
 import { ArrowRight, Smartphone, Layers } from "lucide-react";
 import { getSeriesName } from "@/lib/utils/series";
 
+import { cache } from "react";
+
 export const revalidate = 21600; // Enable ISR (6 hour caching)
+
+const getBrandBySlug = cache(async (brandSlug: string) => {
+  await connectToDatabase();
+  return Brand.findOne({ slug: brandSlug }).lean();
+});
 
 export async function generateMetadata({ params, searchParams }: { params: Promise<{ brand: string }>; searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const { brand } = await params;
-  await connectToDatabase();
   
-  const data = await Brand.findOne({ slug: brand })
-    .select("name description logo_url meta_title meta_description canonical_url og_image primary_keyword")
-    .lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
+  const data = await getBrandBySlug(brand) as any;
   
   if (!data) return { title: "Brand Not Found" };
   
@@ -57,8 +61,6 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const { brand } = await params;
-
-  await connectToDatabase();
   
   // Fetch Brand Info
   let brandData: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */ = null;
@@ -66,7 +68,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
   let totalPhones = 0;
 
   try {
-    const bData = await Brand.findOne({ slug: brand }).lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
+    const bData = await getBrandBySlug(brand) as any;
     if (bData) {
       brandData = bData;
       // Fetch ALL Phones for this brand, no pagination

@@ -378,6 +378,9 @@ const PhoneSchema: Schema = new Schema({
 
 // --- Enterprise MongoDB Indexes for Performance & Search ---
 PhoneSchema.index({ is_published: 1, phone_status: 1, release_date_parsed: -1 });
+PhoneSchema.index({ brand_id: 1, is_published: 1, release_date_parsed: -1 }); // For brand page listings & similar phones
+PhoneSchema.index({ is_published: 1, name: 1 }); // For regex prefix search fallback
+PhoneSchema.index({ is_published: 1, is_featured: 1 }); // For featured & compare suggestions
 PhoneSchema.index({ brand_id: 1, phone_status: 1 });
 PhoneSchema.index({ phone_status: 1, launch_year: 1, launch_quarter: 1 }); // For upcoming filtering
 PhoneSchema.index({ brand_id: 1, name: 1 }); // For autocomplete & suggestions

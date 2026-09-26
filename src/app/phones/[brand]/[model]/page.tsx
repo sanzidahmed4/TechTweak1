@@ -15,13 +15,23 @@ import Link from "next/link";
 import Image from "next/image";
 import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 
+import { cache } from "react";
+
 export const revalidate = 86400; // 24 hours ISR
+
+const getPhoneBySlug = cache(async (modelSlug: string) => {
+  await connectToDatabase();
+  return Phone.findOne({ slug: modelSlug })
+    .populate("brand_id", "name slug")
+    .populate("related_similar_ids", "name slug price_usd images brand_id")
+    .populate("related_compare_ids", "name slug price_usd images brand_id")
+    .populate("related_better_ids", "name slug price_usd images brand_id")
+    .lean();
+});
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string, model: string }> }) {
   const { brand, model } = await params;
-  await connectToDatabase();
-
-  const data = await Phone.findOne({ slug: model }).select("name meta_title meta_description meta_keywords images og_image updated_at").lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
+  const data = await getPhoneBySlug(model) as any;
 
   if (!data) return { title: "Phone Not Found" };
 
@@ -68,15 +78,9 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
 
 export default async function PhoneDetailsPage({ params }: { params: Promise<{ brand: string, model: string }> }) {
   const { brand, model } = await params;
-  await connectToDatabase();
-  let rawPhone = null;
+  let rawPhone: any = null;
   try {
-    rawPhone = await Phone.findOne({ slug: model })
-      .populate("brand_id", "name slug")
-      .populate("related_similar_ids", "name slug price_usd images brand_id")
-      .populate("related_compare_ids", "name slug price_usd images brand_id")
-      .populate("related_better_ids", "name slug price_usd images brand_id")
-      .lean();
+    rawPhone = await getPhoneBySlug(model);
   } catch (err) {
     console.error(err);
   }
@@ -86,19 +90,16 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
   }
 
   // Brand and model resolution
-  // Try to get brand name from populated brand_id first,
-  // then fall back to fetching from DB by slug, then title-case the URL param
   let brandName: string = rawPhone.brand_id?.name || "";
   let brandSlug: string = rawPhone.brand_id?.slug || brand;
 
   if (!brandName) {
     try {
-      const brandDoc = await Brand.findOne({ slug: brand }).select("name slug").lean() as any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
+      const brandDoc = await Brand.findOne({ slug: brand }).select("name slug").lean() as any;
       if (brandDoc) {
         brandName = brandDoc.name;
         brandSlug = brandDoc.slug;
       }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_) { /* ignore */ }
   }
 
@@ -110,53 +111,43 @@ export default async function PhoneDetailsPage({ params }: { params: Promise<{ b
       .join(" ");
   }
 
-  // Load suggested items from database
-  let dbSimilarPhones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
-  let dbSamePricePhones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
-  let dbComparePhones: any   /* eslint-disable-line @typescript-eslint/no-explicit-any */[] = [];
+  // Load suggested items from database only if not already assigned
+  let dbSimilarPhones: any[] = [];
+  let dbComparePhones: any[] = [];
 
-  try {
-    // 1. Similar Phones query
-    dbSimilarPhones = await Phone.find({
-      brand_id: rawPhone.brand_id?._id || rawPhone.brand_id,
-      _id: { $ne: rawPhone._id },
-      is_published: true
-    })
-      .select("name slug price_usd images brand_id")
-      .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
-      .populate("brand_id", "name slug")
-      .limit(4)
-      .lean();
+  const needsSimilar = !rawPhone.related_similar_ids || rawPhone.related_similar_ids.length === 0;
+  const needsCompare = (!rawPhone.related_better_ids || rawPhone.related_better_ids.length === 0) ||
+                        (!rawPhone.related_compare_ids || rawPhone.related_compare_ids.length === 0);
 
-    // 2. Price Match query
-    if (rawPhone.price_usd) {
-      const minPrice = rawPhone.price_usd * 0.8;
-      const maxPrice = rawPhone.price_usd * 1.2;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-      dbSamePricePhones = await Phone.find({
-        price_usd: { $gte: minPrice, $lte: maxPrice },
-        _id: { $ne: rawPhone._id },
-        is_published: true
-      })
-        .select("name slug price_usd images brand_id")
-        .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
-        .populate("brand_id", "name slug")
-        .limit(4)
-        .lean();
+  if (needsSimilar || needsCompare) {
+    try {
+      if (needsSimilar) {
+        dbSimilarPhones = await Phone.find({
+          brand_id: rawPhone.brand_id?._id || rawPhone.brand_id,
+          _id: { $ne: rawPhone._id },
+          is_published: true
+        })
+          .select("name slug price_usd images brand_id")
+          .sort({ release_date_parsed: -1, price_usd: 1, name: 1 })
+          .populate("brand_id", "name slug")
+          .limit(4)
+          .lean();
+      }
+
+      if (needsCompare) {
+        dbComparePhones = await Phone.find({
+          is_featured: true,
+          _id: { $ne: rawPhone._id },
+          is_published: true
+        })
+          .select("name slug price_usd images brand_id")
+          .populate("brand_id", "name slug")
+          .limit(6)
+          .lean();
+      }
+    } catch (err) {
+      console.error("Error querying recommendations:", err);
     }
-
-    // 3. Alternatives/Compare suggestions query
-    dbComparePhones = await Phone.find({
-      is_featured: true,
-      _id: { $ne: rawPhone._id },
-      is_published: true
-    })
-      .select("name slug price_usd images brand_id")
-      .populate("brand_id", "name slug")
-      .limit(6)
-      .lean();
-  } catch (err) {
-    console.error("Error querying recommendations:", err);
   }
 
   // Consolidate suggestions

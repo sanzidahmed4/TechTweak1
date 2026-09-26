@@ -10,6 +10,8 @@ export const metadata = {
   }
 };
 
+export const revalidate = 21600; // 6 hours ISR
+
 export default async function UpcomingPhonesPage() {
   await connectToDatabase();
   

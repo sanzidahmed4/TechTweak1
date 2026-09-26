@@ -16,6 +16,12 @@ export async function POST(req: NextRequest) {
     // In Vercel, IP is in x-real-ip or x-forwarded-for
     const ip = req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for") || "unknown";
     const userAgent = req.headers.get("user-agent") || "unknown";
+
+    // Ignore known bots and crawlers to save CPU and database writes
+    const BOT_REGEX = /bot|spider|crawl|slurp|facebookexternalhit|whatsapp|google-read-aloud|semrush|ahrefs|bingbot|yandex/i;
+    if (BOT_REGEX.test(userAgent)) {
+      return NextResponse.json({ success: true, ignored: true });
+    }
     
     // Create a daily hash (changes every day, respects privacy)
     const today = new Date().toISOString().split('T')[0];

@@ -1,11 +1,5 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
-
 let cached = (global as any /* eslint-disable-line @typescript-eslint/no-explicit-any */ as { mongoose: any }).mongoose;
 
 if (!cached) {
@@ -13,6 +7,12 @@ if (!cached) {
 }
 
 async function connectToDatabase() {
+  const MONGODB_URI = process.env.MONGODB_URI;
+  if (!MONGODB_URI) {
+    console.warn("MONGODB_URI is not defined.");
+    return null;
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -21,9 +21,11 @@ async function connectToDatabase() {
     const opts = {
       bufferCommands: false,
       dbName: "techtweak",
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 10000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       return mongoose;
     });
   }

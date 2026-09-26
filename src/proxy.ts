@@ -2,15 +2,19 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { verifyToken } from '@/lib/auth/jwt';
 
 export async function proxy(request: NextRequest) {
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
+  const isLoginRoute = request.nextUrl.pathname === '/login';
+
+  if (!isAdminRoute && !isLoginRoute) {
+    return NextResponse.next();
+  }
+
   // 1. Get the token from cookies
   const token = request.cookies.get('techtweak_session')?.value;
   
   // 2. Verify token if it exists
   const session = token ? await verifyToken(token) : null;
   const user = session ? session : null;
-
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
-  const isLoginRoute = request.nextUrl.pathname === '/login';
 
   // 3. If trying to access admin and not logged in, redirect to login
   if (isAdminRoute && !user) {
@@ -31,15 +35,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (images, fonts, etc)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/admin/:path*', '/login'],
 };

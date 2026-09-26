@@ -7,10 +7,18 @@ import { notFound } from "next/navigation";
 import { ChevronRight, Calendar, Smartphone } from "lucide-react";
 import { FALLBACK_IMAGE, getCloudinaryBlurUrl, defaultBlurDataURL } from '@/lib/utils/image';
 
+import { cache } from "react";
+
+export const revalidate = 21600; // 6 hours ISR
+
+const getBrandDoc = cache(async (slug: string) => {
+  await connectToDatabase();
+  return Brand.findOne({ slug }).select('_id name').lean() as any;
+});
+
 export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }) {
   const { brand } = await params;
-  await connectToDatabase();
-  const brandDoc = await Brand.findOne({ slug: brand }).select('name').lean() as any;
+  const brandDoc = await getBrandDoc(brand);
   const brandName = brandDoc ? brandDoc.name : brand.charAt(0).toUpperCase() + brand.slice(1);
 
   return {
@@ -24,9 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
 
 export default async function BrandUpcomingPhonesPage({ params }: { params: Promise<{ brand: string }> }) {
   const { brand } = await params;
-  await connectToDatabase();
-  
-  const brandDoc = await Brand.findOne({ slug: brand }).select('_id name').lean() as any;
+  const brandDoc = await getBrandDoc(brand);
   if (!brandDoc) {
     notFound();
   }
