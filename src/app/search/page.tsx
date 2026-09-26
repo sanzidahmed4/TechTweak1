@@ -36,7 +36,11 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const { q = "", brand = "", sort = "newest", year = "", chipset = "" } = await searchParams;
   await connectToDatabase();
   
-  const mongoQuery: any /* eslint-disable-line @typescript-eslint/no-explicit-any */ = { is_published: true, phone_status: 'released' };
+  // When searching with a query, search across all published phones (released & upcoming)
+  const mongoQuery: any /* eslint-disable-line @typescript-eslint/no-explicit-any */ = { is_published: true };
+  if (!q) {
+    mongoQuery.phone_status = 'released';
+  }
   
   if (year) {
     mongoQuery.release_date = { 
@@ -80,9 +84,11 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         .limit(60)
         .lean();
         
-      // 2. If no results, fallback to regex prefix search
+      // 2. Fallback: match terms anywhere in name
       if (rawPhones.length === 0) {
-        const regexQuery = { ...mongoQuery, name: { $regex: new RegExp('^' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } };
+        const words = q.split(/\s+/).filter(Boolean).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        const regexPattern = words.map(w => `(?=.*${w})`).join('');
+        const regexQuery = { ...mongoQuery, name: { $regex: new RegExp(regexPattern, 'i') } };
         rawPhones = await Phone.find(regexQuery)
           .populate('brand_id', 'name slug')
           .sort(sortQuery)
