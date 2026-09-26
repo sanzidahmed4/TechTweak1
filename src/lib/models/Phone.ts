@@ -216,7 +216,7 @@ const PhoneSchema: Schema = new Schema({
   expected_launch_date: { type: String },
   launch_quarter: { type: String },
   launch_year: { type: Number },
-  leak_confidence: { type: String, enum: ['low', 'moderate', 'high', 'officially_confirmed'] },
+  leak_confidence: { type: String, enum: ['low', 'moderate', 'high', 'officially_confirmed', '', null], default: null },
   colors: { type: [String], default: [] },
   model_number: { type: String },
   made_in: { type: String },

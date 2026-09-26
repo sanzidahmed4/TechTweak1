@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { 
   Smartphone, Image as ImageIcon, Zap, Info, Tv, Cpu, Camera, 
-  Battery, Wifi, Activity, Terminal, Search, Save 
+  Battery, Wifi, Activity, Terminal, Search, Save, Loader2, AlertCircle 
 } from "lucide-react";
 import ImageUploader from "./ImageUploader";
 import Link from "next/link";
@@ -25,6 +25,22 @@ interface PhoneFormProps {
 export default function PhoneForm({ initialData, brands, action, title, description, returnUrl }: PhoneFormProps) {
   const [phoneName, setPhoneName] = useState(initialData?.name || "");
   const [phoneSlug, setPhoneSlug] = useState(initialData?.slug || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleSubmit = async (formData: FormData) => {
+    setIsSubmitting(true);
+    setErrorMsg(null);
+    try {
+      await action(formData);
+    } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
+      if (err?.message === "NEXT_REDIRECT" || err?.digest?.startsWith("NEXT_REDIRECT")) {
+        throw err;
+      }
+      setIsSubmitting(false);
+      setErrorMsg(err?.message || "Failed to save phone specifications.");
+    }
+  };
 
   const slugifiedName = (phoneSlug || phoneName || "temp-phone")
     .toLowerCase()
@@ -558,7 +574,25 @@ export default function PhoneForm({ initialData, brands, action, title, descript
         </div>
       </div>
 
-      <form action={action} className="space-y-6">
+      {errorMsg && (
+        <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 flex items-center justify-between text-sm shadow-sm animate-in fade-in">
+          <div className="flex items-center gap-3">
+            <AlertCircle size={20} className="text-red-500 shrink-0" />
+            <div>
+              <span className="font-bold">Save Error:</span> {errorMsg}
+            </div>
+          </div>
+          <button 
+            type="button" 
+            onClick={() => setErrorMsg(null)}
+            className="text-red-500 hover:text-red-800 font-bold px-2 py-1"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      <form action={handleSubmit} className="space-y-6">
         {/* Accordions */}
         <div className="space-y-4">
           {sections.map((section, idx) => {
@@ -587,10 +621,13 @@ export default function PhoneForm({ initialData, brands, action, title, descript
         <div className="flex justify-end pt-6">
           <button 
             type="submit"
-            className="bg-primary text-white font-semibold px-10 py-4 rounded-2xl shadow-xl shadow-primary/20 hover:shadow-2xl hover:bg-primary/95 hover:-translate-y-0.5 transition-all flex items-center gap-2"
+            disabled={isSubmitting}
+            className={`bg-primary text-white font-semibold px-10 py-4 rounded-2xl shadow-xl shadow-primary/20 hover:shadow-2xl hover:bg-primary/95 hover:-translate-y-0.5 transition-all flex items-center gap-2 ${
+              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            <Save size={20} />
-            Save Smartphone Specs
+            {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
+            {isSubmitting ? "Saving Smartphone Specs..." : "Save Smartphone Specs"}
           </button>
         </div>
       </form>

@@ -108,7 +108,9 @@ export async function addPhone(formData: FormData) {
     expected_launch_date: formData.get("expected_launch_date") as string,
     launch_quarter: formData.get("launch_quarter") as string,
     launch_year: parseSafeNumber(formData.get("launch_year")),
-    leak_confidence: formData.get("leak_confidence") as string,
+    leak_confidence: formData.get("leak_confidence") && ['low', 'moderate', 'high', 'officially_confirmed'].includes(formData.get("leak_confidence") as string)
+      ? (formData.get("leak_confidence") as string)
+      : undefined,
 
     is_official: formData.get("is_official") === "on",
     release_date: formData.get("release_date") || null,
@@ -287,18 +289,28 @@ export async function addPhone(formData: FormData) {
   phoneData.faqs = autoFaqs;
 
   try {
-    await Phone.create(phoneData);
-    
-    // Log activity
-    await ActivityLog.create({
-      title: `Added new phone: ${name}`,
-      type: 'Phone',
-      action: 'Create',
-      icon: 'Smartphone',
-      color: 'text-blue-500 bg-blue-50',
-    });
+    const existing = await Phone.findOne({ slug });
+    if (existing) {
+      await Phone.updateOne({ _id: existing._id }, { $set: phoneData });
+      await ActivityLog.create({
+        title: `Updated existing phone: ${name}`,
+        type: 'Phone',
+        action: 'Update',
+        icon: 'Smartphone',
+        color: 'text-blue-500 bg-blue-50',
+      });
+    } else {
+      await Phone.create(phoneData);
+      await ActivityLog.create({
+        title: `Added new phone: ${name}`,
+        type: 'Phone',
+        action: 'Create',
+        icon: 'Smartphone',
+        color: 'text-blue-500 bg-blue-50',
+      });
+    }
   } catch (error: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
-    console.error("Error inserting phone:", error);
+    console.error("Error saving phone:", error);
     throw new Error(error.message);
   }
 
@@ -378,7 +390,9 @@ export async function editPhone(id: string, formData: FormData) {
     expected_launch_date: formData.get("expected_launch_date") as string,
     launch_quarter: formData.get("launch_quarter") as string,
     launch_year: parseSafeNumber(formData.get("launch_year")),
-    leak_confidence: formData.get("leak_confidence") as string,
+    leak_confidence: formData.get("leak_confidence") && ['low', 'moderate', 'high', 'officially_confirmed'].includes(formData.get("leak_confidence") as string)
+      ? (formData.get("leak_confidence") as string)
+      : undefined,
 
     is_official: formData.get("is_official") === "on",
     release_date: formData.get("release_date") || null,
